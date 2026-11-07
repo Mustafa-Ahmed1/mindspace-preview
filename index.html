@@ -915,7 +915,7 @@ button.ms-li:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-pa
 .ms-w .i,.ms-wgal .i,.ms-pop .ms-mi .i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
 /* ---- 1. Grid: 160px-min columns, 132px rows, 12px gap. Phone: 2 columns of square cells. ---- */
 .ms-wgrid{--wrow:132px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));grid-auto-rows:var(--wrow);grid-auto-flow:row dense;gap:var(--ms-s-6)}
-.ms-wgrid[data-layout=phone]{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row}
+.ms-wgrid[data-layout=phone]{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:row}
 
 /* ---- 2. Sizes: S 1x1, M 2x1, L 2x2, XL 4x2. data-fit is the size actually drawn (XL draws as L with fewer than 4 columns). ---- */
 .ms-w{grid-column:span var(--c,1);grid-row:span var(--r,1)}
@@ -923,6 +923,14 @@ button.ms-li:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-pa
 .ms-w[data-fit=m]{--c:2;--r:1}
 .ms-w[data-fit=l]{--c:2;--r:2}
 .ms-w[data-fit=xl]{--c:4;--r:2}
+/* phone: four quarter columns. S is 2 × 2 quarters (the same square as before), M 4 × 2, L 4 × 4.
+   An app or folder launcher is one quarter: four apps share a row, like icons on a phone's home screen. */
+.ms-wgrid[data-layout=phone] .ms-w[data-fit=s]{--c:2;--r:2}
+.ms-wgrid[data-layout=phone] .ms-w[data-fit=m]{--c:4;--r:2}
+.ms-wgrid[data-layout=phone] .ms-w[data-fit=l],.ms-wgrid[data-layout=phone] .ms-w[data-fit=xl]{--c:4;--r:4}
+.ms-wgrid[data-layout=phone] .ms-w[data-type=launcher][data-fit=s]:not([data-kind=actions]){--c:1;--r:1;--w-pad:0;--w-ic:40px}
+.ms-wgrid[data-layout=phone] .ms-w[data-type=launcher][data-fit=s]:not([data-kind=actions]) .ms-w-launch{gap:var(--ms-s-3);padding:var(--ms-s-2)}
+.ms-wgrid[data-layout=phone] .ms-w[data-type=launcher][data-fit=s]:not([data-kind=actions]) .ms-w-name{font-size:var(--ms-fs-sm)}
 
 /* ---- 3. The widget surface. Phone values swap in through the variables. ---- */
 .ms-w{--w-pad:var(--ms-s-8);--w-gap:var(--ms-s-6);--w-fs:var(--ms-fs-body);--w-fs-sm:var(--ms-fs-sm);--w-fs-cap:var(--ms-fs-caption);--w-title:var(--ms-fs-lg);
@@ -1211,13 +1219,14 @@ button.ms-li:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-pa
 .ms-w-tile .i{width:calc(var(--w-av) * .52);height:calc(var(--w-av) * .52)}
 .ms-w-ftype{width:var(--w-av);height:var(--w-av);flex:none;display:grid;place-items:center;border-radius:var(--ms-r-xs);background:var(--tb);color:var(--tf);font-size:9.5px;font-weight:var(--ms-fw-semibold);letter-spacing:.02em;text-transform:uppercase} /* lint-allow: a hairline mark or a tiny calendar dot label */
 /* approval actions: always visible, approve is the one in colour */
-.ms-w-acts{flex:none;display:flex;gap:var(--ms-s-2)}
-.ms-w-acts button{width:28px;height:var(--ms-h-compact);display:grid;place-items:center;border-radius:var(--ms-r-sm);box-shadow:inset 0 0 0 1px var(--ms-line);color:var(--ms-mute);transition:background-color var(--ms-t-fast),color var(--ms-t-fast),box-shadow var(--ms-t-fast),transform var(--ms-t-fast) var(--ms-e)}
+.ms-w-acts{flex:none;display:flex;gap:var(--ms-s-4)}
+.ms-w-acts button{width:28px;height:var(--ms-h-compact);display:grid;place-items:center;border-radius:var(--ms-r-sm);background:var(--ms-btn);color:var(--ms-mute);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line),var(--ms-sh-drop);transition:background-color var(--ms-t-fast),color var(--ms-t-fast),box-shadow var(--ms-t-fast),transform var(--ms-t-fast) var(--ms-e)}
 .ms-w-acts button .i{width:15px;height:15px}
-.ms-w-acts .ok{color:var(--ms-ok-text);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ms-green) 40%,transparent)}
-.ms-w-acts .ok:hover{background:var(--ms-green);color:var(--ms-white);box-shadow:none}
-.ms-w-acts .no:hover{background:color-mix(in srgb,var(--ms-red) 14%,transparent);color:var(--ms-bad-text);box-shadow:none}
-.ms-w-acts button:active{transform:scale(.92)}
+.ms-w-acts button:hover{background:var(--ms-btn-hover);color:var(--ms-text)}
+.ms-w-acts .ok,.ms-w-acts .ok:hover{background:var(--ms-accent);color:var(--ms-on);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--ms-white) 24%,transparent),inset 0 -1px 0 color-mix(in srgb,var(--ms-black) 8%,transparent),0 0 0 1px color-mix(in srgb,var(--ms-accent) 72%,var(--ms-black)),0 1px 2px color-mix(in srgb,var(--ms-black) 28%,transparent)}
+.ms-w-acts .ok:hover{background:color-mix(in srgb,var(--ms-accent) 90%,var(--ms-white))}
+.ms-w-acts .no:hover{background:color-mix(in srgb,var(--ms-red) 10%,var(--ms-btn));color:var(--ms-bad-text);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px color-mix(in srgb,var(--ms-red) 35%,transparent),var(--ms-sh-drop)}
+.ms-w-acts button:active{transform:translateY(1px) scale(.96);box-shadow:inset 0 1px 2px color-mix(in srgb,var(--ms-black) 22%,transparent),0 0 0 1px var(--ms-line)}
 /* at desktop M, two-line rows show their first line only */
 .ms-wgrid[data-layout=desk] .ms-w[data-fit=m] .ms-w-row.two{min-height:var(--w-row)}
 .ms-wgrid[data-layout=desk] .ms-w[data-fit=m] .ms-w-row .t small{display:none}
@@ -1226,6 +1235,7 @@ button.ms-li:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-pa
 .ms-wgrid[data-layout=desk] .ms-w[data-fit=m] .ms-w-row .m.col{flex-direction:row;align-items:center;gap:var(--ms-s-4)}
 .ms-wgrid[data-layout=desk] .ms-w[data-fit=m] .ms-w-row .m.col .ms-tag{display:none}
 .ms-wgrid[data-layout=phone] .ms-w-acts button{width:36px;height:var(--ms-h-field);border-radius:var(--ms-r-md)}
+.ms-wgrid[data-layout=phone] .ms-w-acts{gap:var(--ms-s-6)}
 
 /* ---- Table: header row, rows, status and amounts aligned ---- */
 .ms-w-tbl{display:grid;grid-template-columns:var(--cols);min-height:0;font-size:var(--w-fs-sm)}
@@ -2733,7 +2743,7 @@ button.x-tab:not(.on):hover{color:var(--x-text)}
 .x-qa span{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* canvas on its own: the composer floats over the bottom edge */
 .x-fade{position:absolute;inset:auto 16px 0 16px;height:160px;pointer-events:none;background:linear-gradient(180deg,rgba(21,24,30,0),rgba(21,24,30,.94) 22px)}
-.x-float{position:absolute;left:50%;bottom:15px;width:min(720px,calc(100% - 32px));margin:0;transform:translateX(-50%)}
+.x-float{position:absolute;left:50%;bottom:15px;width:min(720px,calc(100% - 32px));margin:0;transform:translateX(-50%);transition:left var(--ms-t-panel) var(--ms-e),width var(--ms-t-panel) var(--ms-e),bottom var(--ms-t-panel) var(--ms-e)}
 .ws.nochat .x-body{padding-bottom:156px}
 .ws:not(.nochat) .x-fade,.ws:not(.nochat) .x-float{display:none}
 @media (max-width:1120px){
@@ -6849,7 +6859,7 @@ body:is(.theme-light,:not(.theme-light)) .x-search{border-color:transparent;back
 body:is(.theme-light,:not(.theme-light)) .x-search:hover{box-shadow:var(--ms-sh-inset),0 0 0 1px var(--ms-line-strong)}
 body:is(.theme-light,:not(.theme-light)) .x-search:focus-within{border-color:transparent;box-shadow:var(--ms-sh-inset),0 0 0 1px color-mix(in srgb,var(--x-accent) 72%,var(--ms-line)),0 0 0 3px color-mix(in srgb,var(--x-accent) 22%,transparent)}
 /* the composer: a raised panel, radius 14, the halo when you type */
-body:is(.theme-light,:not(.theme-light)) .x-comp{border-color:transparent;border-radius:var(--ms-r-panel);background:var(--ms-panel);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line),var(--ms-sh-drop);transition:box-shadow var(--ms-t-fast)}
+body:is(.theme-light,:not(.theme-light)) .x-comp{border-color:transparent;border-radius:var(--ms-r-panel);background:var(--ms-panel);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line),var(--ms-sh-drop);transition:box-shadow var(--ms-t-fast),margin-bottom var(--ms-t-panel) var(--ms-e)}
 body:is(.theme-light,:not(.theme-light)) .x-comp:focus-within{border-color:transparent;box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px color-mix(in srgb,var(--x-accent) 60%,var(--ms-line)),0 0 0 3px color-mix(in srgb,var(--x-accent) 22%,transparent)}
 
 /* ---------- choices ---------- */
@@ -6951,7 +6961,7 @@ body:is(.theme-light,:not(.theme-light)) .x-appt:hover{border-color:transparent;
 <div class="grain" aria-hidden="true"></div>
 
 <script>
-const MS_BUILT = '26.11.05';
+const MS_BUILT = '26.11.07';
 /* The Mindspace app library in code: builders that return the HTML of each component, and the behaviours that make them move.
    Every screen is built from the same pieces: change a component here (or its CSS) and every app that uses it changes with it.
    Text you pass is escaped. Anything named `html` (and table cells, card bodies) is inserted as it is, so build it from other UI calls.
@@ -7842,7 +7852,7 @@ function grid(root, opt = {}) {
     const w = root.clientWidth; if (!w) return;
     const phone = opt.layout ? opt.layout === 'phone' : w < 560, cols = phone ? 2 : Math.max(1, Math.floor((w + GAP) / (MIN + GAP)));
     root.dataset.layout = phone ? 'phone' : 'desk';
-    if (phone) root.style.setProperty('--wrow', Math.floor((w - GAP) / 2) + 'px'); else root.style.removeProperty('--wrow');
+    if (phone) root.style.setProperty('--wrow', Math.floor((w - 3 * GAP) / 4) + 'px');   /* a phone is four quarter columns: a widget cell is 2 × 2 of them, an app tile one */ else root.style.removeProperty('--wrow');
     if (phone !== g.phone || cols !== g.cols) { const re = phone !== g.phone; g.phone = phone; g.cols = cols; g.list.forEach(x => { if (re || x.fit() !== x.el.dataset.fit) x.render(); }); }
   }
   function stateHTML(w, ctx) {
@@ -8216,7 +8226,7 @@ define('tracker', { name: 'Tracker', icon: 'clock', sizes: ['s', 'm', 'l'], size
 
 /* ---- ACTIONS ---- */
 
-/* 12. launcher: get somewhere fast. kind 'app' (S), 'folder' (S), 'actions' (S four icons, M four labelled, L eight)
+/* 12. launcher: get somewhere fast. kind 'app' (S), 'folder' (S), 'actions' (S four icons, M four labelled, L eight; when there are more, the last one is More)
    data: name, icon, tone, badge? | name, tone, icons[4] | actions: [{ icon, label, tone }] */
 define('launcher', { name: 'Shortcuts', icon: 'apps', sizes: d => (d.kind === 'actions' ? ['s', 'm', 'l'] : ['s']), size: 's',
   launcher: (d, ctx) => d.kind !== 'actions' || ctx.fit === 's',
@@ -8224,7 +8234,9 @@ define('launcher', { name: 'Shortcuts', icon: 'apps', sizes: d => (d.kind === 'a
     if (d.kind === 'app') return `<button class="ms-w-launch" data-open="${esc(d.title)}"><span class="ms-w-icon tn-${esc(d.tone)}">${I(d.glyph || d.icon)}${d.badge ? `<i class="ms-badge red">${esc(d.badge)}</i>` : ''}</span><span class="ms-w-name">${esc(d.title)}</span></button>`;
     if (d.kind === 'folder') return `<button class="ms-w-launch" data-open="${esc(d.title)}"><span class="ms-w-icon folder tn-${esc(d.tone)}">${d.icons.slice(0, 4).map(i => I(i)).join('')}</span><span class="ms-w-name">${esc(d.title)}</span></button>`;
     const s = ctx.fit === 's', n = ctx.fit === 'l' ? 8 : 4;
-    const btns = d.actions.slice(0, n).map(a => `<button data-open="${esc(a.label)}" aria-label="${esc(a.label)}"${s ? ` data-tip="${esc(a.label)}"` : ''}><span class="dot tn-${esc(a.tone)}">${I(a.icon)}</span>${s ? '' : `<span class="l">${esc(a.label)}</span>`}</button>`).join('');
+    const more = d.actions.find(a => a.label === 'More') || { icon: 'apps', label: 'More', tone: 'grey' }, rest = d.actions.filter(a => a !== more);
+    const list = d.actions.length > n ? [...rest.slice(0, n - 1), more] : d.actions;   /* what doesn't fit goes behind More */
+    const btns = list.map(a => `<button data-open="${esc(a.label)}" aria-label="${esc(a.label)}"${s ? ` data-tip="${esc(a.label)}"` : ''}><span class="dot tn-${esc(a.tone)}">${I(a.icon)}</span>${s ? '' : `<span class="l">${esc(a.label)}</span>`}</button>`).join('');
     if (s) return `<div class="ms-w-qa">${btns}</div>`;
     return head(d, ctx, `<button class="ms-ib sm" data-open="Choose shortcuts" aria-label="Choose shortcuts" data-tip="Choose shortcuts">${I('pencil')}</button>`) + body(`<div class="ms-w-qa${ctx.fit === 'l' ? ' eight' : ''}">${btns}</div>`);
   } });
@@ -10750,7 +10762,7 @@ function placeDock(){
     const pg = ws.querySelector('.x-dpager'); if (pg) { if (mob) Object.assign(pg.style, {right:'8px', bottom:(bottom + ch + 8) + 'px'}); else Object.assign(pg.style, {right:(16 + sw + 10) + 'px', bottom:'10px'}); }
   }
   ws.querySelectorAll('.x-dwb').forEach(b => b.scrollTop = b.scrollHeight);
-  fitAsk(); offMini(); offDodge(); if (X.sec === 'office') { offCam(); offMedia(); offFloat(); } roomCallSync(); callVis(); panelWidths(); xtArrive();
+  fitAsk(); fitFloat(); fitChatComp(); offMini(); offDodge(); if (X.sec === 'office') { offCam(); offMedia(); offFloat(); } roomCallSync(); callVis(); panelWidths(); xtArrive();
 }
 /* the calendar's ask bar steps aside for chat windows at the bottom instead of sliding under them */
 function fitAsk(){
@@ -10763,6 +10775,29 @@ function fitAsk(){
     if (w < 300) { w = full; l = (M.width - full) / 2; b = M.bottom - Math.min(...obs.map(r => r.top)) + gap; } }
   Object.assign(ask.style, {left:l + 'px', width:w + 'px', bottom:b + 'px', transform:'none'});
   const sc = main.querySelector('.x-calb, .x-mgrid'); if (sc) sc.style.paddingBottom = (b + AH + 16) + 'px';
+}
+/* the canvas's Auto bar does the same: it narrows beside chat windows at the bottom, or rises above them when there isn't room */
+function fitFloat(){
+  const f = $('#ws .x-canvas .x-float'); if (!f || !f.offsetParent) return;
+  const C = f.offsetParent.getBoundingClientRect(), gap = 12, nw = Math.min(720, C.width - 32), h = f.offsetHeight;     /* where it sits on its own: centred, 15px up */
+  const r = { left: C.left + (C.width - nw) / 2, right: C.left + (C.width + nw) / 2, bottom: C.bottom - 15, top: C.bottom - 15 - h };
+  const obs = [...$('#ws').querySelectorAll('.x-dtray, .x-dpager, :scope > .x-dw')].map(e => e.getBoundingClientRect()).filter(q => q.width && q.bottom > r.top - gap && q.top < r.bottom && q.right > r.left - gap && q.left < r.right + gap);
+  let st = { left: '', width: '', bottom: '' };
+  if (obs.length) { const room = Math.min(...obs.map(q => q.left)) - C.left - gap - 16;
+    st = room >= 300 ? { left: (16 + room / 2) + 'px', width: Math.min(nw, room) + 'px', bottom: '' } : { left: '', width: '', bottom: (C.bottom - Math.min(...obs.map(q => q.top)) + gap) + 'px' }; }
+  const first = !f.dataset.fit; if (first) f.style.transition = 'none';                 /* a freshly drawn bar starts in place; later changes glide */
+  Object.entries(st).forEach(([k, v]) => { if (f.style[k] !== v) f.style[k] = v; });
+  if (first) { f.offsetWidth; f.style.transition = ''; f.dataset.fit = 1; }
+}
+/* the chat's own composer rises above chat windows at the bottom (when the chat runs under them, with the canvas hidden) */
+function fitChatComp(){
+  const c = $('#ws .x-chat > .x-comp'); if (!c || !c.offsetWidth) return;
+  const now = parseFloat(c.style.marginBottom) || 0, base = 8, gap = 12, r = c.getBoundingClientRect(), bottom = r.bottom + (now ? now - base : 0), top = bottom - r.height;      /* where it sits on its own */
+  const obs = [...$('#ws').querySelectorAll('.x-dtray, .x-dpager, :scope > .x-dw')].map(e => e.getBoundingClientRect()).filter(q => q.width && q.bottom > top - gap && q.top < bottom && q.right > r.left - gap && q.left < r.right + gap);
+  const mb = obs.length ? (base + bottom - Math.min(...obs.map(q => q.top)) + gap) + 'px' : '';
+  const first = !c.dataset.fit; if (first) c.style.transition = 'none';
+  if (c.style.marginBottom !== mb) c.style.marginBottom = mb;
+  if (first) { c.offsetWidth; c.style.transition = ''; c.dataset.fit = 1; }
 }
 function goSlot(n){
   const dk = X.dock.filter(w => !(w.fl && innerWidth >= 640)); const to = clamp((X.dslot || 0) + n, 0, dk.length - 1); if (to === X.dslot) return;
@@ -11070,7 +11105,7 @@ const FLOORS = [{"k":"oak","n":"Oak parquet","w":560,"h":366,"c":"#a87956","u":"
 (() => { const st = document.createElement('style'); st.textContent = FLOORS.map(f => `.fl-${f.k}{--fl:url(${f.u});--fls:${f.w}px ${f.h}px;--flc:${f.c}}`).join('') + '.fl-plain{--fl:none;--flc:#8b919a}'; document.head.appendChild(st); })();
 const FLOOR_ALL = [{k:'plain', n:'Plain'}, ...FLOORS];
 const flName = k => (FLOOR_ALL.find(f => f.k === k) || {}).n || 'Plain';
-const oFloor = () => X.off.floor || (X.off.floor = (() => { try { return localStorage.getItem('mindspace-floor-v1'); } catch (e) {} })() || 'lightoak');
+const oFloor = () => X.off.floor || (X.off.floor = (() => { try { return localStorage.getItem('mindspace-floor-v1'); } catch (e) {} })() || 'plain');
 const zFloor = id => zStyle(id).floor || oFloor();
 const setFl = (el, k) => { [...el.classList].filter(c => c.startsWith('fl-')).forEach(c => el.classList.remove(c)); el.classList.add('fl-' + k); };
 const flGrid = (por, id, cur, office) => `<div class="x-flgrid">${office ? `<button data-por="${por}" data-z="${id}" data-f="" class="x-flo fl-${oFloor()} ${!cur ? 'on' : ''}" aria-pressed="${!cur}" title="Same as the office"><em>Office</em></button>` : ''}${FLOOR_ALL.map(f => `<button data-por="${por}" data-z="${id}" data-f="${f.k}" class="fl-${f.k} ${cur === f.k ? 'on' : ''}" aria-pressed="${cur === f.k}" title="${f.n}" aria-label="${f.n}"></button>`).join('')}</div>`;
@@ -16662,7 +16697,7 @@ const WK_HOME = {
   desk: [WK_P('fin.invoices', 'l', 'h-inv'), WK_P('fin.cash', 'm', 'h-cash'), WK_P('fin.revenue', 's', 'h-rev'), WK_P('hr.presence', 's', 'h-who'),
     WK_P('work.today', 'l'), WK_P('sales.pipeline', 'l', 'h-pipe'), WK_P('work.log', 'xl'), WK_P('svc.ride', 'm', 'h-ride'), WK_P('work.quick', 'm'),
     WK_P('com.brief', 'l'), WK_P('work.tasks', 'l'), WK_P('com.announce', 'm'), WK_P('work.app.sales', 's'), WK_P('work.folder.hr', 's')],
-  phone: [WK_P('hr.checkin', 'm'), WK_P('hr.leave', 'm', 'p-leave'), WK_P('svc.ride', 's', 'p-ride'), WK_P('pay.wallet', 's'), WK_P('work.next', 'm'), WK_P('pay.services', 'l'),
+  phone: [WK_P('hr.checkin', 'm'), WK_P('hr.leave', 'm', 'p-leave'), WK_P('svc.ride', 's', 'p-ride'), WK_P('pay.wallet', 's'), WK_P('work.next', 'm'), WK_P('pay.services', 'm'),
     WK_P('com.ask', 's'), WK_P('hr.month', 's'), WK_P('com.messages', 'l'), WK_P('svc.promo', 'm')]
 };
 /* the widgets a canvas you make could hold before the kit, as kit presets */
