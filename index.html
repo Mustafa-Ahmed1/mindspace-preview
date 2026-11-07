@@ -449,6 +449,9 @@ button.ms-kpi:active{transform:scale(.99)}
    .ms-rows > .ms-item: rows that work: 54px, an avatar or tile, two lines, the amount and status at the end. On hover or focus the row's actions (.acts)
      slide in over the end (200ms) and the separators beside the row fade. Phones: 64px, 15px, no hover actions.
    .ms-li: the phone list row (the same row at phone size) in a .ms-card.flush.
+   .ms-rec: a record row for phone record lists (in a .ms-card.flush): the title and its ID, the amount with its unit and the status under it,
+     then, when the record has one, a thin meter of its progress with what's done and what's left. The meter is the accent; red when the record
+     is late; green when it's complete. .ms-lhead above a list says how it's sorted and how many there are.
    .ms-feed > .ms-ev: a record's activity trail: 28px nodes on a 1px rail, newest first, grouped by day (.day).
    .ms-agenda: a time column; past events at 55%; a red line marks now (.ms-now); the next event says how soon.
    .ms-tblwrap: the working record table: a toolbar (.ms-tbar: title with count, search, density, export), quick views (.ms-tfilters),
@@ -585,6 +588,24 @@ button.ms-li:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-pa
 .ms-li>.r em{font-style:normal;font-size:var(--ms-fs-phone);font-weight:var(--ms-fw-semibold);color:var(--ms-text);font-variant-numeric:tabular-nums}
 .ms-li>.r em .ms-unit{font-size:var(--ms-fs-label);color:var(--ms-dim);font-weight:var(--ms-fw-medium);margin-inline-start:3px}
 .ms-li>svg{flex:none;width:16px;height:16px;color:var(--ms-dim)}
+/* record rows */
+.ms-rec{--ms-surface:var(--ms-panel);position:relative;display:flex;flex-direction:column;gap:var(--ms-s-5);width:100%;padding:var(--ms-s-8);text-align:start;color:var(--ms-text);font-size:var(--ms-fs-phone)}
+.ms-rec+.ms-rec::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:var(--ms-line)}
+button.ms-rec{cursor:pointer;transition:background-color var(--ms-t-fast)}
+button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-panel));background:color-mix(in srgb,var(--ms-text) 3%,var(--ms-panel))}
+.ms-rec .ms-rec-h{display:flex;align-items:flex-start;gap:var(--ms-s-6)}
+.ms-rec .ms-rec-h>.ms-av,.ms-rec .ms-rec-h>.ms-tile{align-self:center}
+.ms-rec .ms-rec-h>span:not([class]){flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--ms-s-1)}
+.ms-rec b{font-size:var(--ms-fs-phone);font-weight:var(--ms-fw-medium);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ms-rec .ms-rec-h small{font-size:var(--ms-fs-body);color:var(--ms-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ms-rec .ms-rec-h small.late{color:var(--ms-bad-text)}
+.ms-rec .r{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:var(--ms-s-3);max-width:50%}
+.ms-rec .r em{font-style:normal;font-size:var(--ms-fs-phone);font-weight:var(--ms-fw-semibold);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ms-rec .r em .ms-unit{font-size:var(--ms-fs-body);color:var(--ms-dim);font-weight:var(--ms-fw-medium);margin-inline-start:3px}
+.ms-rec .ms-meter{height:6px;margin-top:var(--ms-s-2)}
+.ms-rec .ms-rec-cap{display:flex;justify-content:space-between;gap:var(--ms-s-6);margin-top:calc(-1 * var(--ms-s-1));font-size:var(--ms-fs-body);color:var(--ms-mute);font-variant-numeric:tabular-nums}
+.ms-lhead{display:flex;align-items:center;justify-content:space-between;margin:var(--ms-s-8) var(--ms-s-2) var(--ms-s-4);font-size:var(--ms-fs-eyebrow);font-weight:var(--ms-fw-semibold);letter-spacing:.06em;text-transform:uppercase;color:var(--ms-dim)}
+.ms-lhead em{font-style:normal;font-variant-numeric:tabular-nums;letter-spacing:0}
 
 /* phones */
 .ms-phone .ms-item{min-height:var(--ms-h-tile)}
@@ -5506,6 +5527,12 @@ body.theme-light #ws.mob .m-seg3 button[aria-checked=true]{background:var(--x-pa
 @keyframes maRead{to{width:100%}}
 @media (prefers-reduced-motion:reduce){#ws.mob .m-ma,#ws.mob .m-mascrim,#ws.mob .m-screen{transition-duration:1ms!important}}
 #ws.mob .m-mav>.ms-btn.primary{width:100%}
+/* a page filter with three or fewer options: a segmented control across the page, options of equal width */
+#ws.mob .m-fseg{display:flex;width:100%}
+#ws.mob .m-fseg>button{flex:1}
+/* the create button floats above the app bar */
+#ws.mob .m-ma>.ms-fab{bottom:calc(var(--ms-s-12) + 64px + env(safe-area-inset-bottom))}
+#ws.mob .m-ma:has(>.ms-fab) .m-mav{padding-bottom:calc(var(--ms-s-12) * 2 + 54px)}
 /* ---------- editing your bar and your apps (30-mobile-bar.js). Every value reads a token. ---------- */
 #ws.mob .m-apps .m-vh{align-items:center}
 #ws.mob .m-apps .m-vh .ms-btn.m-on{background:var(--x-accent);color:var(--x-on)}
@@ -7695,6 +7722,16 @@ const UI = (() => {
       const t = attrs ? 'button' : 'div', right = value || tag ? `<span class="r">${value ? `<em>${e(value)}${unit ? `<span class="ms-unit">${e(unit)}</span>` : ''}</em>` : ''}${tag}</span>` : '';
       return `<${t}${t === 'button' ? ' type="button"' : ''} class="${cx('ms-li', cls)}"${at(attrs)}>${lead}<span><b>${e(title)}</b>${sub ? `<small class="${late ? 'late' : ''}">${e(sub)}</small>` : ''}</span>${right}${chevron}</${t}>`;
     },
+    /* Record row (phone record lists): title, sub (its ID), value + unit, tag (HTML) under the value, lead (avatar or tile),
+       and progress { pct, tone: 'late' | 'done' | '', left, right } for a thin meter with captions. */
+    rec: ({ title = '', sub = '', late, value = '', unit = '', tag = '', lead = '', progress, attrs, cls } = {}) => {
+      const t = attrs ? 'button' : 'div', p = progress, pct = p ? Math.max(0, Math.min(100, +p.pct || 0)) : 0;
+      const right = value || tag ? `<span class="r">${value ? `<em>${e(value)}${unit ? `<span class="ms-unit">${e(unit)}</span>` : ''}</em>` : ''}${tag}</span>` : '';
+      const bar = p ? `<div class="ms-meter" role="img" aria-label="${e(p.left || pct + '%')}"><i class="${p.tone === 'late' ? 'c3' : p.tone === 'done' || pct >= 100 ? 'c1' : 'c2'}" style="--w:${pct}"></i></div>${p.left || p.right ? `<div class="ms-rec-cap"><span>${e(p.left || '')}</span><span>${e(p.right || '')}</span></div>` : ''}` : '';
+      return `<${t}${t === 'button' ? ' type="button"' : ''} class="${cx('ms-rec', cls)}"${at(attrs)}><div class="ms-rec-h">${lead}<span><b>${e(title)}</b>${sub ? `<small class="${late ? 'late' : ''}">${e(sub)}</small>` : ''}</span>${right}</div>${bar}</${t}>`;
+    },
+    /* a list's heading: how it's sorted, and how many there are */
+    lhead: (label, count) => `<div class="ms-lhead"><span>${e(label)}</span>${count != null ? `<em>${e(count)}</em>` : ''}</div>`,
     list: (rows, { empty = 'Nothing here right now.' } = {}) => rows.length ? ui.card(rows.join(''), { flush: true }) : ui.empty(empty),
     /* Swipe row (phones): a row with actions behind it [{ act, label, icon, tone: warn | ok | bad }]. */
     swrow: ({ lead = '', title = '', sub = '', late, value = '', unit = '', tag = '', acts = [], attrs } = {}) =>
@@ -13961,10 +13998,12 @@ const maDef = id => id.startsWith('s:') ? { tabs: [['main']], view: {}, simple: 
 const maSt = id => MA.st[id] = MA.st[id] || Object.assign({ tab: maDef(id).tabs[0][0] }, (maDef(id).init || (() => ({})))());
 const usd = n => (n < 0 ? '−$' : '$') + Math.abs(n).toLocaleString('en-US');
 const maTagK = s => /paid|ready|approved|accepted|won|in office|reconciled|active|running|published|signed|done/i.test(s) ? 'ok' : /overdue|declined|lost|sick|late|closed/i.test(s) ? 'bad' : /waiting|pending|draft|to submit|due|on leave|review/i.test(s) ? 'warn' : 'info';
-const maLi = (o, i) => `<button class="ms-li" data-ma="${o.act || 'row'}" data-i="${i}"${o.act === 'toast' ? ` data-t="${esc(o.tt || o.t + ': ' + o.s)}"` : ''}>${o.lead || ''}<span><b>${esc(o.t)}</b><small>${esc(o.s)}</small></span>${o.v != null || o.tag ? `<span class="r">${o.v != null ? `<em>${esc(o.v)}</em>` : ''}${o.tag ? mtag(o.tag, maTagK(o.tag)) : ''}</span>` : ''}</button>`;
+/* a record row from the design system (UI.rec): title and detail, the amount, the status under it, and progress when there is some */
+const maLi = (o, i) => UI.rec({ title: o.t, sub: o.s, value: o.v != null ? String(o.v) : '', unit: o.u || '', tag: o.tag ? mtag(o.tag, maTagK(o.tag)) : '', lead: o.lead || '', progress: o.p,
+  attrs: { 'data-ma': o.act || 'row', 'data-i': i, ...(o.act === 'toast' ? { 'data-t': o.tt || o.t + ': ' + o.s } : {}) } });
 const maList = (rows, f) => rows.length ? `<div class="ms-card flush">${rows.map((r, i) => f(r, i)).join('')}</div>` : '<p class="ms-empty">Nothing here right now.</p>';
-const maChips = (st, key, opts) => `<div class="ms-chips">${opts.map(([k, t, n]) => `<button class="ms-chip" data-ma="chip" data-f="${key}" data-k="${k}" aria-pressed="${(st[key] || opts[0][0]) === k}">${esc(t)}${n != null ? `<em>${n}</em>` : ''}</button>`).join('')}</div>`;
-const maAdd = t => `<button class="ms-ib primary" data-ma="new" aria-label="${esc(t)}">${xi('plus', 20, 1.5)}</button>`;
+const maChips = (st, key, opts) => opts.length <= 3 ? `<div class="ms-seg m-fseg">${opts.map(([k, t]) => `<button data-ma="chip" data-f="${key}" data-k="${k}" aria-pressed="${(st[key] || opts[0][0]) === k}">${esc(t)}</button>`).join('')}</div>` : `<div class="ms-chips">${opts.map(([k, t, n]) => `<button class="ms-chip" data-ma="chip" data-f="${key}" data-k="${k}" aria-pressed="${(st[key] || opts[0][0]) === k}">${esc(t)}${n != null ? `<em>${n}</em>` : ''}</button>`).join('')}</div>`;
+const maAdd = t => `<button class="ms-fab" data-ma="new" aria-label="${esc(t)}">${xi('plus', 22, 1.6)}<span class="lbl">${esc(t)}</span></button>`;
 const maIc = (ic, tone) => `<span class="m-fic tn-${tone}">${xi(ic, 20, 1.4)}</span>`;
 const maFld = (label, f, val = '', type = 'text') => `<label class="ms-field"><span>${label}</span><input class="ms-input" data-f="${f}" type="${type}" value="${esc(String(val))}"></label>`;
 const maSel = (label, f, opts) => `<label class="ms-field"><span>${label}</span><select class="ms-select" data-f="${f}">${opts.map(o => `<option>${esc(o)}</option>`).join('')}</select></label>`;
@@ -14032,8 +14071,21 @@ function maBody(id, keep, dir){
   const D = maDef(id), st = maSt(id), b = win.querySelector('.m-mab'), y = b.scrollTop;
   if (D.simple) { b.innerHTML = ''; b.appendChild(mobViewEl(S(current), mobType(S(current)), D.simple)); return; }
   b.innerHTML = `<div class="m-mav">${maView(id, st.tab)(st, APP(id))}</div>`; b.scrollTop = keep ? y : 0;
+  maFab(win, b);
   if (st.tab === 'more' && !keep && !reduce) { const s1 = document.documentElement.dir === 'rtl' ? -1 : 1, d = (dir || (st.mp ? 1 : 0)) * s1; if (d) b.firstElementChild.animate([{ transform: `translateX(${d * 30}%)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 320, easing: 'cubic-bezier(.32,.72,0,1)' }); }
   win.querySelectorAll('.m-man [data-t]').forEach(t => { t.setAttribute('aria-current', t.dataset.t === st.tab ? 'page' : 'false'); const n = D.badge ? D.badge(st, t.dataset.t) : 0, e = t.querySelector('.ms-badge'); if (n && e) e.textContent = n; else if (n) t.insertAdjacentHTML('beforeend', `<em class="ms-badge red">${n}</em>`); else if (e) e.remove(); }); win.querySelectorAll('.m-man').forEach(n => UI.navSync(n));
+}
+
+/* the page's create button floats above the bar (UI .ms-fab): it shrinks to its icon while you scroll down and grows back on the way up.
+   The same button stays put between redraws; a new one fades in and an old one fades out. */
+function maFab(win, b){
+  const nu = b.querySelector('.m-mav .ms-fab'), old = win.querySelector(':scope > .ms-fab');
+  if (nu && old && old.getAttribute('aria-label') === nu.getAttribute('aria-label')) { old.dataset.ma = nu.dataset.ma; Object.assign(old.dataset, nu.dataset); nu.remove(); }
+  else {
+    if (old) { old.classList.add('out'); if (reduce) old.remove(); else old.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.9)' }], { duration: 160, easing: 'ease-in' }).onfinish = () => old.remove(); }
+    if (nu) { win.appendChild(nu); if (!reduce) nu.animate([{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'cubic-bezier(.22,1,.36,1)' }); }
+  }
+  if (!b._fab) { b._fab = 1; let last = 0; b.addEventListener('scroll', () => { const f = win.querySelector(':scope > .ms-fab:not(.out)'), y = b.scrollTop; if (f) { if (y > last + 3 && y > 60) f.classList.add('min'); else if (y < last - 3 || y < 30) f.classList.remove('min'); } last = y; }, { passive: true }); }
 }
 
 /* ---------- taps ---------- */
@@ -16580,17 +16632,32 @@ function finHome(st){                                                           
     <h2>Due in the next 30 days <em>${x.soon.length}</em></h2>${UI.list(x.soon.slice(0, 5).map(i => UI.li({ title: `${i.unit} · ${i.instalment_id}`, sub: `${i.customer} · due ${AGF.dFmt(i.due_date)}`, value: short(i.expected), attrs: { 'data-ma': 'x', 'data-x': 'open', 'data-k': 'Payment Intent', 'data-n': i.name } })), { empty: 'Nothing falls due in the next 30 days.' })}`;
 }
 const D_PAID = () => AGF.D.intent.filter(i => i.status === 'Satisfied').length;
+/* how far a record has come: a plan or a schedule by what its unit's payments have collected; late when a payment is past its date */
+const PROG = (() => { const of = sale => { const it = AGF.D.intent.filter(i => i.sale === sale); return { it, got: AGF.sum(it, 'posted_allocated'), late: it.some(i => ['Open', 'PartiallyMatched'].includes(i.status) && i.due_date < AGF.TODAY) }; };
+  return { 'Payment Plan': r => { const s = AGF.D.sale.find(x => x.plan === r.name); if (!s) return null; const o = of(s.name), tot = +r.amount || AGF.sum(o.it, 'expected'); return tot ? { got: o.got, tot, late: o.late } : null; },
+    'Schedule Version': r => { const o = of(r.sale), tot = AGF.sum(o.it, 'expected'); return tot ? { got: o.got, tot, late: o.late } : null; } }; })();
+const FILTER_BY = { 'Payment Plan': 'route' };                                            /* a page filters by its status, or by the field that splits it best */
+const newLabel = dt => 'New ' + dt.split(' ').pop().toLowerCase();
 function finList(dt, st){
-  const L = F().recs(dt), fk = 'f:' + dt, f = st[fk] || 'All', sts = [...new Set(L.map(r => r.status).filter(Boolean))];
-  const top = sts.map(x => [x, L.filter(r => r.status === x).length]).sort((p, q) => q[1] - p[1])[0], usual = top && top[1] > L.length / 2 ? top[0] : '';      /* most records share it */
-  const rows = L.slice().reverse().filter(r => f === 'All' || r.status === f);
-  const row = r => { const a = amountOf(dt, r), sub = [...F().SC[dt].list, ...((AGF.DES[F().SC[dt].store] || {}).cols || []).filter(c => c[2] !== 'num').map(c => c[0])].filter((k, i, L) => k !== 'status' && k !== F().SC[dt].title && L.indexOf(k) === i).map(k => { const fd = F().SC[dt].fields.find(x => x.k === k), v = F().val(dt, r, k); return fd && v !== '' && v != null && !F().isEmpty(fd, v) ? show(fd, v) : ''; }).filter(Boolean).slice(0, 2);
+  const L = F().recs(dt), by = FILTER_BY[dt] || 'status', fk = 'f:' + dt, f = st[fk] || 'All', vals = [...new Set(L.map(r => r[by]).filter(Boolean))];
+  const pr = PROG[dt], P = new Map(pr ? L.map(r => [r, pr(r)]) : []);
+  let rows = L.slice().reverse().filter(r => f === 'All' || r[by] === f);
+  if (pr) rows.sort((a, b) => ((P.get(a) || {}).got / ((P.get(a) || {}).tot || 1) || 0) - ((P.get(b) || {}).got / ((P.get(b) || {}).tot || 1) || 0));      /* the ones furthest behind first */
+  const row = r => { const a = amountOf(dt, r), sub = [...F().SC[dt].list, ...((AGF.DES[F().SC[dt].store] || {}).cols || []).filter(c => c[2] !== 'num').map(c => c[0])].filter((k, i, L) => k !== 'status' && k !== F().SC[dt].title && L.indexOf(k) === i).map(k => { const fd = F().SC[dt].fields.find(x => x.k === k), v = F().val(dt, r, k); return fd && v !== '' && v != null ? show(fd, v) : ''; }).filter(Boolean).slice(0, 2);
     if (!sub.length) F().SC[dt].fields.filter(f => ['Data', 'Date', 'Link'].includes(f.t) && !['company', 'currency'].includes(f.k) && !/hash|digest|key/.test(f.k)).forEach(f => { const v = F().val(dt, r, f.k); if (sub.length < 2 && v !== '' && v != null) sub.push(show(f, v)); });
-    const one = titleOf(dt, r) !== r.name ? r.name : sub[0] || grpOf(dt), odd = r.status && r.status !== usual ? fTag(r.status) : '';      /* one detail; the status only when it isn't the page's usual one */
-    return `<button class="ms-li" data-ma="x" data-x="open" data-k="${esc(dt)}" data-n="${esc(r.name)}"><span><b>${esc(titleOf(dt, r))}</b><small>${esc(one)}</small></span>${a && a.v || odd ? `<span class="r">${a && a.v ? `<em>${short(a.v)}</em>` : ''}${odd}</span>` : ''}</button>`; };
-  return `${mhead(dt, `${L.length} ${L.length === 1 ? 'record' : 'records'} · ${esc(grpOf(dt))}`, `<button class="ms-ib primary" data-ma="x" data-x="new" data-k="${esc(dt)}" aria-label="New ${esc(dt)}">${xi('plus', 20, 1.5)}</button>`)}
-    ${sts.length > 1 ? maChips(st, fk, [['All', 'All', L.length], ...sts.map(s => [s, nm(s), L.filter(r => r.status === s).length])]) : ''}
-    <div class="m-mt">${rows.length ? `<div class="ms-card flush">${rows.map(row).join('')}</div>` : `<p class="ms-empty">No ${esc(dt.toLowerCase())} records yet.</p>`}</div>`;
+    const p = P.get(r), pct = p ? Math.round(p.got / p.tot * 100) : 0, late = p && p.late && pct < 100;
+    return UI.rec({ title: titleOf(dt, r), sub: titleOf(dt, r) !== r.name ? r.name : sub[0] || grpOf(dt), value: a && a.v ? short(a.v) : '', unit: a && a.v ? 'IQD' : '',
+      tag: late ? mtag('Overdue', 'bad') : fTag(r.status),
+      progress: p ? { pct, tone: late ? 'late' : pct >= 100 ? 'done' : '', left: `${pct}% collected`, right: `${short(Math.max(0, p.tot - p.got))} left` } : null,
+      attrs: { 'data-ma': 'x', 'data-x': 'open', 'data-k': dt, 'data-n': r.name } }); };
+  const sumOf = pr ? (() => { const got = [...P.values()].reduce((t, p) => t + (p ? p.got : 0), 0), tot = [...P.values()].reduce((t, p) => t + (p ? p.tot : 0), 0), pct = tot ? Math.round(got / tot * 100) : 0;
+      return UI.target({ label: 'Collected so far', value: short(got), unit: 'IQD', plan: short(tot), parts: [{ w: pct, c: 'c2' }], keys: [{ label: 'Collected', color: 'var(--ms-accent)', value: pct + '%' }, { label: 'Remaining', color: 'var(--ms-track)', value: short(Math.max(0, tot - got)) }] }); })()
+    : (() => { const tot = L.reduce((t, r) => { const a = amountOf(dt, r); return t + (a ? a.v : 0); }, 0); return tot ? UI.stats([{ label: 'Total', value: short(tot), unit: 'IQD', note: `across ${L.length} ${L.length === 1 ? 'record' : 'records'}` }]) : ''; })();
+  return `${mhead(dt, `${L.length} ${L.length === 1 ? 'record' : 'records'} · ${esc(grpOf(dt))}`)}
+    ${sumOf ? `<div class="m-mt">${sumOf}</div>` : ''}
+    ${vals.length > 1 ? `<div class="m-mt">${maChips(st, fk, [['All', 'All', L.length], ...vals.map(s => [s, nm(s), L.filter(r => r[by] === s).length])])}</div>` : ''}
+    ${rows.length ? `${UI.lhead(pr ? 'Lowest collection first' : 'Newest first', rows.length)}<div class="ms-card flush">${rows.map(row).join('')}</div>` : `<p class="ms-empty m-mt">No ${esc(dt.toLowerCase())} records yet.</p>`}
+    <button class="ms-fab" data-ma="x" data-x="new" data-k="${esc(dt)}" aria-label="${esc(newLabel(dt))}">${xi('plus', 22, 1.6)}<span class="lbl">${esc(newLabel(dt))}</span></button>`;
 }
 /* Payment Intent opens unit by unit, like the desktop */
 function finUnits(st){
