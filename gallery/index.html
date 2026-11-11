@@ -202,6 +202,9 @@ body.theme-light .tn-slate{--tb:#e3e9fb;--tf:#3a4f94} /* lint-allow: an app tone
 .ms-phone .ms-token{height:var(--ms-h-control);font-size:var(--ms-fs-lg);border-radius:var(--ms-r-row)}
 /* disabled: can't be used right now (say why in the help line); flat, 45%, no hover */
 .ms-control:has(input:disabled,textarea:disabled,select:disabled),.ms-input:disabled,.ms-select:disabled,.ms-textarea:disabled,.ms-control.disabled{opacity:.45;pointer-events:none;box-shadow:inset 0 0 0 1px var(--ms-line)}
+/* Compact: add .sm to a control, select, search or dropdown for the 32px size used in toolbars, filters and dense forms */
+.ms-control.sm,.ms-input.sm,.ms-select.sm,.ms-search.sm,.ms-dd.sm{height:var(--ms-h-control);padding-inline-start:var(--ms-s-5);font-size:var(--ms-fs-control)}
+.ms-control.sm input,.ms-search.sm input,.ms-control.sm .v,.ms-dd.sm>span{font-size:var(--ms-fs-control)}
 
 /* Choices, picked by case:
    - Segmented (.ms-seg): 2–4 options that apply right away. A recessed tray; one thumb slides and resizes to the pressed option (320ms). Counts sit inside (em).
@@ -502,7 +505,7 @@ button.ms-kpi:active{transform:scale(.99)}
    .ms-agenda: a time column; past events at 55%; a red line marks now (.ms-now); the next event says how soon.
    .ms-tblwrap: the working record table: a toolbar (.ms-tbar: title with count, search, density, export), quick views (.ms-tfilters),
      the table (.ms-tbl > .ms-tr, set --cols), a footer (.ms-tfoot) and the action bar (.ms-bulk) that rises when rows are selected.
-     Comfortable rows 50px, compact 38. On phones a record table (.ms-tbl.rec, with c-cust, c-amt, c-inv, c-due and c-life cells) turns each row into a stacked record.
+     Comfortable rows 50px, compact 38. Add .flat to the wrap for the flat variant: no panel, a 44px header with a hairline, rows 52px with a rounded hover. On phones a record table (.ms-tbl.rec, with c-cust, c-amt, c-inv, c-due and c-life cells) turns each row into a stacked record.
    .ms-row: a menu-style row (38px, 28 compact) for side lists and pickers. */
 .ms-rows{--ms-surface:var(--ms-panel);display:flex;flex-direction:column;padding:var(--ms-s-2);border-radius:var(--ms-r-lg);background:var(--ms-panel);
   box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line),var(--ms-sh-lift)}
@@ -588,7 +591,7 @@ button.ms-kpi:active{transform:scale(.99)}
 .ms-sort:hover{color:var(--ms-text)}
 .ms-sort svg{width:12px;height:12px;transition:transform var(--ms-t-panel) var(--ms-e)}
 .ms-sort[data-dir=asc] svg{transform:rotate(180deg)}
-.ms-tfoot{display:flex;align-items:center;gap:var(--ms-s-6);min-height:46px;padding:0 var(--ms-s-8);box-shadow:inset 0 1px 0 var(--ms-line);font-size:var(--ms-fs-sm);color:var(--ms-dim)}
+.ms-tfoot{display:flex;align-items:center;gap:var(--ms-s-6);min-height:46px;padding:0 var(--ms-s-8);font-size:var(--ms-fs-sm);color:var(--ms-dim)}
 .ms-tfoot .pg b{color:var(--ms-text);font-weight:var(--ms-fw-medium)}
 .ms-tfoot .total{margin-inline-start:auto;display:flex;align-items:baseline;gap:var(--ms-s-4)}
 .ms-tfoot .total b{color:var(--ms-text);font-size:var(--ms-fs-body);font-weight:var(--ms-fw-semibold);font-variant-numeric:tabular-nums}
@@ -686,6 +689,17 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-phone .ms-item .acts{display:none}
 .ms-phone .ms-item:hover .r{opacity:1}
 .ms-phone .ms-ev p{font-size:var(--ms-fs-lg);line-height:20px}
+/* App-managed tables: group headers, the New row, left-aligned sort buttons */
+.ms-sort{justify-content:flex-start}
+.ms-tr .num .ms-sort{justify-content:flex-end}
+.ms-tr.grp{display:flex;align-items:center;gap:var(--ms-s-4);min-height:var(--ms-h-field);background:var(--ms-table-head);color:var(--ms-mute);font-size:var(--ms-fs-sm);cursor:pointer}
+.ms-tr.grp>svg{width:14px;height:14px;transition:transform var(--ms-t-panel) var(--ms-e)}
+.ms-tr.grp[aria-expanded=false]>svg{transform:rotate(-90deg)}
+.ms-tr.grp .cap{color:var(--ms-dim)}
+.ms-tr.grp em{font-style:normal;font-variant-numeric:tabular-nums;color:var(--ms-dim)}
+.ms-tr.new{display:flex;align-items:center;gap:var(--ms-s-4);min-height:var(--ms-h-field);color:var(--ms-dim);font-size:var(--ms-fs-control);cursor:pointer}
+.ms-tr.new:hover{color:var(--ms-text)}
+.ms-tr.new svg{width:14px;height:14px}
 .ms-phone .ms-tbar .ms-control,.ms-phone .ms-tbar .ms-search{order:3;width:100%;height:var(--ms-h-tap)}
 .ms-phone .ms-tbar .ms-seg{display:none}
 .ms-phone .ms-tbl.rec .ms-tr.th{display:none}
@@ -704,6 +718,19 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-phone .ms-bulk{left:var(--ms-s-6);right:var(--ms-s-6);transform:translateY(calc(100% + 16px));justify-content:space-between}
 .ms-phone .ms-bulk.on{transform:none}
 .ms-phone .ms-bulk .hide-s{display:none}
+
+/* Flat variant (.ms-tblwrap.flat): no panel; the toolbar and footer sit on the page, a 44px header with a hairline, 52px rows at 14px with a rounded hover */
+.ms-tblwrap.flat{--ms-surface:var(--ms-ground);border-radius:0;background:none;overflow:visible;box-shadow:none}
+.ms-tblwrap.flat .ms-tbar{padding:var(--ms-s-6) 0}
+.ms-tblwrap.flat .ms-tfilters{padding:0 0 var(--ms-s-6)}
+.ms-tblwrap.flat .ms-tbl{--rh:var(--ms-h-row)}
+.ms-tblwrap.flat .ms-tr{--ms-surface:var(--ms-ground);border-radius:var(--ms-r-md);font-size:var(--ms-fs-lg)}
+.ms-tblwrap.flat .ms-tr:hover+.ms-tr,.ms-tblwrap.flat .ms-tr:has(+.ms-tr:hover){box-shadow:none}
+.ms-tblwrap.flat .ms-tr.th{min-height:44px;border-radius:0;background:transparent;font-size:var(--ms-fs-body);color:var(--ms-mute);box-shadow:inset 0 -1px 0 var(--ms-line)} /* lint-allow: the table header row */
+.ms-tblwrap.flat .ms-tr[aria-selected=true]{background:color-mix(in srgb,var(--ms-accent) 10%,transparent)}
+.ms-tblwrap.flat .ms-tr[aria-selected=true]:hover{background:color-mix(in srgb,var(--ms-accent) 14%,transparent)}
+.ms-tblwrap.flat .ms-tfoot{flex-wrap:wrap;gap:var(--ms-s-4) var(--ms-s-8);padding:var(--ms-s-6) var(--ms-s-2) 0}
+.ms-tblwrap.flat .ms-sort{gap:var(--ms-s-4)}
 
 /* Page and section headers; empty, loading and error states; and the phone patterns.
    Page header: title 20px semibold, one line under it, actions at the right end. Phones: 22px.
@@ -1030,10 +1057,11 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
    Deliberately different from canvas tabs (canvas-tabs.css). */
 .ms-anav{--ms-surface:var(--ms-panel);position:relative;flex:none;display:flex;align-items:center;height:50px;padding:0 var(--ms-s-5) 0 var(--ms-s-6);border-radius:var(--ms-r-lg);background:var(--ms-panel);
   box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line),var(--ms-sh-drop)}
-.ms-anav .id{display:flex;align-items:center;gap:9px;flex:none;padding-inline-end:var(--ms-s-3);font-size:var(--ms-fs-chat);font-weight:var(--ms-fw-semibold);white-space:nowrap}
-.ms-anav .id>i{width:26px;height:26px;flex:none;display:grid;place-items:center;border-radius:var(--ms-r-sm);background:var(--tb,var(--ms-tint));color:var(--tf,var(--ms-tint-text))}   /* an app's own tone (--tb, --tf) when it has one */
-.ms-anav .id b{font-weight:inherit}
-.ms-anav .vsep,.ms-anav>.sep{width:1px;height:20px;flex:none;margin:0 var(--ms-s-5) 0 var(--ms-s-4);background:var(--ms-line)} /* lint-allow: a divider, not a control */
+.ms-anav .id,.ms-mnav .id{display:flex;align-items:center;gap:9px;flex:none;padding-inline-end:var(--ms-s-3);font-size:var(--ms-fs-chat);font-weight:var(--ms-fw-semibold);white-space:nowrap}
+.ms-anav .id>i,.ms-mnav .id>i{width:26px;height:26px;flex:none;display:grid;place-items:center;border-radius:var(--ms-r-sm);background:var(--tb,var(--ms-tint));color:var(--tf,var(--ms-tint-text))}   /* an app's own tone (--tb, --tf) when it has one */
+.ms-anav .id b,.ms-mnav .id b{font-weight:inherit}
+.ms-mnav .id,.ms-mnav .vsep{align-self:center}   /* the open app, so you always know where you are (UI.mnav({ app: { name, icon, tone } })) */
+.ms-anav .vsep,.ms-anav>.sep,.ms-mnav .vsep{width:1px;height:20px;flex:none;margin:0 var(--ms-s-5) 0 var(--ms-s-4);background:var(--ms-line)} /* lint-allow: a divider, not a control */
 .ms-anav .tabs{position:relative;display:flex;align-self:stretch}
 .ms-anav .tab{position:relative;display:inline-flex;align-items:center;gap:var(--ms-s-3);height:100%;padding:0 var(--ms-s-5);font-size:var(--ms-fs-body);color:var(--ms-mute);white-space:nowrap;transition:color var(--ms-t-fast)}
 .ms-anav .tab:hover,.ms-anav .tab[aria-expanded=true],.ms-anav .tab[aria-selected=true]{color:var(--ms-text)}
@@ -1050,6 +1078,38 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-phone .ms-anav{overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)} /* lint-allow: a mask's black is opacity, not a colour */
 .ms-phone .ms-anav::-webkit-scrollbar{display:none}
 .ms-phone .ms-anav .tab{font-size:var(--ms-fs-phone)}
+
+/* Section bar with a mega menu (.ms-mnav): a full-width flat bar of text tabs for an app with many sections (UI.mnav). Each group tab (.mgrp > .tab) opens, on hover or focus,
+   a panel that unrolls under the whole bar (320ms) with a dim backdrop; the panel lists its sections in three columns (two on narrow screens), each a link with its record count.
+   The bar takes the panel's colour while a panel is open. The current tab has a 2px accent underline that grows in; hovering a tab grows it too. Add .shut to close the panels (after a pick). */
+.ms-mnav{position:sticky;top:0;z-index:20;display:flex;align-items:stretch;gap:var(--ms-s-2);height:var(--ms-h-row);padding-inline:var(--ms-s-6);background:var(--ms-ground);border-bottom:1px solid var(--ms-line);
+  transition:background var(--ms-t-panel) var(--ms-e),border-color var(--ms-t-panel)}
+.ms-mnav:has(.mgrp:hover):not(.shut),.ms-mnav:has(.mgrp:focus-within):not(.shut){background:var(--ms-panel);border-bottom-color:transparent}
+.ms-mnav .mgrp{position:static;display:flex}
+.ms-mnav .tab{position:relative;display:inline-flex;align-items:center;gap:7px;height:var(--ms-h-field);margin-block:8px;padding-inline:var(--ms-s-6);border-radius:var(--ms-r);font-size:var(--ms-fs-chat);font-weight:var(--ms-fw-medium);color:var(--ms-mute);transition:color var(--ms-t-fast)}
+.ms-mnav .mgrp>.tab{cursor:default}
+.ms-mnav .tab::after{content:'';position:absolute;left:var(--ms-s-6);right:var(--ms-s-6);bottom:-9px;height:2px;border-radius:var(--ms-r-hair);background:var(--ms-accent);transform:scaleX(0);transform-origin:left;transition:transform var(--ms-t-panel) var(--ms-e)}
+.ms-mnav .tab:hover,.ms-mnav .mgrp:hover>.tab,.ms-mnav .mgrp:focus-within>.tab,.ms-mnav .tab.on{color:var(--ms-text)}
+.ms-mnav .tab.on::after,.ms-mnav .tab:hover::after,.ms-mnav .mgrp:hover>.tab::after,.ms-mnav .mgrp:focus-within>.tab::after{transform:scaleX(1)}
+.ms-mnav::before{content:'';position:absolute;left:0;right:0;top:100%;height:100vh;z-index:1;background:var(--ms-scrim);opacity:0;pointer-events:none;transition:opacity var(--ms-t-panel)}
+.ms-mnav:has(.mgrp:hover):not(.shut)::before,.ms-mnav:has(.mgrp:focus-within):not(.shut)::before{opacity:1}
+.ms-mnav .pn{position:absolute;left:0;right:0;top:100%;z-index:30;padding:var(--ms-s-10) var(--ms-s-11) var(--ms-s-11);border-bottom:1px solid var(--ms-line);background:var(--ms-panel);box-shadow:var(--ms-sh-drop);
+  clip-path:inset(0 0 100% 0);visibility:hidden;transition:clip-path var(--ms-t-panel) var(--ms-e),visibility 0s var(--ms-t-panel)}
+.ms-mnav .mgrp:hover>.pn,.ms-mnav .mgrp:focus-within>.pn{clip-path:inset(0 0 -40px 0);visibility:visible;transition:clip-path var(--ms-t-panel) var(--ms-e),visibility 0s}
+.ms-mnav.shut .pn{display:none}
+.ms-mnav .ph,.ms-mnav .gr{transform:translateY(-16px);opacity:0;transition:transform var(--ms-t-panel) var(--ms-e),opacity var(--ms-t)}
+.ms-mnav .mgrp:hover .ph,.ms-mnav .mgrp:hover .gr,.ms-mnav .mgrp:focus-within .ph,.ms-mnav .mgrp:focus-within .gr{transform:none;opacity:1;transition-delay:.04s}
+.ms-mnav .ph{margin:0 var(--ms-s-2) var(--ms-s-6);padding-bottom:var(--ms-s-5);border-bottom:1px solid var(--ms-line);font-size:var(--ms-fs-chat);font-weight:var(--ms-fw-semibold)}
+.ms-mnav .gr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(var(--r,1),auto);grid-auto-flow:column;gap:0 var(--ms-s-12)}
+.ms-mnav .sub{display:flex;align-items:center;gap:var(--ms-s-5);min-height:34px;padding:var(--ms-s-3) var(--ms-s-4);text-align:start;font-size:var(--ms-fs-body);color:var(--ms-text);transition:color var(--ms-t-fast),transform var(--ms-t-fast)}
+.ms-mnav .sub .l{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.7;text-decoration:underline transparent;text-decoration-thickness:1.5px;text-underline-offset:4px;transition:text-decoration-color var(--ms-t-fast)}
+.ms-mnav .sub em{font-style:normal;font-size:var(--ms-fs-caption);color:var(--ms-dim);font-variant-numeric:tabular-nums}
+.ms-mnav .sub:hover,.ms-mnav .sub:focus-visible,.ms-mnav .sub.on{color:var(--ms-accent);transform:translateX(4px)}
+.ms-mnav .sub.on{font-weight:var(--ms-fw-semibold);transform:none}
+.ms-mnav .sub:hover .l,.ms-mnav .sub:focus-visible .l{text-decoration-color:var(--ms-accent)}
+.ms-mnav .sub:hover em,.ms-mnav .sub:focus-visible em,.ms-mnav .sub.on em{color:var(--ms-accent)}
+@container (max-width:640px){ .ms-mnav .gr{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none;grid-auto-flow:row} }
+@media (prefers-reduced-motion:reduce){ .ms-mnav,.ms-mnav .pn,.ms-mnav .ph,.ms-mnav .gr,.ms-mnav .tab::after{transition:none} }
 
 /* Chat: grouped, cited, actionable.
    Messages group by sender (.ms-mg): the avatar, name and time once, then bubbles. Bubbles in a group get tight inner corners (6) and round outer ones (14).
@@ -1740,6 +1800,101 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-hues-l{margin:var(--ms-s-1) var(--ms-s-2) var(--ms-s-4);font-size:var(--ms-fs-label);font-weight:var(--ms-fw-medium);color:var(--ms-dim)}
 body,.ms-card,.ms-btn,.ms-seg,.ms-input{transition-property:background-color,border-color,color}
 
+/* Record pages and their tools: the record bar, form sections, value rows, the record side panel, the filter builder and the column picker.
+   Record bar (.ms-rbar): the breadcrumb (.ms-crumbs: the parent page as a button, then the record's title), its status tag, then previous and next and the
+     actions at the right end. A long title is cut with an ellipsis.
+   Record head (.ms-rhead): the title (20px), its ID, then one headline figure (.fig) with a few facts under it.
+   Form (.ms-fsec): a section with a 12.5px semibold title and a two-column grid (.ms-fgrid) with a 28px gutter; a .wide cell takes the full row. Fields are UI.field.
+   Value rows (.ms-vrows > .ms-vrow): the record's fields as a label and a value, split by hairlines; .mono for hashes and keys, .mute for empty values;
+     .ms-vmore reveals the empty fields.
+   Side panel (.ms-rside): a raised box of quick actions (icon, label), then dim notes (who created and edited it).
+   Filter builder (.ms-fbuild, the body of a popover): quick filters in two columns, saved filters as chips, your own conditions (field, operator, value), a name to save the set, and Clear and Apply.
+   Column picker (.ms-colpick, the body of a popover with no padding): a title with "n of N shown" and Reset, a search, then groups of columns; each row has a switch, its name and its type, and a shown row can be dragged
+     (UI.initColpick) to reorder; a locked row can't be switched off. */
+.ms-crumbs{display:flex;align-items:center;flex-wrap:wrap;gap:var(--ms-s-4);min-width:0;font-size:var(--ms-fs-control);line-height:18px;color:var(--ms-mute)}
+.ms-crumbs button{color:var(--ms-mute);transition:color var(--ms-t-fast)}
+.ms-crumbs button:hover{color:var(--ms-text)}
+.ms-crumbs>b{min-width:0;font-size:var(--ms-fs-phone);line-height:20px;font-weight:var(--ms-fw-semibold);color:var(--ms-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-crumbs>*{flex:none}
+.ms-crumbs>b{flex:0 1 auto}
+.ms-rbar{display:flex;align-items:center;gap:var(--ms-s-5);min-height:var(--ms-h-header);padding-block:var(--ms-s-4)}
+.ms-rbar>.ms-crumbs{flex:1 1 0;flex-wrap:nowrap;overflow:hidden;white-space:nowrap}
+.ms-rbar>*:not(.ms-crumbs){flex:none}
+.ms-rbar .ms-ib{box-shadow:inset 0 0 0 1px var(--ms-line)}
+.ms-rbar .ms-ib:hover{box-shadow:inset 0 0 0 1px var(--ms-line-strong)}
+.ms-rhead h2{margin:0;font-size:var(--ms-fs-page);line-height:28px;font-weight:var(--ms-fw-semibold);letter-spacing:-.01em;text-wrap:balance}
+.ms-rhead .id{display:block;margin-top:var(--ms-s-2);font-size:var(--ms-fs-sm);color:var(--ms-dim)}
+.ms-rhead .fig{margin-top:var(--ms-s-9)}
+.ms-rhead .fig>span{display:block;font-size:var(--ms-fs-sm);color:var(--ms-mute)}
+.ms-rhead .fig>b{display:block;margin-top:var(--ms-s-2);font-size:var(--ms-fs-large-title);line-height:38px;font-weight:var(--ms-fw-semibold);letter-spacing:-.015em;font-variant-numeric:tabular-nums}
+.ms-rhead .fig>b small{margin-inline-start:var(--ms-s-4);font-size:var(--ms-fs-lg);font-weight:var(--ms-fw-medium);letter-spacing:0;color:var(--ms-mute)}
+.ms-rhead .fig>p{display:flex;flex-wrap:wrap;gap:var(--ms-s-3) var(--ms-s-10);margin:var(--ms-s-5) 0 0;font-size:var(--ms-fs-body)}
+.ms-rhead .fig>p em{font-style:normal;color:var(--ms-mute);margin-inline-end:var(--ms-s-2)}
+
+.ms-fsec{max-width:700px;margin-inline:auto;padding:var(--ms-s-9) 0;box-shadow:inset 0 1px 0 var(--ms-line)}
+.ms-fsec:first-child{box-shadow:none}
+.ms-fsec>h4{margin:0 0 var(--ms-s-7);font-size:var(--ms-fs-control);line-height:18px;font-weight:var(--ms-fw-semibold)}
+.ms-fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ms-s-7) var(--ms-s-11)}
+.ms-fgrid>.wide{grid-column:1/-1}
+.ms-field.bad .ms-control,.ms-field.bad .ms-select,.ms-field.bad .ms-input,.ms-field.bad .ms-textarea{box-shadow:var(--ms-sh-inset),0 0 0 1px var(--ms-red),0 0 0 3px color-mix(in srgb,var(--ms-red) 16%,transparent)}
+.ms-fgrid>*{min-width:0}
+.ms-phone .ms-fgrid{grid-template-columns:1fr;gap:var(--ms-s-8)}
+
+.ms-vrows{display:grid;margin:0}
+.ms-vrow{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr);gap:var(--ms-s-8);padding:var(--ms-s-6) 0;box-shadow:inset 0 1px 0 var(--ms-line);font-size:var(--ms-fs-body);overflow-wrap:anywhere}
+.ms-vrow:first-child{box-shadow:none;padding-top:var(--ms-s-1)}
+.ms-vrow dt{color:var(--ms-mute)}
+.ms-vrow dd{margin:0}
+.ms-vrow.mono dd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:var(--ms-fs-sm);color:var(--ms-mute)}
+.ms-vrow .mute{color:var(--ms-dim)}
+.ms-vmore{margin-top:var(--ms-s-4);font-size:var(--ms-fs-control);color:var(--ms-mute);transition:color var(--ms-t-fast)}
+.ms-vmore:hover{color:var(--ms-text)}
+.ms-phone .ms-vrow{grid-template-columns:1fr;gap:var(--ms-s-1)}
+
+.ms-rside{display:grid;gap:var(--ms-s-2);align-content:start;padding:var(--ms-s-8) var(--ms-s-7);border-radius:var(--ms-r-lg);background:var(--ms-panel);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line);font-size:var(--ms-fs-control)}
+.ms-rside.sticky{position:sticky;top:var(--ms-s-6);align-self:start}
+.ms-rside h5{margin:0 0 var(--ms-s-5);font-size:var(--ms-fs-control);font-weight:var(--ms-fw-medium);overflow-wrap:anywhere}
+.ms-rside .row{display:flex;align-items:center;gap:var(--ms-s-5);height:34px;color:var(--ms-mute);text-align:start;transition:color var(--ms-t-fast)}
+.ms-rside .row:hover{color:var(--ms-text)}
+.ms-rside .row span{flex:1}
+.ms-rside p{margin:var(--ms-s-5) 0 0;color:var(--ms-mute);line-height:18px}
+.ms-rside p b{display:block;color:var(--ms-text);font-weight:var(--ms-fw-medium)}
+
+.ms-fbuild{width:min(480px,calc(100cqw - 24px));display:block}
+.ms-fbuild .hd{display:flex;align-items:center;gap:var(--ms-s-4);margin-bottom:var(--ms-s-5);font-size:var(--ms-fs-body)}
+.ms-fbuild .hd b{font-weight:var(--ms-fw-semibold);margin-inline-end:auto}
+.ms-fbuild .lbl{display:block;margin-bottom:var(--ms-s-3);font-size:var(--ms-fs-caption);color:var(--ms-mute)}
+.ms-fbuild .quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ms-s-4) var(--ms-s-5);margin-bottom:var(--ms-s-6)}
+.ms-fbuild .quick>label{display:grid;gap:var(--ms-s-2);font-size:var(--ms-fs-caption);color:var(--ms-mute)}
+.ms-fbuild .saved{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ms-s-3);margin-bottom:var(--ms-s-6)}
+.ms-fbuild .saved .lbl{flex:1 0 100%;margin-bottom:0}
+.ms-fbuild .conds{display:grid;gap:var(--ms-s-4);padding-top:var(--ms-s-6);box-shadow:inset 0 1px 0 var(--ms-line)}
+.ms-fbuild .conds .lbl{margin-bottom:0}
+.ms-fbuild .cond{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr) minmax(0,1fr) auto;gap:var(--ms-s-3);align-items:center}
+.ms-fbuild .quick .ms-select,.ms-fbuild .quick .ms-control,.ms-fbuild .cond .ms-select,.ms-fbuild .cond .ms-control{height:var(--ms-h-control);font-size:var(--ms-fs-control)}
+.ms-fbuild .add{justify-self:start}
+.ms-fbuild .save{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--ms-s-3);margin-top:var(--ms-s-6);padding-top:var(--ms-s-6);box-shadow:inset 0 1px 0 var(--ms-line)}
+.ms-fbuild .go{display:flex;align-items:center;gap:var(--ms-s-4);margin-top:var(--ms-s-6)}
+.ms-fbuild .go .sp{flex:1}
+
+.ms-colpick{width:320px;max-height:min(72vh,560px);display:flex;flex-direction:column;overflow:hidden}
+.ms-colpick .hd{display:flex;align-items:center;gap:var(--ms-s-5);padding:var(--ms-s-6) var(--ms-s-6) var(--ms-s-4) var(--ms-s-7)}
+.ms-colpick .hd b{font-size:var(--ms-fs-body);font-weight:var(--ms-fw-semibold)}
+.ms-colpick .hd span{flex:1;font-size:var(--ms-fs-sm);color:var(--ms-mute)}
+.ms-colpick .find{display:block;padding:0 var(--ms-s-6) var(--ms-s-4)}
+.ms-colpick .list{overflow-y:auto;padding:0 var(--ms-s-3) var(--ms-s-4);scrollbar-width:thin;box-shadow:inset 0 1px 0 var(--ms-line)}
+.ms-colpick .grp{margin:var(--ms-s-6) var(--ms-s-4) var(--ms-s-2);font-size:var(--ms-fs-caption);color:var(--ms-mute)}
+.ms-colpick .grp small{font-size:var(--ms-fs-caption);color:var(--ms-dim)}
+.ms-colpick .crow{display:flex;align-items:center;gap:var(--ms-s-4);min-height:var(--ms-h-big);padding:var(--ms-s-2) var(--ms-s-4);border-radius:var(--ms-r);transition:background var(--ms-t-fast)}
+.ms-colpick .crow:hover{background:var(--ms-row-hover)}
+.ms-colpick .crow[draggable=true]{cursor:grab}
+.ms-colpick .crow.drag{opacity:.4}
+.ms-colpick .crow.over{box-shadow:0 -2px 0 var(--ms-accent)}
+.ms-colpick .crow .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-colpick .crow.off .n,.ms-colpick .crow.lock .n,.ms-colpick .crow.lock small{color:var(--ms-mute)}
+.ms-colpick .crow small{font-size:var(--ms-fs-caption);color:var(--ms-dim);white-space:nowrap}
+.ms-colpick .crow .ms-switch:disabled{opacity:.45;cursor:default}
+
 /* gallery layout only: everything else is the design system itself */
 .g-crumb{flex:1;min-width:0;display:flex;align-items:center;gap:var(--ms-s-3);margin:0;font-size:var(--ms-fs-control);color:var(--ms-dim);white-space:nowrap;overflow:hidden}
 .g-crumb span::after{content:"/";margin-left:var(--ms-s-3);color:var(--ms-line)}
@@ -2262,6 +2417,14 @@ UI.feed(events)</pre><ul class="g-rules"><li>A whole row that opens something is
     <h2>Record table</h2><p>list.css · ui.js (UI.table, UI.initTable). Quick views, search, selection with an action bar, sorting and density. On a phone it turns into stacked records.</p>
     <h3>What a record table has</h3><div class="g-dt"><div><b>Quick views</b><small>views</small><span>Saved slices with counts: All, Overdue, Mine.</span><span>Chips at the top; changing the view animates rows out and in.</span><span></span></div><div><b>Search</b><small>search</small><span>Finding a record in this table.</span><span>“Search invoices”, 30 high.</span><span></span></div><div><b>Density</b><small>density</small><span>Comfortable (50) or compact (38) rows.</span><span>Comfortable by default; the person chooses.</span><span></span></div><div><b>Selection</b><small>select</small><span>Acting on several records at once.</span><span>A checkbox column; the header goes half-checked; an action bar rises from the bottom; Esc clears.</span><span></span></div><div><b>Sorting</b><small>cols[].sort</small><span>Ordering by a column.</span><span>Rows move to their new place; the arrow turns.</span><span></span></div><div><b>Footer</b><small>foot</small><span>“Showing 12 of 48” and the total.</span><span>The total cross-fades when the view changes.</span><span></span></div><div><b>Coming</b><span>Column chooser, saved filters, paging, frozen first column.</span><span>Finance already has the first three; they move into the library next.</span><span></span></div></div><div class="g-guide"><div><b>Columns</b><p>The first column is the record’s name or ID, and it opens the record. Numbers are right-aligned with tabular digits and a dim unit. Status is a tag. Dates read “13 Nov”. Keep headers to one or two words.</p></div><div><b>On phones</b><p>A table turns into stacked records: name and amount on top; number, date and status under them.</p></div></div><h3>Measurements</h3><div class="g-meas"><div><b>Header</b><span>36 high · 11.5px grey on the table-head colour</span></div><div><b>Rows</b><span>44 · two-line 56 · compact 38 · comfortable 50</span></div><div><b>Toolbar</b><span>title and count, search 30 high, density, then actions</span></div></div><h3>Columns</h3><div class="g-dodont"><div class="do"><b>Do</b><span class="g-row"><span class="g-cells"><span>Due</span><span class="r">1,250,000 <small>IQD</small></span></span></span><p>Short headers; numbers right-aligned with the unit dim.</p></div><div class="dont"><b>Don’t</b><span class="g-row"><span class="g-cells"><span>Due date of the invoice</span><span>1250000 IQD</span></span></span><p>Long headers; numbers left-aligned or ungrouped.</p></div></div><h3>Try it</h3>
     <div class="g-stage" id="tableStage"></div>
+    <h2 style="margin-top:28px">App-managed table</h2><p>list.css · ui.js (UI.table with app: true). For an app that keeps its own sort, selection and paging and redraws the table: sort state on the headers, group headers, a New row, a summary row, its own footer and the action bar.</p>
+    <div class="g-stage" id="appTableStage"></div>
+
+    <h2 style="margin-top:28px">Record pages and tools</h2><p>record.css · ui.js (UI.rbar, UI.rhead, UI.fsec, UI.vrows, UI.rside, UI.fbuild, UI.colpick, UI.initColpick). A record's bar with its breadcrumb, head and figure; its fields as value rows or as a form; the side panel; and the filter builder and column picker that open from a list's toolbar.</p>
+    <div class="g-stage" id="recordStage" style="display:grid;gap:28px"></div>
+
+    <h2 style="margin-top:28px">Section bar with a mega menu</h2><p>app-tabs.css · ui.js (UI.mnav). A flat bar of text tabs for an app with many sections: hover a group and its panel unrolls under the whole bar. Compact fields (.sm, 32px) are for toolbars and filters.</p>
+    <div class="g-stage" id="mnavStage" style="container:mnavstage / inline-size;min-height:260px"></div>
 
       <h3>Code</h3><pre class="g-code">const wrap = el.appendChild(document.createElement('div'));
 wrap.innerHTML = UI.table({ title: 'Invoices', count: 48, search: true, select: true,
@@ -3076,6 +3239,16 @@ const UI = (() => {
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire); else wire();
 
+  /* Column picker: drag a shown row up or down to reorder; onReorder gets the data-k of the shown rows in their new order. */
+  function initColpick(root, onReorder) {
+    if (!root || root._cp) return; root._cp = 1; let from = null;
+    const row = ev => ev.target.closest && ev.target.closest('.crow[draggable=true]');
+    root.addEventListener('dragstart', ev => { const r = row(ev); if (!r) return; from = r; r.classList.add('drag'); ev.dataTransfer.effectAllowed = 'move'; ev.dataTransfer.setData('text/plain', r.dataset.k || ''); });
+    root.addEventListener('dragover', ev => { const r = row(ev); if (!from || !r) return; ev.preventDefault(); $$('.crow.over', root).forEach(x => x.classList.remove('over')); if (r !== from) r.classList.add('over'); });
+    root.addEventListener('drop', ev => { const r = row(ev); if (!from || !r || r === from) return; ev.preventDefault(); r.before(from); if (onReorder) onReorder($$('.crow[draggable=true]', root).map(x => x.dataset.k)); });
+    root.addEventListener('dragend', () => { from = null; $$('.crow.drag,.crow.over', root).forEach(x => x.classList.remove('drag', 'over')); });
+  }
+
   /* ---------- builders ---------- */
   const ui = {
     esc: e, attrs: at, icon: I,
@@ -3168,21 +3341,29 @@ const UI = (() => {
        views [{ v, label, count, on }] and filter (true adds "+ Filter"); select (adds the checkbox column);
        cols [{ label, num, w, sort }] (w is a grid width; sort on a num column adds the sort arrow); rows [{ id, cells: [HTML…], amt, attrs, hidden, cls, menu }];
        foot { total, pre, unit } (shows "Showing n of n" and the total); bulk [{ v, label, icon }]; empty: the text when nothing matches; two: two-line rows;
-       rec: a record table (its rows stack on phones). Rows carry v (their quick view) and q (the text search looks in). */
-    table: ({ title, count, search, searchValue = '', searchAttrs, density, compact, actions = '', views, filter, select, cols = [], rows = [], foot, bulk, empty = 'Nothing here yet', two, rec, attrs, menu } = {}) => {
+       rec: a record table (its rows stack on phones); flat: the flat variant (no panel, taller rows). Rows carry v (their quick view) and q (the text search looks in).
+       App-managed state (an app that keeps its own sort, selection and paging and redraws the table): app: true leaves out the library's own
+       table behaviour. Then cols take html (a label with an icon), dir ('asc' | 'desc') and attrs on the sort button; select is { all: attrs, on };
+       rows take sel, cb (attrs on the row's checkbox) and nocb (no checkbox, for a summary row); bulk items take attrs, and bulkClear sets attrs on its clear button; a row { grp: { caption, tag, count, closed, attrs } } is a group header;
+       newRow { label, attrs } adds the "New" row at the end; foot { html } replaces the footer; bulkOn and bulkText show the action bar. */
+    table: ({ title, count, search, searchValue = '', searchAttrs, density, compact, actions = '', views, filter, select, cols = [], rows = [], foot, bulk, empty = 'Nothing here yet', two, rec, flat, attrs, menu, app, newRow, bulkOn, bulkText, bulkClear } = {}) => {
       const lead = select ? ['28px'] : [], tail = menu ? ['32px'] : [];
       const grid = [...lead, ...cols.map(c => c.w || 'minmax(0,1fr)'), ...tail].join(' ');
-      const head = `<div class="ms-tr th">${select ? `<span class="c-cb"><label class="ms-opt" style="min-height:0"><input type="checkbox" class="sr-only" data-all aria-label="Select all">${CB}</label></span>` : ''}${cols.map(c => `<span class="${c.num ? 'num' : ''}">${c.sort ? `<button type="button" class="ms-sort" data-dir="">${e(c.label)}${I('chevdn', 12)}</button>` : e(c.label)}</span>`).join('')}${menu ? '<span></span>' : ''}</div>`;
-      const body = rows.map(r => `<div class="${cx('ms-tr', r.cls)}"${r.id != null ? ` data-id="${e(r.id)}" aria-selected="false"` : ''}${r.amt != null ? ` data-amt="${e(r.amt)}"` : ''}${r.v != null ? ` data-v="${e(r.v)}"` : ''}${r.q != null ? ` data-q="${e(String(r.q).toLowerCase())}"` : ''}${at(r.attrs)}${r.hidden ? ' hidden' : ''}>${select ? `<span class="c-cb"><label class="ms-opt" style="min-height:0"><input type="checkbox" class="sr-only" aria-label="Select ${e(r.id)}">${CB}</label></span>` : ''}${r.cells.map((c, i) => `<span class="${cx(cols[i] && cols[i].num && 'num', cols[i] && cols[i].cls)}">${c}</span>`).join('')}${menu ? `<span class="c-act">${ui.ib({ icon: I('more'), label: 'Actions', size: 'sm', attrs: { 'data-rowmenu': r.id } })}</span>` : ''}</div>`).join('');
-      const tbl = `<div class="${cx('ms-tbl', two && 'two', rec && 'rec', compact && 'compact')}" style="--cols:${grid}">${head}${body}<p class="ms-tnone"${rows.some(r => !r.hidden) ? ' hidden' : ''}>${e(empty)}</p></div>`;
-      if (title == null && !views && !foot && !bulk) return `<div class="ms-tblwrap"${at(attrs)}>${tbl}</div>`;
+      const CBX = (inp) => `<span class="c-cb"><label class="ms-opt" style="min-height:0"><input type="checkbox" class="sr-only" ${inp}>${CB}</label></span>`;
+      const head = `<div class="ms-tr th">${select ? CBX(`${app ? at(select.all) + (select.on ? ' checked' : '') : 'data-all'} aria-label="Select all"`) : ''}${cols.map(c => `<span class="${c.num ? 'num' : ''}">${c.sort ? `<button type="button" class="ms-sort" data-dir="${c.dir || ''}"${at(c.attrs)}>${c.html || e(c.label)}${I('chevdn', 12)}</button>` : (c.html || e(c.label))}</span>`).join('')}${menu ? '<span></span>' : ''}</div>`;
+      const body = rows.map(r => r.grp
+        ? `<div class="ms-tr grp" role="button" tabindex="0" aria-expanded="${!r.grp.closed}"${at(r.grp.attrs)}>${ui.icon('chevdn', 14)}<span class="cap">${e(r.grp.caption || '')}</span>${r.grp.tag || ''}<em>${e(r.grp.count)}</em></div>`
+        : `<div class="${cx('ms-tr', r.cls)}"${r.id != null ? ` data-id="${e(r.id)}" aria-selected="${!!r.sel}"` : ''}${r.amt != null ? ` data-amt="${e(r.amt)}"` : ''}${r.v != null ? ` data-v="${e(r.v)}"` : ''}${r.q != null ? ` data-q="${e(String(r.q).toLowerCase())}"` : ''}${at(r.attrs)}${r.hidden ? ' hidden' : ''}>${select ? (r.nocb ? '<span class="c-cb"></span>' : CBX(`${app ? at(r.cb) + (r.sel ? ' checked' : '') : ''} aria-label="Select ${e(r.id)}"`)) : ''}${r.cells.map((c, i) => `<span class="${cx(cols[i] && cols[i].num && 'num', cols[i] && cols[i].cls)}">${c}</span>`).join('')}${menu ? `<span class="c-act">${ui.ib({ icon: I('more'), label: 'Actions', size: 'sm', attrs: { 'data-rowmenu': r.id } })}</span>` : ''}</div>`).join('');
+      const addRow = newRow ? `<div class="ms-tr new" role="button" tabindex="0"${at(newRow.attrs)}>${I('plus', 14)}${e(newRow.label)}</div>` : '';
+      const tbl = `<div class="${cx('ms-tbl', two && 'two', rec && 'rec', compact && 'compact')}" style="--cols:${grid}">${head}${body}${addRow}<p class="ms-tnone"${rows.some(r => !r.hidden) ? ' hidden' : ''}>${e(empty)}</p></div>`;
+      if (title == null && !views && !foot && !bulk) return `<div class="${cx('ms-tblwrap', flat && 'flat')}"${at(attrs)}>${tbl}</div>`;
       const n = rows.filter(r => !r.hidden).length;
-      return `<div class="ms-tblwrap" data-ms-table${at(attrs)}>
-        <div class="ms-tbar"><h3>${e(title || '')}${count != null ? ui.count(count) : ''}</h3>${search ? ui.search({ placeholder: search, value: searchValue, attrs: searchAttrs }) : ''}${density ? `<div class="ms-seg" aria-label="Density"><button type="button" aria-pressed="${!compact}" data-v="comfy" aria-label="Comfortable" data-tip="Comfortable">${I('list', 14)}</button><button type="button" aria-pressed="${!!compact}" data-v="compact" aria-label="Compact" data-tip="Compact">${I('collapse', 14)}</button></div>` : ''}${actions}</div>
+      return `<div class="${cx('ms-tblwrap', flat && 'flat')}"${app ? '' : ' data-ms-table'}${at(attrs)}>
+        ${title != null || search || density || actions ? `<div class="ms-tbar"><h3>${e(title || '')}${count != null ? ui.count(count) : ''}</h3>${search ? ui.search({ placeholder: search, value: searchValue, attrs: searchAttrs }) : ''}${density ? `<div class="ms-seg" aria-label="Density"><button type="button" aria-pressed="${!compact}" data-v="comfy" aria-label="Comfortable" data-tip="Comfortable">${I('list', 14)}</button><button type="button" aria-pressed="${!!compact}" data-v="compact" aria-label="Compact" data-tip="Compact">${I('collapse', 14)}</button></div>` : ''}${actions}</div>` : ''}
         ${views ? `<div class="ms-tfilters ms-chips">${views.map(v => ui.chip(v)).join('')}${filter ? ui.addchip('Filter', { 'data-tfilter': '' }) : ''}</div>` : ''}
         ${tbl}
-        ${foot ? `<div class="ms-tfoot"><span class="pg">Showing <b data-shown>${n}</b> of ${rows.length}</span>${foot.total != null ? `<span class="total"><span>Total</span><b data-total${foot.pre ? ` data-pre="${e(foot.pre)}"` : ''}${foot.unit ? ` data-unit="${e(foot.unit)}"` : ''}>${e(foot.total)}</b></span>` : ''}</div>` : ''}
-        ${bulk ? `<div class="ms-bulk" role="toolbar" aria-label="Selected rows"><b data-count>0 selected</b>${bulk.map(b => ui.btn({ label: b.label, size: 'sm', icon: b.icon ? I(b.icon, 15) : '', attrs: { 'data-bulk': b.v } })).join('')}<span class="sep"></span>${ui.ib({ icon: I('close'), label: 'Clear selection', size: 'sm', attrs: { 'data-clear': '' } })}</div>` : ''}</div>`;
+        ${foot ? `<div class="ms-tfoot">${foot.html ? foot.html : `<span class="pg">Showing <b data-shown>${n}</b> of ${rows.length}</span>${foot.total != null ? `<span class="total"><span>Total</span><b data-total${foot.pre ? ` data-pre="${e(foot.pre)}"` : ''}${foot.unit ? ` data-unit="${e(foot.unit)}"` : ''}>${e(foot.total)}</b></span>` : ''}`}</div>` : ''}
+        ${bulk ? `<div class="${cx('ms-bulk', bulkOn && 'on')}" role="toolbar" aria-label="Selected rows"><b data-count>${e(bulkText || '0 selected')}</b>${bulk.map(b => ui.btn({ label: b.label, size: 'sm', icon: b.icon ? I(b.icon, 15) : '', attrs: Object.assign({ 'data-bulk': b.v }, b.attrs) })).join('')}<span class="sep"></span>${ui.ib({ icon: I('close'), label: 'Clear selection', size: 'sm', attrs: Object.assign({ 'data-clear': '' }, bulkClear) })}</div>` : ''}</div>`;
     },
     /* Rows that work: [{ lead (an avatar or tile), title, sub, late, value, unit, tag, acts (HTML), attrs }] in a raised list. */
     item: ({ lead = '', title = '', sub = '', late, value = '', unit = '', tag = '', acts = '', attrs, cls } = {}) =>
@@ -3228,6 +3409,9 @@ const UI = (() => {
     menu: ({ title, items = [], attrs, hidden = true } = {}) => `<div class="ms-menu" role="menu"${at(attrs)}${hidden ? ' hidden' : ''}>${title ? `<div class="ms-mlab">${e(title)}</div>` : ''}${items.map(it => it === '-' ? '<div class="ms-msep"></div>'
       : `<button type="button" role="menuitem" class="${cx('ms-mi', it.danger && 'danger')}" aria-current="${!!it.current}"${at(it.attrs)}>${it.icon || ''}<b>${e(it.label)}</b>${it.kb ? `<span class="kb">${it.kb.split(' ').map(k => `<i>${e(k)}</i>`).join('')}</span>` : ''}${it.current ? I('check', 14).replace('<svg', '<svg class="chk"') : ''}</button>`).join('')}</div>`,
     menuHTML,
+    /* Section bar with a mega menu: home { label, on, attrs }, then groups [{ label, on, items: [{ label, count, on, attrs }] }]; the group's panel opens on hover or focus.
+       shut closes the panels (after a pick); attrs go on each item's button, so the app can tell what was picked. */
+    mnav: ({ label = '', app, home, groups = [], shut, attrs } = {}) => `<nav class="${cx('ms-mnav', shut && 'shut')}" aria-label="${e(label)}"${at(attrs)}>${app ? `<span class="id"><i class="${cx(app.tone)}">${app.icon || ''}</i><b>${e(app.name)}</b></span><i class="vsep" aria-hidden="true"></i>` : ''}${home ? `<button type="button" class="${cx('tab', home.on && 'on')}"${home.on ? ' aria-current="page"' : ''}${at(home.attrs)}>${e(home.label)}</button>` : ''}${groups.map(g => `<div class="mgrp"><button type="button" class="${cx('tab', g.on && 'on')}" aria-haspopup="true"${g.on ? ' aria-current="page"' : ''}>${e(g.label)}</button><div class="pn" role="menu" aria-label="${e(g.label)}"><div class="ph">${e(g.label)}</div><div class="gr" style="--r:${Math.ceil(g.items.length / 3)}">${g.items.map(x => `<button type="button" class="${cx('sub', x.on && 'on')}" role="menuitem"${at(x.attrs)}><span class="l">${e(x.label)}</span><em>${x.count ? e(x.count) : ''}</em></button>`).join('')}</div></div></div>`).join('')}</nav>`,
     /* App header: the app's icon (tone: a tn- class) and name, a divider, then tabs { label, on, attrs, caret, badge }. html goes after the tabs (menus, actions). */
     anav: ({ name = '', icon = '', tone, tabs = [], html = '', attrs } = {}) => `<nav class="ms-anav" aria-label="${e(name)} sections"${at(attrs)}><span class="id"><i class="${cx(tone)}">${icon}</i><b>${e(name)}</b></span><i class="vsep" aria-hidden="true"></i><div class="tabs" role="tablist">${tabs.map(t =>
       `<button type="button" class="tab" role="tab" aria-selected="${!!t.on}"${at(t.attrs)}>${e(t.label)}${t.badge != null ? ui.badge(t.badge, t.badgeKind || 'red') : ''}${t.caret || ''}</button>`).join('')}<span class="ink"></span></div><span class="sp"></span>${html}</nav>`,
@@ -3245,12 +3429,42 @@ const UI = (() => {
     ltitle: (title, sub = '') => `<div class="ms-ltitle"><h3>${e(title)}${sub ? `<small>${e(sub)}</small>` : ''}</h3></div>`,
     psech: (title, action = '', attrs) => `<div class="ms-psech"><b>${e(title)}</b>${action ? `<button type="button"${at(attrs)}>${e(action)}</button>` : ''}</div>`,
 
+    /* ---------- record pages (record.css) ---------- */
+    /* Breadcrumb: the parent pages as buttons [{ label, attrs }], then the record's title. */
+    crumbs: (items = [], title = '') => `<nav class="ms-crumbs" aria-label="Breadcrumb">${items.map(c => `<button type="button"${at(c.attrs)}>${e(c.label)}</button>`).join('')}${title ? `<b>${e(title)}</b>` : ''}</nav>`,
+    /* Record bar: the breadcrumb, the record's status tag (HTML), then previous and next and the actions (html). */
+    rbar: ({ crumbs = [], title = '', tag = '', html = '', attrs } = {}) => `<div class="ms-rbar"${at(attrs)}>${ui.crumbs(crumbs, title)}${tag}${html}</div>`,
+    /* Record head: the title and its ID, then one headline figure { label, value, unit } with facts [[name, value]] (or ready-made HTML spans). */
+    rhead: ({ title = '', id = '', fig, facts = [] } = {}) => `<div class="ms-rhead"><h2>${e(title)}</h2>${id ? `<span class="id">${e(id)}</span>` : ''}${fig ? `<div class="fig"><span>${e(fig.label)}</span><b>${e(fig.value)}${fig.unit ? `<small>${e(fig.unit)}</small>` : ''}</b>${facts.length ? `<p>${facts.map(f => Array.isArray(f) ? `<span><em>${e(f[0])}</em>${e(f[1])}</span>` : f).join('')}</p>` : ''}</div>` : ''}</div>`,
+    /* Form section: a title and a two-column grid of fields (UI.field). Wrap a field in UI.fwide to give it the whole row. plain: true puts the html under the title without the grid (value rows, tables); the title is then taken as HTML. */
+    fsec: (title, html = '', attrs, plain) => `<section class="ms-fsec"${at(attrs)}>${title ? `<h4>${plain ? title : e(title)}</h4>` : ''}${plain ? html : `<div class="ms-fgrid">${html}</div>`}</section>`,
+    fwide: html => `<div class="wide">${html}</div>`,
+    /* Value rows: the record's fields as label and value [{ label, html, mono }]; a missing value shows a dash. */
+    vrows: rows => `<dl class="ms-vrows">${rows.map(r => `<div class="${cx('ms-vrow', r.mono && 'mono')}"><dt>${e(r.label)}</dt><dd>${r.html != null && r.html !== '' ? r.html : '<span class="mute">–</span>'}</dd></div>`).join('')}</dl>`,
+    vmore: (n, attrs) => `<button type="button" class="ms-vmore"${at(attrs)}>Show ${e(n)} empty field${n === 1 ? '' : 's'}</button>`,
+    /* Side panel: quick actions [{ icon, label, attrs }] and dim notes [[name, value]]. */
+    rside: ({ title = '', rows = [], notes = [], sticky, attrs } = {}) => `<aside class="${cx('ms-rside', sticky && 'sticky')}"${at(attrs)}>${title ? `<h5>${e(title)}</h5>` : ''}${rows.map(r => `<button type="button" class="row"${at(r.attrs)}>${r.icon || ''}<span>${e(r.label)}</span></button>`).join('')}${notes.map(([k, v]) => `<p>${e(k)}<b>${e(v)}</b></p>`).join('')}</aside>`,
+    /* Filter builder (the body of a popover: UI.openPop, or inside .ms-pop): quick [{ label, html }] controls, saved [{ label, attrs, xattrs }], conds [HTML of one condition's controls],
+       then the name to save the set under and Clear and Apply. attrs go on the add, save, clear and apply buttons and on the name field. */
+    fbuild: ({ title = 'Filters', applied = 0, quick = [], saved = [], conds = [], name = '', nameAttrs, addAttrs, saveAttrs, clearAttrs, applyAttrs } = {}) =>
+      `<div class="ms-fbuild" role="dialog" aria-label="${e(title)}"><div class="hd"><b>${e(title)}</b>${applied ? ui.tag(applied + ' applied', 'info') : ''}</div>
+      ${quick.length ? `<div class="quick">${quick.map(q => `<label><span>${e(q.label)}</span>${q.html}</label>`).join('')}</div>` : ''}
+      ${saved.length ? `<div class="saved"><span class="lbl">Saved filters</span>${saved.map(s => `<span class="ms-chip"><button type="button"${at(s.attrs)}>${e(s.label)}</button><button type="button" class="x" aria-label="Delete saved filter ${e(s.label)}"${at(s.xattrs)}>${I('close', 11)}</button></span>`).join('')}</div>` : ''}
+      <div class="conds"><span class="lbl">Add your own conditions</span>${conds.map(c => `<div class="cond">${c}</div>`).join('')}${ui.btn({ label: 'Add condition', icon: I('plus', 13), cls: 'add', attrs: addAttrs })}</div>
+      <div class="save"><span class="ms-control"><input value="${e(name)}" placeholder="Name this filter to save it" aria-label="Filter name" autocomplete="off"${at(nameAttrs)}></span>${ui.btn({ label: 'Save', attrs: saveAttrs })}</div>
+      <div class="go">${ui.btn({ label: 'Clear', attrs: clearAttrs })}<span class="sp"></span>${ui.btn({ label: 'Apply filters', kind: 'primary', attrs: applyAttrs })}</div></div>`,
+    /* Column picker (the body of a popover with no padding: onMount(node) { node.style.padding = '0'; }): groups [{ label, small, rows: [{ label, type, on, lock, attrs, swAttrs }] }]. A shown row is draggable; see initColpick. */
+    colpick: ({ title = 'Columns', shown = 0, total = 0, resetAttrs, resetOff, find = '', findAttrs, groups = [] } = {}) =>
+      `<div class="ms-colpick" role="dialog" aria-label="${e(title)}"><div class="hd"><b>${e(title)}</b><span>${e(shown)} of ${e(total)} shown</span>${ui.btn({ label: 'Reset', attrs: Object.assign({}, resetAttrs, resetOff ? { disabled: true } : {}) })}</div>
+      <div class="find">${ui.search({ placeholder: 'Find a column', value: find, attrs: findAttrs })}</div>
+      <div class="list">${groups.map(g => `${g.label ? `<p class="grp">${e(g.label)}${g.small ? ` <small>${e(g.small)}</small>` : ''}</p>` : ''}${g.rows.map(r => `<div class="${cx('crow', !r.on && 'off', r.lock && 'lock')}"${r.on && !r.lock ? ' draggable="true"' : ''}${at(r.attrs)}>${ui.sw({ on: r.on, label: (r.on ? 'Hide ' : 'Show ') + r.label, attrs: Object.assign({}, r.swAttrs, r.lock ? { disabled: true } : {}), manual: true })}<span class="n">${e(r.label)}</span>${r.type ? `<small>${e(r.type)}</small>` : ''}</div>`).join('')}`).join('')}</div></div>`,
+
     /* behaviours */
     anim, after, calm, E, EI, SHEET, el, fmt, swap, layers, toast, useTips, flashTip, alsoSlide,
     openPop, closePop, togglePop, repopulate, popOpen, openMenu,
     initSeg, setSeg, segSync, initInkTabs, initBottomBar, setNav, navSync,
     initFieldError, initCounter, initAmount, initDateField, initPeopleField,
-    initCheckGroup, chipIn, chipOut, initFilterChips, initTable, showState, initChat,
+    initCheckGroup, chipIn, chipOut, initFilterChips, initTable, initColpick, showState, initChat,
     initLargeTitle, initCarousel, initSwipeList, initSheet, rowIn, rowOut, fmtD, addD, relDay, iso, fromIso, SW, CB
   };
   return ui;
@@ -3959,6 +4173,30 @@ const INV = [['INV-1041', 'Issued 30 Sep', 'Budoor Al-Najaf', 'BN', '#E0B45C', '
 const invRows = () => INV.map(([id, issued, cust, ini, h, due, late, tone, lab, amt]) => ({ id, amt, v: tone, q: `${id} ${cust}`,
   cells: [`<span class="c-inv"><b>${id}</b><small>${issued}</small></span>`, `<span class="c-cust">${UI.av(ini, h, 'sm org')}<span>${cust}</span></span>`, `<span class="c-due${late ? ' late' : ''}">${due}</span>`, `<span class="c-life">${UI.tag(lab, tone)}</span>`, `<span class="c-amt">${UI.fmt(amt)}<span class="ms-unit">IQD</span></span>`] }));
 const counts = () => [['all', 'All', INV.length], ['unpaid', 'Unpaid', INV.filter(r => r[7] !== 'ok').length], ['late', 'Overdue', INV.filter(r => r[6]).length]];
+$('#recordStage').innerHTML = `<div style="display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:28px;align-items:start"><div>`
+  + UI.rbar({ crumbs: [{ label: 'Payment Plan' }], title: 'B1006 · Cash — one-off cash settlement', tag: UI.tag('Validated', 'info'), html: UI.ibgroup([{ icon: I('left', 15), label: 'Previous' }, { icon: I('right', 15), label: 'Next' }]) + UI.btn({ label: 'Edit', kind: 'primary' }) })
+  + UI.rhead({ title: 'B1006 · Cash — one-off cash settlement', id: 'AG-PLAN-00021', fig: { label: 'Plan amount', value: '114,675,750', unit: 'IQD' }, facts: [['Down payment', '100%'], ['Instalments', '0 months'], ['Interest', '0%']] })
+  + `<div style="margin-top:24px">` + UI.vrows([{ label: 'Plan Name', html: 'B1006 · Cash' }, { label: 'Code', html: 'PL-B1006' }, { label: 'Route', html: UI.tag('Cash') }, { label: 'Hash', html: 'a3f9…c21e', mono: true }, { label: 'Notes', html: '' }]) + UI.vmore(3) + `</div>`
+  + UI.fsec('Terms', UI.field({ label: 'Down payment *', value: '114,675,750.00' }) + UI.field({ label: 'Down payment %', value: '100' }) + UI.field({ label: 'Route', type: 'select', options: ['Cash', 'Instalments'], value: 'Cash' }) + UI.field({ label: 'RMS Plan', type: 'locked', value: 'PL-B1006' }) + UI.fwide(UI.field({ label: 'Plan Name', value: 'B1006 · Cash — one-off cash settlement' })))
+  + `</div>` + UI.rside({ title: 'B1006 · Cash', rows: [{ icon: I('users', 15), label: 'Assign' }, { icon: I('clip', 15), label: 'Attachments' }, { icon: I('tag', 15), label: 'Tags' }], notes: [['Last edited', 'You · 1 d ago'], ['Created', 'You · 1 d ago']] }) + `</div>`
+  + `<div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">`
+  + `<div class="ms-pop" style="position:static;display:block">` + UI.fbuild({ applied: 2, quick: [{ label: 'Status', html: '<select class="ms-select" aria-label="Status"><option>Any</option><option>Draft</option><option>Validated</option></select>' }, { label: 'Route', html: '<span class="ms-control"><input placeholder="Any" aria-label="Route"></span>' }], saved: [{ label: 'Late cash plans' }],
+      conds: ['<select class="ms-select" aria-label="Field"><option>Route</option></select><select class="ms-select" aria-label="Condition"><option>equals</option></select><span class="ms-control"><input placeholder="Value" aria-label="Value"></span>' + UI.ib({ icon: I('close', 14), label: 'Remove condition', size: 'sm' })] }) + `</div>`
+  + `<div class="ms-pop" style="position:static;display:block;padding:0">` + UI.colpick({ shown: 4, total: 9, groups: [{ label: 'Shown', small: '4', rows: [{ label: 'Plan Name', type: 'Data', on: true, lock: true, attrs: { 'data-k': 'name' } }, { label: 'Code', type: 'Data', on: true, attrs: { 'data-k': 'code' } }, { label: 'Plan Amount', type: 'Currency', on: true, attrs: { 'data-k': 'amount' } }, { label: 'Route', type: 'Select', on: true, attrs: { 'data-k': 'route' } }] }, { label: 'More fields', rows: [{ label: 'Version', type: 'Int', attrs: { 'data-k': 'version' } }, { label: 'Currency', type: 'Link', attrs: { 'data-k': 'cur' } }] }] }) + `</div>`
+  + `</div>`;
+UI.initColpick($('#recordStage .ms-colpick'));
+$('#appTableStage').innerHTML = UI.table({ app: true, flat: true, select: { all: { 'data-demo': 'all' }, on: false },
+  cols: [{ label: 'Plan', sort: true, dir: 'asc', w: 'minmax(180px,2fr)' }, { label: 'Route', sort: true, w: 'minmax(120px,1fr)' }, { label: 'Amount', num: true, sort: true, w: '140px' }],
+  rows: [{ grp: { caption: 'Status', tag: UI.tag('Validated', 'ok'), count: 2 } },
+    { id: 'p1', sel: true, cb: { 'data-demo': 'row' }, cells: ['<b>B1006 · Cash</b><small>AG-PLAN-00021</small>', UI.tag('Cash'), '114,675,750'] },
+    { id: 'p2', cb: { 'data-demo': 'row' }, cells: ['<b>B0601 · Instalments</b><small>AG-PLAN-00020</small>', UI.tag('Instalments'), '703,472,000'] },
+    { grp: { caption: 'Status', tag: UI.tag('Draft', 'warn'), count: 1, closed: true } },
+    { nocb: true, cells: ['<small>3 records</small>', '', '818,147,750'] }],
+  newRow: { label: 'New plan' }, foot: { html: '<span>1–3 of 3</span>' }, bulk: [{ label: 'Copy IDs' }], bulkOn: true, bulkText: '1 selected' });
+$('#mnavStage').innerHTML = UI.mnav({ label: 'Sections', home: { label: 'Home' }, groups: [
+  { label: 'Collections', on: true, items: ['Payment plan', 'Schedule version', 'Billing record', 'Payment intent', 'Receipt evidence', 'Instrument'].map((l, i) => ({ label: l, count: i ? 12 * i : '', on: !i })) },
+  { label: 'Finance', items: ['Posting batch', 'Posting attempt', 'Fee obligation'].map(l => ({ label: l, count: 6 })) }] })
+  + `<div style="display:flex;gap:8px;margin-top:80px;max-width:420px">${UI.search({ placeholder: 'Search' }).replace('class="ms-search', 'class="ms-search sm')}<select class="ms-select sm" aria-label="Status"><option>Any status</option></select></div>`;
 $('#tableStage').innerHTML = UI.table({ title: 'Invoices', count: INV.length, search: 'Search customers or numbers', density: true, actions: UI.btn({ label: 'Export', icon: I('upfile', 15), attrs: { 'data-toast': 'Exported 6 invoices' } }),
   views: counts().map(([v, label, count]) => ({ v, label, count, on: v === 'all' })), filter: true, select: true, menu: true, rec: true,
   cols: [{ label: 'Invoice', w: 'minmax(104px,.8fr)' }, { label: 'Customer', w: 'minmax(0,1.6fr)' }, { label: 'Due', w: 'minmax(0,1fr)' }, { label: 'Status', w: '116px' }, { label: 'Amount', num: true, sort: true, w: 'minmax(110px,.9fr)' }],
