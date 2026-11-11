@@ -700,13 +700,36 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-tblwrap.flat .ms-tbar{padding:var(--ms-s-6) 0}
 .ms-tblwrap.flat .ms-tfilters{padding:0 0 var(--ms-s-6)}
 .ms-tblwrap.flat .ms-tbl{--rh:var(--ms-h-row)}
-.ms-tblwrap.flat .ms-tr{--ms-surface:var(--ms-ground);border-radius:var(--ms-r-md);font-size:var(--ms-fs-lg)}
-.ms-tblwrap.flat .ms-tr:hover+.ms-tr,.ms-tblwrap.flat .ms-tr:has(+.ms-tr:hover){box-shadow:none}
+/* rows are square, so the lines between them run straight to the edges; only the hover and selected highlight are rounded, and the two lines beside it fade */
+.ms-tblwrap.flat .ms-tr{--ms-surface:var(--ms-ground);border-radius:0;font-size:var(--ms-fs-lg)}
+.ms-tblwrap.flat .ms-tr:hover,.ms-tblwrap.flat .ms-tr[aria-selected=true]{border-radius:var(--ms-r-md)}
+.ms-tblwrap.flat .ms-tr:hover,.ms-tblwrap.flat .ms-tr:hover+.ms-tr,.ms-tblwrap.flat .ms-tr[aria-selected=true],.ms-tblwrap.flat .ms-tr[aria-selected=true]+.ms-tr{box-shadow:none}
 .ms-tblwrap.flat .ms-tr.th{min-height:44px;border-radius:0;background:transparent;font-size:var(--ms-fs-body);color:var(--ms-mute);box-shadow:inset 0 -1px 0 var(--ms-line)} /* lint-allow: the table header row */
 .ms-tblwrap.flat .ms-tr[aria-selected=true]{background:color-mix(in srgb,var(--ms-accent) 10%,transparent)}
 .ms-tblwrap.flat .ms-tr[aria-selected=true]:hover{background:color-mix(in srgb,var(--ms-accent) 14%,transparent)}
 .ms-tblwrap.flat .ms-tfoot{flex-wrap:wrap;gap:var(--ms-s-4) var(--ms-s-8);padding:var(--ms-s-6) var(--ms-s-2) 0}
 .ms-tblwrap.flat .ms-sort{gap:var(--ms-s-4)}
+
+/* Side-scrolling edge fade (.ms-xfade on anything that scrolls sideways, like a wide table):
+   the edge with more content fades out over 32px, so you can see there is more to scroll to. The fades follow the scroll position;
+   a list that fits shows no fade. */
+@property --ms-xl{syntax:"<length>";inherits:false;initial-value:0px}
+@property --ms-xr{syntax:"<length>";inherits:false;initial-value:0px}
+.ms-xfade{-webkit-mask-image:linear-gradient(90deg,transparent,black var(--ms-xl),black calc(100% - var(--ms-xr)),transparent);mask-image:linear-gradient(90deg,transparent,black var(--ms-xl),black calc(100% - var(--ms-xr)),transparent); /* lint-allow: mask colours are alpha only */
+  animation:ms-xfade linear both;animation-timeline:scroll(self inline)}
+@keyframes ms-xfade{0%{--ms-xl:0px;--ms-xr:var(--ms-s-12)}6%{--ms-xl:var(--ms-s-12)}94%{--ms-xr:var(--ms-s-12)}100%{--ms-xl:var(--ms-s-12);--ms-xr:0px}}
+
+/* Main cell (UI.tmain): the first column of a record table. A page icon, the name (one line, cut with …), a dim second line, and "Open" that fades in on hover. */
+.ms-tmain{display:flex;align-items:center;gap:var(--ms-s-5);min-width:0}
+.ms-tmain>i{flex:none;display:grid;place-items:center;color:var(--ms-dim)}
+.ms-tmain>b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:var(--ms-fw-semibold)}
+.ms-tmain>small{flex:none;font-size:var(--ms-fs-sm);color:var(--ms-dim)}
+.ms-tmain>.open{flex:none;margin-inline-start:auto;padding:var(--ms-s-1) var(--ms-s-4);border-radius:var(--ms-r-xs);background:var(--ms-panel);box-shadow:0 0 0 1px var(--ms-line);font-style:normal;font-size:var(--ms-fs-label);font-weight:var(--ms-fw-semibold);opacity:0;transition:opacity var(--ms-t-fast)}
+.ms-tr:hover .ms-tmain>.open,.ms-tr:focus-visible .ms-tmain>.open{opacity:1}
+/* a wide table scrolls sideways inside .ms-xscroll (pair it with .ms-xfade); column headers can lead with their type (.ms-thic: Aa text, # number, a list icon for a status) */
+.ms-xscroll{overflow-x:auto;scrollbar-width:thin}
+.ms-xscroll>.ms-tblwrap .ms-tbl{min-width:max-content}
+.ms-thic{display:inline-grid;place-items:center;min-width:14px;margin-inline-end:var(--ms-s-3);font-size:var(--ms-fs-label);font-weight:var(--ms-fw-semibold);color:var(--ms-dim)}
 /* Page and section headers; empty, loading and error states; and the phone patterns.
    Page header: title 20px semibold, one line under it, actions at the right end. Phones: 22px.
    Section header: 14px semibold title, a grey count, an optional action at the right; 28px above and 12px below it.
@@ -861,6 +884,23 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-phone .ms-empty{font-size:var(--ms-fs-phone);line-height:21px}
 
 .ms-pagedots i{corner-shape:round}
+
+/* App pages (desktop): the shell every app's pages sit in, Finance's design.
+   .ms-apage: 16px sides; its section bar (UI.mnav) runs edge to edge across the top.
+   .ms-ptitle (UI.ptitle): a 32px bold title with a quiet line under it; .ms-ptools: the tools row (search, icon buttons, New) at the right.
+   .ms-rpage: a record page: the record bar (UI.rbar), then the record (UI.rhead, UI.fsec + UI.vrows) beside a 260px side panel (UI.rside). */
+.ms-apage{padding:0 var(--ms-s-8) var(--ms-s-12)}
+.ms-apage>.ms-mnav{margin-inline:calc(-1 * var(--ms-s-8));padding-inline-start:var(--ms-s-8)}
+.ms-ptitle{padding:var(--ms-s-12) 0 var(--ms-s-2)}
+.ms-ptitle h1{margin:0;font-size:var(--ms-fs-large-title);line-height:1.15;font-weight:var(--ms-fw-semibold);letter-spacing:-.02em;text-wrap:balance}
+.ms-ptitle p{margin:var(--ms-s-3) 0 0;font-size:var(--ms-fs-body);color:var(--ms-mute)}
+.ms-ptools{display:flex;align-items:center;gap:var(--ms-s-4);padding:var(--ms-s-1) 0 var(--ms-s-9);margin-top:var(--ms-s-5)}
+.ms-ptools>.sp{flex:1}
+.ms-ptools>.ms-control{flex:none;width:220px;height:var(--ms-h-control)}   /* the search (UI.search) */
+.ms-apage .x-whead{padding-top:var(--ms-s-9)}
+.ms-rpage{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:var(--ms-s-12);padding-top:var(--ms-s-6)}
+.ms-rpage>.main{display:grid;gap:var(--ms-s-9);align-content:start;max-width:720px;width:100%;margin-inline:auto}
+@media (max-width:960px){.ms-rpage{grid-template-columns:minmax(0,1fr)}.ms-rpage>.ms-rside{display:none}}
 /* App tabs: a raised 50px bar (radius 12, a lit edge) with the app's tile and name, a divider, then tabs. One 2px accent ink slides and resizes
    to the selected tab (340ms; UI.initInkTabs places it, and any .ms-anav on the page gets one). Counts on tabs are badges.
    A tab can open a menu that drops under the bar. On phones the tabs scroll sideways inside the bar with a fade at the end.
@@ -900,6 +940,8 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-mnav .tab{position:relative;display:inline-flex;align-items:center;gap:7px;height:var(--ms-h-field);margin-block:8px;padding-inline:var(--ms-s-6);border-radius:var(--ms-r);font-size:var(--ms-fs-chat);font-weight:var(--ms-fw-medium);color:var(--ms-mute);transition:color var(--ms-t-fast)}
 .ms-mnav .mgrp>.tab{cursor:default}
 .ms-mnav .tab::after{content:'';position:absolute;left:var(--ms-s-6);right:var(--ms-s-6);bottom:-9px;height:2px;border-radius:var(--ms-r-hair);background:var(--ms-accent);transform:scaleX(0);transform-origin:left;transition:transform var(--ms-t-panel) var(--ms-e)}
+.ms-mnav .tab>.dd{display:grid;place-items:center;margin-inline-end:calc(-1 * var(--ms-s-2));color:var(--ms-dim);transition:transform var(--ms-t-panel) var(--ms-e),color var(--ms-t-fast)}   /* a tab that opens a menu has a down arrow; it turns up while the menu is open */
+.ms-mnav .mgrp:hover:not(.shut *)>.tab>.dd,.ms-mnav .mgrp:focus-within>.tab>.dd{transform:rotate(180deg);color:var(--ms-text)}
 .ms-mnav .tab:hover,.ms-mnav .mgrp:hover>.tab,.ms-mnav .mgrp:focus-within>.tab,.ms-mnav .tab.on{color:var(--ms-text)}
 .ms-mnav .tab.on::after,.ms-mnav .tab:hover::after,.ms-mnav .mgrp:hover>.tab::after,.ms-mnav .mgrp:focus-within>.tab::after{transform:scaleX(1)}
 .ms-mnav::before{content:'';position:absolute;left:0;right:0;top:100%;height:100vh;z-index:1;background:var(--ms-scrim);opacity:0;pointer-events:none;transition:opacity var(--ms-t-panel)}
@@ -920,7 +962,7 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-mnav .sub:hover .l,.ms-mnav .sub:focus-visible .l{text-decoration-color:var(--ms-accent)}
 .ms-mnav .sub:hover em,.ms-mnav .sub:focus-visible em,.ms-mnav .sub.on em{color:var(--ms-accent)}
 @container (max-width:640px){ .ms-mnav .gr{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none;grid-auto-flow:row} }
-@media (prefers-reduced-motion:reduce){ .ms-mnav,.ms-mnav .pn,.ms-mnav .ph,.ms-mnav .gr,.ms-mnav .tab::after{transition:none} }
+@media (prefers-reduced-motion:reduce){ .ms-mnav,.ms-mnav .pn,.ms-mnav .ph,.ms-mnav .gr,.ms-mnav .tab::after,.ms-mnav .tab>.dd{transition:none} }
 /* Menus and popovers sit one level above surfaces: the --ms-pop fill, a --ms-pop-line ring, a lit edge and --ms-sh-pop. Radius 12.
    Menus: 5px padding, 32px items (a 16px icon, the label, keys at the right). A label at the top names the object (.ms-mlab, or .ms-label);
    destructive actions go last, after a separator (.ms-msep, or hr), in red. Submenus open to the side on hover or focus (150ms), or below
@@ -1627,7 +1669,7 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
   .ms-w-steps>div>i,.ms-w-vsteps>div>i,.ms-w-month button>span i,.ms-w-counts i,.ms-w-agenda .now i::before,.ms-w-row.unread::after,.ms-w-meta.stale::before{corner-shape:round}}
 @media (prefers-reduced-motion:reduce){.ms-w-live::before,.ms-w-steps .cur.live>i,.ms-w-vsteps .cur.live>i,.ms-w-mic.on::before,.ms-w-mic.on::after,.ms-w-skel i{animation:none}}
 /* Record pages and their tools: the record bar, form sections, value rows, the record side panel, the filter builder and the column picker.
-   Record bar (.ms-rbar): the breadcrumb (.ms-crumbs: the parent page as a button, then the record's title), its status tag, then previous and next and the
+   Record bar (.ms-rbar): the breadcrumb (.ms-crumbs: the parent page as a button, a › arrow, then the record's title), its status tag, then previous and next and the
      actions at the right end. A long title is cut with an ellipsis.
    Record head (.ms-rhead): the title (20px), its ID, then one headline figure (.fig) with a few facts under it.
    Form (.ms-fsec): a section with a 12.5px semibold title and a two-column grid (.ms-fgrid) with a 28px gutter; a .wide cell takes the full row. Fields are UI.field.
@@ -1640,11 +1682,13 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-crumbs{display:flex;align-items:center;flex-wrap:wrap;gap:var(--ms-s-4);min-width:0;font-size:var(--ms-fs-control);line-height:18px;color:var(--ms-mute)}
 .ms-crumbs button{color:var(--ms-mute);transition:color var(--ms-t-fast)}
 .ms-crumbs button:hover{color:var(--ms-text)}
+.ms-crumbs>.sep{display:grid;place-items:center;color:var(--ms-dim)}   /* a › after each parent, so it reads as a path you can click back along */
 .ms-crumbs>b{min-width:0;font-size:var(--ms-fs-phone);line-height:20px;font-weight:var(--ms-fw-semibold);color:var(--ms-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ms-crumbs>*{flex:none}
 .ms-crumbs>b{flex:0 1 auto}
 .ms-rbar{display:flex;align-items:center;gap:var(--ms-s-5);min-height:var(--ms-h-header);padding-block:var(--ms-s-4)}
-.ms-rbar>.ms-crumbs{flex:1 1 0;flex-wrap:nowrap;overflow:hidden;white-space:nowrap}
+.ms-rbar>.ms-crumbs{flex:0 1 auto;flex-wrap:nowrap;overflow:hidden;white-space:nowrap}
+.ms-rbar>.ms-crumbs+*{margin-inline-end:auto}   /* the status tag sits right after the title; the record's tools go to the end */
 .ms-rbar>*:not(.ms-crumbs){flex:none}
 .ms-rbar .ms-ib{box-shadow:inset 0 0 0 1px var(--ms-line)}
 .ms-rbar .ms-ib:hover{box-shadow:inset 0 0 0 1px var(--ms-line-strong)}
@@ -6614,6 +6658,30 @@ body:is(.theme-light,:not(.theme-light)) .x-mine{border-color:transparent;border
 body:is(.theme-light,:not(.theme-light)) .x-w:not(.m-short){border-color:transparent;background:var(--ms-panel);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line),var(--ms-sh-lift)}
 /* the phone's shortcut tiles: the widget is see-through, each tile is a raised surface */
 body:is(.theme-light,:not(.theme-light)) #ws.mob .m-short button{border-color:transparent;box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line),var(--ms-sh-lift)}
+/* the floating chat box on a canvas sits in front of the page: above every card and widget, with a soft glow in the canvas colour (white in light mode) so what scrolls behind it fades away */
+.ws .x-comp.x-float{z-index:10}   /* above cards and widgets (1–4), under an open menu bar and its dim (20) */
+body:is(.theme-light,:not(.theme-light)) .x-comp.x-float{box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line),var(--ms-sh-drop),0 0 var(--ms-s-12) var(--ms-s-6) var(--x-panel)}
+body:is(.theme-light,:not(.theme-light)) .x-comp.x-float:focus-within{box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px color-mix(in srgb,var(--x-accent) 60%,var(--ms-line)),0 0 0 3px color-mix(in srgb,var(--x-accent) 22%,transparent),0 0 var(--ms-s-12) var(--ms-s-6) var(--x-panel)}
+/* the profile menu, roomy like the phone's You menu: 320px, a 48px picture, 44px rows, 15px text */
+.x-menu.x-mem{width:320px;padding:var(--ms-s-4)}
+.x-menu.x-mem .x-memh{height:auto;min-height:var(--ms-h-tile);padding:var(--ms-s-4);gap:var(--ms-s-6)}
+.x-menu.x-mem .x-memh b{font-size:var(--ms-fs-phone)}
+.x-menu.x-mem .x-memh small{margin-top:var(--ms-s-1);font-size:var(--ms-fs-chat)}
+.x-menu.x-mem .x-mstat{gap:var(--ms-s-2);padding:var(--ms-s-4) 0 var(--ms-s-2)}
+.x-menu.x-mem .x-mstat button{height:var(--ms-h-big);padding:0 var(--ms-s-6);gap:var(--ms-s-4);font-size:var(--ms-fs-title)}
+.x-menu.x-mem .x-mcstr{padding:var(--ms-s-2) 0}
+.x-menu.x-mem .x-mcstr .x-mcst{height:var(--ms-h-big);padding:0 var(--ms-s-6);font-size:var(--ms-fs-title)}
+.x-menu.x-mem hr{margin:var(--ms-s-4) calc(-1 * var(--ms-s-4))}
+.x-menu.x-mem>button[role=menuitem]:not(.x-memh){height:var(--ms-h-tap);padding:0 var(--ms-s-5);gap:var(--ms-s-6);border-radius:var(--ms-r-md);font-size:var(--ms-fs-title)}
+.x-menu.x-mem>button[role=menuitem]>b{font-weight:var(--ms-fw-medium)}
+.x-menu.x-mem .x-msub{margin-inline-start:auto;font-size:var(--ms-fs-chat);color:var(--x-dim)}
+.x-menu.x-mem>button[role=menuitem]>svg:last-child{color:var(--x-dim)}
+/* Settings: Appearance sits above Notifications */
+.x-sdlg .x-sds .x-mseg{margin:0}
+.x-sdlg .x-sds .x-mseg button{flex:1;height:var(--ms-h-control);font-size:var(--ms-fs-chat)}
+/* the "What do you want to open" options are cards: the panel colour with the 1px outline and lit top edge, no shadow (they were the grey page colour) */
+.x-lopt{border-color:transparent;background:var(--ms-panel);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line);transition:box-shadow .18s,transform .18s var(--ease),background .18s} /* lint-allow: same timing as before */
+.x-lopt:hover{border-color:transparent;box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px color-mix(in srgb,var(--x-accent) 50%,transparent)}
 /* Home's header above its widget grid (prototype/src/js/37-widgets.js): the title, then Add widget and Edit */
 .x-whead{display:flex;align-items:center;gap:var(--ms-s-4);margin:var(--ms-s-8) 0 var(--ms-s-6)}   /* 16px from the top, like the canvas's sides */
 .x-whead .x-h{margin:0}
@@ -6855,6 +6923,7 @@ body.calm .ag-js .ag-dot{transition:none}
 .fn .ms-crumbs button{color:var(--ws-mute);transition:color .15s}
 .fn .ms-crumbs button:hover{color:var(--ws-text)}
 .fn .ms-crumbs i{font-style:normal;color:var(--ws-dim)}
+.fn .ms-crumbs>.sep{display:grid;place-items:center}
 .fn .ms-crumbs b{font-size:var(--ms-fs-phone);line-height:20px;font-weight:var(--ms-fw-semibold);color:var(--ws-text)}
 
 /* Table: header 36px (11px caps, muted), rows 44px, 12.5px, hairline rows, radius 12 */
@@ -7852,7 +7921,7 @@ body.theme-light .fz-hero{background:var(--ws-panel)}
 .fn .ms-menu>button>svg:last-child:not(:first-child){margin-inline-start:auto}
 
 /* the section bar (the design system's ms-mnav) runs edge to edge in the page */
-.fn .ms-mnav{margin-inline:-16px;padding-inline:var(--ms-s-2) 0}
+.fn .ms-mnav{margin-inline:-16px;padding-inline:var(--ms-s-8) 0}   /* the app icon lines up with the page content (16px) */
 .fn .ms-mnav .pn{padding-inline:var(--ms-s-6)}
 
 /* The record list is the design system's flat table (ms-tblwrap > ms-tbl > ms-tr); Finance adds the pieces that are its own: the page icon and Open chip, the group rows and the calculation row */
@@ -8630,6 +8699,10 @@ const UI = (() => {
     card: (html, { flush, cls, attrs } = {}) => `<div class="${cx('ms-card', flush && 'flush', cls)}"${at(attrs)}>${html}</div>`,
     cardh: ({ icon = '', tone, label = '', html = '' } = {}) => `<div class="ms-card-h">${icon ? ui.tile(icon, tone) : ''}<span>${e(label)}</span><span class="sp"></span>${html}</div>`,
     /* Page header: title, one line under it, actions (HTML) at the right end. */
+    /* App page title (a list or dashboard inside an app): a big title, a quiet line under it, then a row of tools at the right (search, icon buttons, New). */
+    ptitle: ({ title = '', sub = '', tools = '' } = {}) => `<header class="ms-ptitle"><h1>${e(title)}</h1>${sub ? `<p>${e(sub)}</p>` : ''}</header>${tools ? `<div class="ms-ptools"><span class="sp"></span>${tools}</div>` : ''}`,
+    /* The first cell of a record table: a page icon, the record's name in bold, a dim second line, and "Open" that shows on hover. */
+    tmain: ({ icon = '', title = '', sub = '' } = {}) => `<span class="ms-tmain">${icon ? `<i>${icon}</i>` : ''}<b>${e(title)}</b>${sub ? `<small>${e(sub)}</small>` : ''}<em class="open">Open</em></span>`,
     ph: ({ title = '', sub = '', html = '' } = {}) => `<div class="ms-ph"><div><h2>${e(title)}</h2>${sub ? `<p>${e(sub)}</p>` : ''}</div>${html}</div>`,
     /* Section header: title, grey count, then anything at the right (a search, a button). */
     sh: ({ title = '', count, html = '' } = {}) => `<div class="ms-sech"><b>${e(title)}</b>${count != null ? ui.count(count) : ''}<span class="sp"></span>${html}</div>`,
@@ -8735,7 +8808,7 @@ const UI = (() => {
     menuHTML,
     /* Section bar with a mega menu: home { label, on, attrs }, then groups [{ label, on, items: [{ label, count, on, attrs }] }]; the group's panel opens on hover or focus.
        shut closes the panels (after a pick); attrs go on each item's button, so the app can tell what was picked. */
-    mnav: ({ label = '', app, home, groups = [], shut, attrs } = {}) => `<nav class="${cx('ms-mnav', shut && 'shut')}" aria-label="${e(label)}"${at(attrs)}>${app ? `<span class="id"><i class="${cx(app.tone)}">${app.icon || ''}</i><b>${e(app.name)}</b></span><i class="vsep" aria-hidden="true"></i>` : ''}${home ? `<button type="button" class="${cx('tab', home.on && 'on')}"${home.on ? ' aria-current="page"' : ''}${at(home.attrs)}>${e(home.label)}</button>` : ''}${groups.map(g => `<div class="mgrp"><button type="button" class="${cx('tab', g.on && 'on')}" aria-haspopup="true"${g.on ? ' aria-current="page"' : ''}>${e(g.label)}</button><div class="pn" role="menu" aria-label="${e(g.label)}"><div class="ph">${e(g.label)}</div><div class="gr" style="--r:${Math.ceil(g.items.length / 3)}">${g.items.map(x => `<button type="button" class="${cx('sub', x.on && 'on')}" role="menuitem"${at(x.attrs)}><span class="l">${e(x.label)}</span><em>${x.count ? e(x.count) : ''}</em></button>`).join('')}</div></div></div>`).join('')}</nav>`,
+    mnav: ({ label = '', app, home, groups = [], shut, attrs } = {}) => `<nav class="${cx('ms-mnav', shut && 'shut')}" aria-label="${e(label)}"${at(attrs)}>${app ? `<span class="id"><i class="${cx(app.tone)}">${app.icon || ''}</i><b>${e(app.name)}</b></span><i class="vsep" aria-hidden="true"></i>` : ''}${home ? `<button type="button" class="${cx('tab', home.on && 'on')}"${home.on ? ' aria-current="page"' : ''}${at(home.attrs)}>${e(home.label)}</button>` : ''}${groups.map(g => !(g.items && g.items.length) ? `<button type="button" class="${cx('tab', g.on && 'on')}"${g.on ? ' aria-current="page"' : ''}${at(g.attrs)}>${e(g.label)}</button>` : `<div class="mgrp"><button type="button" class="${cx('tab', g.on && 'on')}" aria-haspopup="true"${g.on ? ' aria-current="page"' : ''}>${e(g.label)}<i class="dd" aria-hidden="true">${I('chevdn', 14)}</i></button><div class="pn" role="menu" aria-label="${e(g.label)}"><div class="ph">${e(g.label)}</div><div class="gr" style="--r:${Math.ceil(g.items.length / 3)}">${g.items.map(x => `<button type="button" class="${cx('sub', x.on && 'on')}" role="menuitem"${at(x.attrs)}><span class="l">${e(x.label)}</span><em>${x.count ? e(x.count) : ''}</em></button>`).join('')}</div></div></div>`).join('')}</nav>`,
     /* App header: the app's icon (tone: a tn- class) and name, a divider, then tabs { label, on, attrs, caret, badge }. html goes after the tabs (menus, actions). */
     anav: ({ name = '', icon = '', tone, tabs = [], html = '', attrs } = {}) => `<nav class="ms-anav" aria-label="${e(name)} sections"${at(attrs)}><span class="id"><i class="${cx(tone)}">${icon}</i><b>${e(name)}</b></span><i class="vsep" aria-hidden="true"></i><div class="tabs" role="tablist">${tabs.map(t =>
       `<button type="button" class="tab" role="tab" aria-selected="${!!t.on}"${at(t.attrs)}>${e(t.label)}${t.badge != null ? ui.badge(t.badge, t.badgeKind || 'red') : ''}${t.caret || ''}</button>`).join('')}<span class="ink"></span></div><span class="sp"></span>${html}</nav>`,
@@ -8755,7 +8828,7 @@ const UI = (() => {
 
     /* ---------- record pages (record.css) ---------- */
     /* Breadcrumb: the parent pages as buttons [{ label, attrs }], then the record's title. */
-    crumbs: (items = [], title = '') => `<nav class="ms-crumbs" aria-label="Breadcrumb">${items.map(c => `<button type="button"${at(c.attrs)}>${e(c.label)}</button>`).join('')}${title ? `<b>${e(title)}</b>` : ''}</nav>`,
+    crumbs: (items = [], title = '') => `<nav class="ms-crumbs" aria-label="Breadcrumb">${items.map(c => `<button type="button"${at(c.attrs)}>${e(c.label)}</button><i class="sep" aria-hidden="true">${I('right', 14)}</i>`).join('')}${title ? `<b>${e(title)}</b>` : ''}</nav>`,
     /* Record bar: the breadcrumb, the record's status tag (HTML), then previous and next and the actions (html). */
     rbar: ({ crumbs = [], title = '', tag = '', html = '', attrs } = {}) => `<div class="ms-rbar"${at(attrs)}>${ui.crumbs(crumbs, title)}${tag}${html}</div>`,
     /* Record head: the title and its ID, then one headline figure { label, value, unit } with facts [[name, value]] (or ready-made HTML spans). */
@@ -11473,16 +11546,11 @@ function cstSwap(){ const m = $('#meMenu'); cstRefresh(!!X.meCst); if (m && !SET
 function meMenuHTML(s, d){
   if (X.meCst) return cstEditHTML();
   if (X.meLite) return `<p class="x-mlbl">Your status in ${esc(s.name)}</p>` + meStatusHTML();
-  const sw = on => `<i class="x-msw ${on ? 'on' : ''}"></i>`, muted = !!(X.mute && X.mute[current]), TH = [['dark', 'Dark'], ['light', 'Light'], ['system', 'System']];
-  return `<button class="x-memh" role="menuitem" data-a="me-profile">${pAv(ME, 'MA', 40)}<span><b>${esc(meName())}</b><small>${esc(meProf().role || s.role)} · Edit profile</small></span>${xi('right', 15, 1.5)}</button>
+  /* like the phone's You menu: who you are, your status, then Settings and Invite. Notifications, Appearance and Members live in Settings. */
+  return `<button class="x-memh" role="menuitem" data-a="me-profile">${pAv(ME, 'MA', 48)}<span><b>${esc(meName())}</b><small>${esc(meProf().role || s.role)} · Edit profile</small></span>${xi('right', 16, 1.5)}</button>
     ${meStatusHTML()}<hr>
-    <p class="x-mlbl">${esc(s.name)}</p>
-    <button role="menuitem" data-a="me-go" data-p="info">${xi('gear', 16, 1.3)}<b>Space settings</b></button>
-    <button role="menuitem" data-a="me-go" data-p="members">${xi('users', 16, 1.3)}<b>Members</b><em class="x-mct">${humans(d).length + 1}</em></button>
-    <button role="menuitem" data-a="me-invite">${xi('invite', 16, 1.3)}<b>Invite people</b></button>
-    <button role="menuitemcheckbox" aria-checked="${!muted}" data-a="me-mute">${xi('bell', 16, 1.3)}<b>Notifications</b>${sw(!muted)}</button><hr>
-    <p class="x-mlbl">Appearance</p>
-    <div class="x-mseg" role="radiogroup" aria-label="Appearance">${TH.map(([k, t]) => `<button role="radio" data-a="me-theme" data-th="${k}" aria-checked="${SET.theme === k}" class="${SET.theme === k ? 'on' : ''}">${t}</button>`).join('')}</div>
+    <button role="menuitem" data-a="me-go" data-p="info">${xi('gear', 18, 1.3)}<b>Settings</b><small class="x-msub">${esc(s.name)}</small>${xi('right', 16, 1.5)}</button>
+    <button role="menuitem" data-a="me-invite">${xi('invite', 18, 1.3)}<b>Invite people</b></button>
 `;
 }
 function meStatusHTML(){ return `<div class="x-mstat" role="radiogroup" aria-label="Your status">${STATS.map(([st, col]) => `<button role="radio" data-a="stat" data-s="${st}" aria-checked="${X.stat === st}" class="${X.stat === st ? 'on' : ''}"><i class="x-sdot" style="background:${col}"></i>${st}</button>`).join('')}</div>
@@ -11495,6 +11563,7 @@ function spaceDlg(focus){
   dl.innerHTML = `<div class="x-dlg x-sdlg" role="dialog" aria-modal="true" aria-labelledby="spT">
     <header><span class="x-sdot2" style="background:${hue}"></span><b id="spT">${esc(sp.name)}</b><button class="x-dx" data-k="close" aria-label="Close">${xi('close', 18, 1.4)}</button></header>
     <p class="x-dnote">You are ${esc(sp.role || 'a member')} here.</p>
+    <section class="x-sds"><h4>Appearance</h4><div class="x-mseg" role="radiogroup" aria-label="Appearance">${[['dark', 'Dark'], ['light', 'Light'], ['system', 'System']].map(([k, t]) => `<button role="radio" data-k="theme" data-th="${k}" aria-checked="${SET.theme === k}" class="${SET.theme === k ? 'on' : ''}">${t}</button>`).join('')}</div></section>
     <section class="x-sds"><h4>Notifications</h4><div class="x-sdrow"><span><b>Sounds and pop-ups</b><small>Muting keeps this space quiet. Calls still ring.</small></span>${sw()}</div></section>
     <section class="x-sds"><h4>Invite people</h4><div class="x-sdrow"><span class="x-sdlink">${esc(link)}</span><button class="x-dgo ghost" data-k="copy">${xi('copy', 15, 1.4)}Copy link</button></div></section>
     <section class="x-sds" data-sec="members"><h4>Members <em>${ppl.length}</em></h4><div class="x-sdppl">${ppl.map(n => `<div class="x-sdp">${pAv(n, keyOf(n), 32)}<span><b>${esc(n === ME ? meName() + ' (you)' : n)}</b><small><i style="background:${statCol(n === ME ? X.stat : statOf(n))}"></i>${esc(n === ME ? X.stat : statOf(n))}</small></span>${n === ME ? '<em class="x-sdrole">Owner</em>' : `<button class="x-dgo ghost sm" data-k="msg" data-n="${esc(n)}">Message</button>`}</div>`).join('')}</div></section>
@@ -11505,6 +11574,7 @@ function spaceDlg(focus){
   const key = e => { if (e.key === 'Escape') { e.stopPropagation(); e.preventDefault(); close(); } }; document.addEventListener('keydown', key, true);
   dl.addEventListener('click', e => { if (e.target === dl) return close(); const b = e.target.closest('[data-k]'); if (!b) return; const k = b.dataset.k;
     if (k === 'close') close();
+    if (k === 'theme') { SET.theme = b.dataset.th; setSave(); applySettings(); b.parentElement.querySelectorAll('button').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); }); toast(SET.theme === 'light' ? 'Light mode is on inside your spaces' : SET.theme === 'dark' ? 'Dark mode' : 'Following your system'); }
     if (k === 'copy') { try { navigator.clipboard && navigator.clipboard.writeText('https://' + link).catch(() => {}); } catch (er) {} b.innerHTML = `${xi('check', 15, 1.6)}Copied`; toast(`Invite link to ${sp.name} copied`); }
     if (k === 'mute') { X.mute = X.mute || {}; X.mute[current] = !X.mute[current]; b.setAttribute('aria-checked', !X.mute[current]); b.firstElementChild.classList.toggle('on', !X.mute[current]); toast(X.mute[current] ? `${sp.name} is muted` : `Notifications on for ${sp.name}`); }
     if (k === 'msg') { const n = b.dataset.n; close(); openWin(n); renderSpace(S(current)); focusComposer('w:' + n); } });
@@ -17625,7 +17695,7 @@ const go2 = (mode, dt, name) => { FU.pg = 0; if (mode === 'form' && name !== FU.
 /* ---------- the bar with breadcrumb ---------- */
 const pagesPop = cur => `<div class="ms-pop ms-menu fn-pos fn-pgs" role="menu" style="inset-inline-start:0;top:38px">${GROUPS.map(([g, list]) => `<p class="fn-pgh">${e(g)}</p>${list.map(dt => `<button role="menuitem" data-fn="nav" data-go="${e(dt)}">${xi((HI[dt] || ['file'])[0], 15, 1.4)}<span class="fn-pgn">${e(dt)}</span>${dt === cur ? xi('check', 14, 1.5) : ''}</button>`).join('')}`).join('')}</div>`;
 const switcher = dt => `<span class="fn-wrap"><button class="fn-sw" data-fn="pop" data-p="pages" aria-haspopup="menu" aria-expanded="${FU.pop === 'pages'}" title="Go to another page"><b>${e(dt)}</b>${xi('chevdn', 14, 1.5)}</button>${FU.pop === 'pages' ? pagesPop(dt) : ''}</span>`;
-const crumbs = (dt, last, extra) => `<nav class="ms-crumbs fn-title" aria-label="Breadcrumb">${last ? `<button type="button" class="fn-lbl fn-route" data-fn="list" data-dt="${e(dt)}" title="Back to ${e(dt)}">${e(dt)}</button><b>${last}</b>${extra || ''}` : `<b class="fn-lbl on">${e(dt)}</b>`}</nav>`;
+const crumbs = (dt, last, extra) => `<nav class="ms-crumbs fn-title" aria-label="Breadcrumb">${last ? `<button type="button" class="fn-lbl fn-route" data-fn="list" data-dt="${e(dt)}" title="Back to ${e(dt)}">${e(dt)}</button><i class="sep" aria-hidden="true">${xi('right', 14)}</i><b>${last}</b>${extra || ''}` : `<b class="fn-lbl on">${e(dt)}</b>`}</nav>`;
 const sel = (id, opts, cur) => `<select data-fnf="${id}">${opts.map(o => `<option value="${e(o)}" ${o === cur ? 'selected' : ''}>${e(o ? lbl(o) : '')}</option>`).join('')}</select>`;
 /* ---------- aggregation, the Odoo way: group a list by a field, total the numbers inside each group, and keep a footer of calculations (Airtable's group bar and summary row, Notion's Calculate) ---------- */
 const AG = (() => { try { return JSON.parse(localStorage.getItem('ms-fin-agg') || '{}'); } catch (x) { return {}; } })();
@@ -17673,7 +17743,7 @@ function listHTML(dt){
   const nRec = L.length === all.length ? iqn(L.length) + ' record' + (L.length === 1 ? '' : 's') : iqn(L.length) + ' of ' + iqn(all.length);
   const foot = L.length ? `<div class="ms-tr ag-foot" role="row"><span class="c0"></span>${(idFirst ? [`<span class="ag-n0">${nRec}</span>`] : []).concat(colDefs.map((c, i) => (i === 0 && tf) ? `<span class="ag-n0">${nRec}</span>` : `<span class="${isNumCol(c) ? 'num' : ''}"><button class="ag-fc" data-fn="agmenu" data-k="${c.k}" aria-haspopup="menu" aria-label="Calculate ${e(c.l)}">${agCell(dt, fdOf(c.k), L) || '<span class="ag-add">Calculate</span>'}</button></span>`)).join('')}<span></span></div>` : '';
   const empty = !all.length ? `<div class="fn-empty"><b>You haven’t created a ${e(dt)} yet</b><button class="ms-btn primary" data-fn="new">${xi('plus', 14, 1.5)}Create your first ${e(dt)}</button></div>` : '';
-  return `<div class="fn ms">${bar(dt)}${flt}${empty || (L.length ? `<div class="ms-tblwrap flat fn-tw"><div class="ms-tbl" role="table" style="--cols:${widths.join(' ')};min-width:${minW}px">${th}${body}<div class="ms-tr new" role="button" data-fn="new" tabindex="0"><span class="nt-plus">${xi('plus', 14, 1.6)}</span> New ${e(dt)}</div>${foot}</div></div>` : `<div class="fn-empty"><b>Nothing matches these filters</b><button class="ms-btn" data-fn="clear">Clear filters</button></div>`)}
+  return `<div class="fn ms">${bar(dt)}${flt}${empty || (L.length ? `<div class="ms-tblwrap flat fn-tw ms-xfade"><div class="ms-tbl" role="table" style="--cols:${widths.join(' ')};min-width:${minW}px">${th}${body}<div class="ms-tr new" role="button" data-fn="new" tabindex="0"><span class="nt-plus">${xi('plus', 14, 1.6)}</span> New ${e(dt)}</div>${foot}</div></div>` : `<div class="fn-empty"><b>Nothing matches these filters</b><button class="ms-btn" data-fn="clear">Clear filters</button></div>`)}
     ${all.length && L.length && gF ? `<div class="ms-list-foot"><span>${iqn(L.length)} record${L.length === 1 ? '' : 's'} in ${FU.gkeys.length} group${FU.gkeys.length === 1 ? '' : 's'}</span></div>` : all.length && L.length ? `<div class="ms-list-foot"><label>Rows per page <select class="ms-select sm" data-fnlim aria-label="Rows per page">${[20, 100, 500, 2500].map(n => `<option value="${n}" ${FU.lim === n ? 'selected' : ''}>${n}</option>`).join('')}</select></label><span>${pg * FU.lim + 1}–${Math.min(L.length, (pg + 1) * FU.lim)} of ${L.length}</span><span class="ms-sp"></span><button class="ms-btn" data-fn="pgprev" ${pg > 0 ? '' : 'disabled'}>Previous</button><button class="ms-btn" data-fn="pgnext" ${pg < pages - 1 ? '' : 'disabled'}>Next</button></div>` : ''}
     ${selN ? `<div class="ms-bulk" role="toolbar" aria-label="Selected rows"><b>${selN} selected</b><button class="ms-btn" data-fn="copyids">Copy IDs</button><button class="ms-ibtn compact" data-fn="selclear" aria-label="Clear selection" title="Clear selection">${xi('close', 13, 1.5)}</button></div>` : ''}${/^calc:/.test(FU.pop || '') ? calcPop(dt) : ''}</div>`;
   function selStatus(o){ return `<select class="ms-select sm" data-fnf="status" aria-label="Status">${o.map(x => `<option value="${e(x)}" ${FU.f.status === x ? 'selected' : ''}>${x ? e(lbl(x)) : 'Status'}</option>`).join('')}</select>`; }
@@ -17963,7 +18033,7 @@ function viewHTML(dt){
     const rows = shown.length ? `<dl class="fn-rows">${shown.map(f => { const v = val(dt, rec, f.k), em = isEmpty(f, v); return `<div><dt>${e(f.l)}</dt><dd class="${em ? 'nil' : ''}">${em ? '–' : fmtv(dt, f, v)}</dd></div>`; }).join('')}</dl>` : '';
     const single = tbls.length === 1 && !rows, cnt = single ? (Array.isArray(rec[tbls[0].k]) ? rec[tbls[0].k].length : 0) : 0;
     const grids = tbls.map(f => { const cols = ctCols(f.o), data = (Array.isArray(rec[f.k]) ? rec[f.k] : []).map(r => typeof r === 'string' ? { title: r } : r); if (!data.length && !FU.showEmpty) return ''; const total = f.o === 'AG Plan Row' ? sum(data, 'amount') : 0;
-      return `<div class="fn-grid2">${single ? '' : `<h5>${e(f.l)} <small>${data.length}</small></h5>`}${data.length ? `<div class="ms-tblwrap flat fn-tw"><div class="ms-tbl static" role="table" style="--cols:${cols.map(() => 'minmax(110px,1fr)').concat(total ? ['170px'] : []).join(' ')};--rh:46px;min-width:${(cols.length + (total ? 1 : 0)) * 124}px"><div class="ms-tr th" role="row">${cols.map(c => `<span role="columnheader" class="${c.n ? 'num' : ''}">${e(c.l.replace('*', ''))}</span>`).join('')}${total ? '<span role="columnheader">Share</span>' : ''}</div>${data.map(r => `<div class="ms-tr" role="row">${cols.map((c, j) => `<span class="${c.n ? 'num' : ''}">${c.k === 'offset_days' ? 'Day ' + e(r[c.k] ?? 0) : linkish(r[c.k], c) || '<span class="mu">–</span>'}</span>`).join('')}${total ? `<span><span class="fn-share"><i style="width:${Math.round((r.amount || 0) / total * 100)}%"></i></span><em>${Math.round((r.amount || 0) / total * 100)}%</em></span>` : ''}</div>`).join('')}</div></div>` : '<p class="nil">No rows.</p>'}</div>`; }).join('');
+      return `<div class="fn-grid2">${single ? '' : `<h5>${e(f.l)} <small>${data.length}</small></h5>`}${data.length ? `<div class="ms-tblwrap flat fn-tw ms-xfade"><div class="ms-tbl static" role="table" style="--cols:${cols.map(() => 'minmax(110px,1fr)').concat(total ? ['170px'] : []).join(' ')};--rh:46px;min-width:${(cols.length + (total ? 1 : 0)) * 124}px"><div class="ms-tr th" role="row">${cols.map(c => `<span role="columnheader" class="${c.n ? 'num' : ''}">${e(c.l.replace('*', ''))}</span>`).join('')}${total ? '<span role="columnheader">Share</span>' : ''}</div>${data.map(r => `<div class="ms-tr" role="row">${cols.map((c, j) => `<span class="${c.n ? 'num' : ''}">${c.k === 'offset_days' ? 'Day ' + e(r[c.k] ?? 0) : linkish(r[c.k], c) || '<span class="mu">–</span>'}</span>`).join('')}${total ? `<span><span class="fn-share"><i style="width:${Math.round((r.amount || 0) / total * 100)}%"></i></span><em>${Math.round((r.amount || 0) / total * 100)}%</em></span>` : ''}</div>`).join('')}</div></div>` : '<p class="nil">No rows.</p>'}</div>`; }).join('');
     if (!rows && !grids) return ''; return `<section class="ms-fsec">${name ? `<h4>${e(name)}${single ? ` <small>${cnt}</small>` : ''}</h4>` : ''}${rows}${grids}</section>`; }).join('');
   const empties = hidden || FU.showEmpty ? `<div class="fn-vem"><button class="ms-btn" data-fn="empties">${FU.showEmpty ? 'Hide empty fields' : 'Show ' + hidden + ' empty field' + (hidden === 1 ? '' : 's')}</button></div>` : '';
   const side = `<aside class="ms-side sticky"><h5><b>${e(rec.name)}</b></h5>${[['Assign', 'person'], ['Attachments', 'clip'], ['Tags', 'note'], ['Share', 'link']].map(s => `<div class="ms-side-row">${xi(s[1], 15, 1.3)}<span>${s[0]}</span><button class="ms-ibtn" data-fn="stub" data-s="${s[0]}" aria-label="Add ${s[0]}">${xi('plus', 14, 1.4)}</button></div>`).join('')}<p>Last Edited By You<b>yesterday</b></p><p>Created By ${rec.captured_by === 'You' ? 'You' : 'Salesman'}<b>yesterday</b></p></aside>`;
@@ -18581,6 +18651,92 @@ document.addEventListener('click', e => {
 /* the "Widgets" button under the greeting opens the column with the gallery */
 $('#lwAdd').addEventListener('click', () => setTimeout(() => { const b = $('#lwcol [data-lwk=add]'); if (b && LWK.grid) MSW.gallery(b, LWK.grid, { cats: ['Your day'] }); }, 360));
 lwRender();
+/* ---------- every app's desktop pages, in Finance's design, built only from the design system ----------
+   The bar (UI.mnav with the app's icon and name), a widget dashboard on Home (the widget kit), lists with a big title (UI.ptitle),
+   a search and New, and a flat record table (UI.table flat + UI.tmain); a row opens its record page (UI.rbar, UI.rhead, UI.fsec + UI.vrows, UI.rside).
+   Finance keeps its own pages (34-finance.js); it uses the same bar and parts. */
+(() => {
+  const AP = { an: '', rec: null, shut: 0, q: {} };
+  const redraw = top => { const b = $('#ws .x-body'), y = b ? b.scrollTop : 0; renderSpace(S(current)); const b2 = $('#ws .x-body'); if (b2) b2.scrollTop = top ? 0 : y; };
+  const tagOf = (a, t) => { const [l, k] = appSt(a, t); return UI.tag(l, k === 'grey' ? '' : k); };
+  const pageOf = a => { const an = X.an || [0, -1]; if (an[0] === 0) return null; const g = a.nav[an[0]] || a.nav[1]; return (g[1] || [])[an[1] < 0 ? 0 : an[1]] || g[0]; };
+  const numOf = v => parseFloat(String(v).replace(/[^\d.-]/g, '')) || 0;
+
+  /* the bar: the app, Home, then each section; a section with pages opens its wide menu on hover */
+  const bar = a => { const an = X.an || [0, -1];
+    return UI.mnav({ label: a.name + ' sections', app: { name: a.name, icon: xi(a.ic, 15, 1.3), tone: 'tn-' + a.tone }, shut: AP.shut,
+      home: { label: a.nav[0][0], on: an[0] === 0, attrs: { 'data-ap': 'home' } },
+      groups: a.nav.slice(1).map((n, gi) => ({ label: n[0], on: an[0] === gi + 1, attrs: { 'data-ap': 'nav', 'data-g': gi + 1, 'data-i': -1 },
+        items: (n[1] || []).map((t, j) => ({ label: t, on: an[0] === gi + 1 && an[1] === j, attrs: { 'data-ap': 'nav', 'data-g': gi + 1, 'data-i': j } })) })) }); };
+
+  /* Home: the widget kit, filled from the app's own numbers and records */
+  const TONE = { ok: 'sage', info: 'blue', warn: 'gold', bad: 'coral', ah: 'purple', grey: 'slate' };
+  const reg = a => { if (AP['p' + a.id]) return; AP['p' + a.id] = 1; const P = (id, cat, type, size, title, icon, data) => MSW.preset(`ap.${a.id}.${id}`, { category: cat, type, size, title, icon, data });
+    const si = a.cols.indexOf('Status'), ni = a.cols.findIndex(c => NUMCOL.test(c)), rows = () => appRows(a);
+    a.stats.forEach((t, i) => P('s' + i, 'Figures', 'metric', 's', t[0], i ? 'perf' : a.ic, () => ({ value: t[1], caption: t[2] })));
+    if (si >= 0) P('status', 'Charts', 'breakdown', 'm', 'By status', 'poll', () => { const g = {}; rows().forEach(r => { g[r[si]] = (g[r[si]] || 0) + 1; }); const E = Object.entries(g);
+      return { total: String(rows().length), unit: rows().length === 1 ? 'record' : 'records', items: E.map(([k, n]) => ({ label: appSt(a, k)[0], value: n, display: String(n), tone: TONE[appSt(a, k)[1]] || 'slate' })) }; });
+    P('latest', 'Lists', 'list', 'l', a.tt || 'Latest', 'list', () => ({ kind: 'default', total: rows().length, items: rows().slice(0, 6).map((r, i) => ({ id: String(i), title: r[0], sub: [r[1], si >= 0 ? appSt(a, r[si])[0] : ''].filter(Boolean).join(' · '), icon: 'file', tone: TONE[si >= 0 ? appSt(a, r[si])[1] : 'grey'] || 'slate', value: ni >= 0 ? r[ni] : undefined })) }));
+    P('quick', 'Shortcuts', 'launcher', 'm', 'Quick actions', 'plus', () => ({ kind: 'actions', actions: [{ icon: 'plus', label: a.cta || 'New', tone: 'purple' }].concat(a.nav.slice(1, 4).map(n => ({ icon: 'list', label: (n[1] || [n[0]])[0], tone: 'slate' }))) }));
+  };
+  const home = a => { reg(a); const key = `app:${a.id}:desk`, si = a.cols.indexOf('Status');
+    WK_GAL[key] = { cats: ['Figures', 'Charts', 'Lists', 'Shortcuts'] };
+    WK_ON[key] = { open(w, t) { const d = w.data || {}, it = (d.items || []).find(x => x.title === t), act = (d.actions || []).find(x => x.label === t);
+      if (it && it.id != null && w.preset.endsWith('.latest')) { X.an = [1, 0]; AP.an = X.an.join(); AP.rec = +it.id; return redraw(true); }
+      if (act) { if (act.label === (a.cta || 'New')) return appNewDlg(a); const g = a.nav.findIndex(n => (n[1] || [n[0]])[0] === act.label); X.an = [g, 0]; return redraw(true); }
+      X.an = [1, 0]; redraw(true); } };
+    const defs = a.stats.map((t, i) => ({ preset: `ap.${a.id}.s${i}`, size: 's', id: 's' + i })).concat(si >= 0 ? [{ preset: `ap.${a.id}.status`, size: 'm', id: 'status' }] : [], [{ preset: `ap.${a.id}.quick`, size: 'm', id: 'quick' }, { preset: `ap.${a.id}.latest`, size: 'l', id: 'latest' }]);
+    return wkHead('Dashboard', key, 'desk', defs); };
+
+  /* a list: the big title, its tools, then the flat record table */
+  const list = (a, page) => { const rows = appRows(a), q = (AP.q[a.id] || '').toLowerCase(), si = a.cols.indexOf('Status'), hit = r => !q || r.join(' ').toLowerCase().includes(q), n = rows.filter(hit).length;
+    const cols = a.cols.map((c, i) => ({ label: c, html: `<span class="ms-thic">${NUMCOL.test(c) ? '#' : i === si ? xi('list', 13, 1.5) : 'Aa'}</span>${esc(c)}`, num: NUMCOL.test(c), w: i === 0 ? 'minmax(260px,2.2fr)' : NUMCOL.test(c) ? 'minmax(120px,1fr)' : 'minmax(150px,1.2fr)' }));
+    const tools = UI.search({ placeholder: 'Search', value: AP.q[a.id] || '', attrs: { 'data-apq': a.id, 'aria-label': 'Search ' + page } }) + UI.btn({ label: 'New', kind: 'primary', icon: xi('plus', 15, 1.5), attrs: { 'data-ap': 'new' } });
+    return UI.ptitle({ title: page, sub: n === rows.length ? `${rows.length} record${rows.length === 1 ? '' : 's'}` : `${n} of ${rows.length} records`, tools })
+      + '<div class="ms-xscroll ms-xfade">' + UI.table({ flat: true, cols, empty: 'Nothing matches this search.', newRow: { label: 'New ' + (a.cta || 'record').replace(/^(New|Add)\s+/i, ''), attrs: { 'data-ap': 'new' } },
+        rows: rows.map((r, i) => ({ id: i, q: r.join(' '), hidden: !hit(r), attrs: { 'data-ap': 'open', 'data-r': i, tabindex: 0, role: 'button' },
+          cells: r.map((c, j) => j === 0 ? UI.tmain({ icon: xi('file', 16, 1.4), title: c }) : j === si ? tagOf(a, c) : esc(c)) })) }) + '</div>'; };
+
+  /* a record: the bar with the way back, the record, its fields, and the side panel */
+  const record = (a, page) => { const rows = appRows(a), i = Math.max(0, Math.min(AP.rec, rows.length - 1)), r = rows[i], si = a.cols.indexOf('Status'), ni = a.cols.findIndex(c => NUMCOL.test(c));
+    const nav = UI.ib({ icon: xi('left', 15, 1.4), label: 'Previous record', attrs: { 'data-ap': 'prev', disabled: i <= 0 } }) + UI.ib({ icon: xi('right', 15, 1.4), label: 'Next record', attrs: { 'data-ap': 'next', disabled: i >= rows.length - 1 } }) + UI.btn({ label: 'Edit', kind: 'primary', attrs: { 'data-ap': 'edit' } });
+    const fig = ni >= 0 ? { label: a.cols[ni], value: r[ni] } : null;
+    return UI.rbar({ crumbs: [{ label: page, attrs: { 'data-ap': 'back', title: 'Back to ' + page } }], title: r[0], tag: si >= 0 ? tagOf(a, r[si]) : '', html: nav })
+      + `<div class="ms-rpage"><div class="main">${UI.rhead({ title: r[0], id: `${a.name} · ${page}`, fig })}${UI.fsec('Details', UI.vrows(a.cols.map((c, j) => ({ label: c, html: j === si ? tagOf(a, r[j]) : esc(r[j]) }))), null, true)}</div>`
+      + UI.rside({ title: r[0], sticky: true, rows: [['Assign', 'person'], ['Attachments', 'clip'], ['Tags', 'note'], ['Share', 'link']].map(([l, ic]) => ({ label: l, icon: xi(ic, 15, 1.3), attrs: { 'data-ap': 'stub', 'data-s': l } })), notes: [['Last edited by you', 'yesterday'], ['Created by you', 'last week']] }) + '</div>'; };
+
+  const prevNav = appNavHTML; appNavHTML = a => a.id === 'fin' ? prevNav(a) : '';
+  const prevHTML = appHTML;
+  appHTML = function (s, a) {
+    if (a.id === 'fin') return prevHTML(s, a);
+    const key = a.id + ':' + (X.an || [0, -1]).join(); if (key !== AP.an) { AP.an = key; AP.rec = null; }
+    const page = pageOf(a);
+    const body = !page ? home(a) : AP.rec != null ? record(a, page) : list(a, page);
+    return `<div class="ms-apage" data-apapp="${esc(a.id)}">${bar(a)}${body}</div>`;
+  };
+
+  /* what the pages do */
+  const appIn = el => APP((el.closest('[data-apapp]') || {}).dataset ? el.closest('[data-apapp]').dataset.apapp : '');
+  document.addEventListener('click', ev => { const el = ev.target.closest('#ws .ms-apage [data-ap]'); if (!el) return; const a = appIn(el); if (!a) return; const k = el.dataset.ap, rows = appRows(a);
+    if (k === 'home') { X.an = [0, -1]; AP.shut = 1; return redraw(true); }
+    if (k === 'nav') { X.an = [+el.dataset.g, +el.dataset.i]; AP.shut = 1; return redraw(true); }
+    if (k === 'open') { AP.rec = +el.dataset.r; return redraw(true); }
+    if (k === 'back') { AP.rec = null; return redraw(true); }
+    if (k === 'prev' || k === 'next') { AP.rec = Math.max(0, Math.min(rows.length - 1, AP.rec + (k === 'next' ? 1 : -1))); return redraw(); }
+    if (k === 'new') return appNewDlg(a);
+    if (k === 'edit') return toast(`Editing ${rows[AP.rec][0]} opens its form in the full app`);
+    if (k === 'stub') return toast(`${el.dataset.s}: ${rows[AP.rec][0]}`);
+  });
+  document.addEventListener('keydown', ev => { if (ev.key !== 'Enter') return; const el = ev.target.closest && ev.target.closest('#ws .ms-apage .ms-tr[data-ap]'); if (el) { ev.preventDefault(); el.click(); } });
+  /* search filters the rows as you type, and the count under the title follows */
+  document.addEventListener('input', ev => { const ip = ev.target.closest && ev.target.closest('#ws [data-apq]'); if (!ip) return; const a = APP(ip.dataset.apq), q = ip.value.toLowerCase(); AP.q[a.id] = ip.value;
+    const pg = ip.closest('.ms-apage'), trs = [...pg.querySelectorAll('.ms-tr[data-q]')]; let n = 0; trs.forEach(t => { const on = !q || t.dataset.q.includes(q); t.hidden = !on; if (on) n++; });
+    const p = pg.querySelector('.ms-ptitle p'); if (p) p.textContent = n === trs.length ? `${trs.length} record${trs.length === 1 ? '' : 's'}` : `${n} of ${trs.length} records`;
+    const none = pg.querySelector('.ms-tnone'); if (none) none.hidden = n > 0; });
+  /* a menu closes after a pick, and opens again once the pointer leaves the bar */
+  document.addEventListener('mousedown', ev => { if (ev.target.closest('#ws .ms-apage .ms-mnav .mgrp > .tab')) ev.preventDefault(); });
+  document.addEventListener('mousemove', ev => { if (AP.shut && !ev.target.closest('.ms-apage .ms-mnav')) { AP.shut = 0; const n = document.querySelector('.ms-apage .ms-mnav'); if (n) n.classList.remove('shut'); } });
+})();
 </script>
 </body>
 </html>

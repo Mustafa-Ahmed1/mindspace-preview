@@ -729,13 +729,36 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-tblwrap.flat .ms-tbar{padding:var(--ms-s-6) 0}
 .ms-tblwrap.flat .ms-tfilters{padding:0 0 var(--ms-s-6)}
 .ms-tblwrap.flat .ms-tbl{--rh:var(--ms-h-row)}
-.ms-tblwrap.flat .ms-tr{--ms-surface:var(--ms-ground);border-radius:var(--ms-r-md);font-size:var(--ms-fs-lg)}
-.ms-tblwrap.flat .ms-tr:hover+.ms-tr,.ms-tblwrap.flat .ms-tr:has(+.ms-tr:hover){box-shadow:none}
+/* rows are square, so the lines between them run straight to the edges; only the hover and selected highlight are rounded, and the two lines beside it fade */
+.ms-tblwrap.flat .ms-tr{--ms-surface:var(--ms-ground);border-radius:0;font-size:var(--ms-fs-lg)}
+.ms-tblwrap.flat .ms-tr:hover,.ms-tblwrap.flat .ms-tr[aria-selected=true]{border-radius:var(--ms-r-md)}
+.ms-tblwrap.flat .ms-tr:hover,.ms-tblwrap.flat .ms-tr:hover+.ms-tr,.ms-tblwrap.flat .ms-tr[aria-selected=true],.ms-tblwrap.flat .ms-tr[aria-selected=true]+.ms-tr{box-shadow:none}
 .ms-tblwrap.flat .ms-tr.th{min-height:44px;border-radius:0;background:transparent;font-size:var(--ms-fs-body);color:var(--ms-mute);box-shadow:inset 0 -1px 0 var(--ms-line)} /* lint-allow: the table header row */
 .ms-tblwrap.flat .ms-tr[aria-selected=true]{background:color-mix(in srgb,var(--ms-accent) 10%,transparent)}
 .ms-tblwrap.flat .ms-tr[aria-selected=true]:hover{background:color-mix(in srgb,var(--ms-accent) 14%,transparent)}
 .ms-tblwrap.flat .ms-tfoot{flex-wrap:wrap;gap:var(--ms-s-4) var(--ms-s-8);padding:var(--ms-s-6) var(--ms-s-2) 0}
 .ms-tblwrap.flat .ms-sort{gap:var(--ms-s-4)}
+
+/* Side-scrolling edge fade (.ms-xfade on anything that scrolls sideways, like a wide table):
+   the edge with more content fades out over 32px, so you can see there is more to scroll to. The fades follow the scroll position;
+   a list that fits shows no fade. */
+@property --ms-xl{syntax:"<length>";inherits:false;initial-value:0px}
+@property --ms-xr{syntax:"<length>";inherits:false;initial-value:0px}
+.ms-xfade{-webkit-mask-image:linear-gradient(90deg,transparent,black var(--ms-xl),black calc(100% - var(--ms-xr)),transparent);mask-image:linear-gradient(90deg,transparent,black var(--ms-xl),black calc(100% - var(--ms-xr)),transparent); /* lint-allow: mask colours are alpha only */
+  animation:ms-xfade linear both;animation-timeline:scroll(self inline)}
+@keyframes ms-xfade{0%{--ms-xl:0px;--ms-xr:var(--ms-s-12)}6%{--ms-xl:var(--ms-s-12)}94%{--ms-xr:var(--ms-s-12)}100%{--ms-xl:var(--ms-s-12);--ms-xr:0px}}
+
+/* Main cell (UI.tmain): the first column of a record table. A page icon, the name (one line, cut with …), a dim second line, and "Open" that fades in on hover. */
+.ms-tmain{display:flex;align-items:center;gap:var(--ms-s-5);min-width:0}
+.ms-tmain>i{flex:none;display:grid;place-items:center;color:var(--ms-dim)}
+.ms-tmain>b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:var(--ms-fw-semibold)}
+.ms-tmain>small{flex:none;font-size:var(--ms-fs-sm);color:var(--ms-dim)}
+.ms-tmain>.open{flex:none;margin-inline-start:auto;padding:var(--ms-s-1) var(--ms-s-4);border-radius:var(--ms-r-xs);background:var(--ms-panel);box-shadow:0 0 0 1px var(--ms-line);font-style:normal;font-size:var(--ms-fs-label);font-weight:var(--ms-fw-semibold);opacity:0;transition:opacity var(--ms-t-fast)}
+.ms-tr:hover .ms-tmain>.open,.ms-tr:focus-visible .ms-tmain>.open{opacity:1}
+/* a wide table scrolls sideways inside .ms-xscroll (pair it with .ms-xfade); column headers can lead with their type (.ms-thic: Aa text, # number, a list icon for a status) */
+.ms-xscroll{overflow-x:auto;scrollbar-width:thin}
+.ms-xscroll>.ms-tblwrap .ms-tbl{min-width:max-content}
+.ms-thic{display:inline-grid;place-items:center;min-width:14px;margin-inline-end:var(--ms-s-3);font-size:var(--ms-fs-label);font-weight:var(--ms-fw-semibold);color:var(--ms-dim)}
 
 /* Page and section headers; empty, loading and error states; and the phone patterns.
    Page header: title 20px semibold, one line under it, actions at the right end. Phones: 22px.
@@ -891,6 +914,23 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-phone .ms-empty{font-size:var(--ms-fs-phone);line-height:21px}
 
 .ms-pagedots i{corner-shape:round}
+
+/* App pages (desktop): the shell every app's pages sit in, Finance's design.
+   .ms-apage: 16px sides; its section bar (UI.mnav) runs edge to edge across the top.
+   .ms-ptitle (UI.ptitle): a 32px bold title with a quiet line under it; .ms-ptools: the tools row (search, icon buttons, New) at the right.
+   .ms-rpage: a record page: the record bar (UI.rbar), then the record (UI.rhead, UI.fsec + UI.vrows) beside a 260px side panel (UI.rside). */
+.ms-apage{padding:0 var(--ms-s-8) var(--ms-s-12)}
+.ms-apage>.ms-mnav{margin-inline:calc(-1 * var(--ms-s-8));padding-inline-start:var(--ms-s-8)}
+.ms-ptitle{padding:var(--ms-s-12) 0 var(--ms-s-2)}
+.ms-ptitle h1{margin:0;font-size:var(--ms-fs-large-title);line-height:1.15;font-weight:var(--ms-fw-semibold);letter-spacing:-.02em;text-wrap:balance}
+.ms-ptitle p{margin:var(--ms-s-3) 0 0;font-size:var(--ms-fs-body);color:var(--ms-mute)}
+.ms-ptools{display:flex;align-items:center;gap:var(--ms-s-4);padding:var(--ms-s-1) 0 var(--ms-s-9);margin-top:var(--ms-s-5)}
+.ms-ptools>.sp{flex:1}
+.ms-ptools>.ms-control{flex:none;width:220px;height:var(--ms-h-control)}   /* the search (UI.search) */
+.ms-apage .x-whead{padding-top:var(--ms-s-9)}
+.ms-rpage{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:var(--ms-s-12);padding-top:var(--ms-s-6)}
+.ms-rpage>.main{display:grid;gap:var(--ms-s-9);align-content:start;max-width:720px;width:100%;margin-inline:auto}
+@media (max-width:960px){.ms-rpage{grid-template-columns:minmax(0,1fr)}.ms-rpage>.ms-rside{display:none}}
 
 /* Bottom bar: a 62px pill floating 12px from the sides and above the safe area; the panel at 80% with a blur, a lit edge and --ms-sh-float.
    One tinted indicator (.ind) slides and resizes to the open tab (380ms; UI.initBottomBar places it, and any .ms-tabbar on the page gets one).
@@ -1094,6 +1134,8 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-mnav .tab{position:relative;display:inline-flex;align-items:center;gap:7px;height:var(--ms-h-field);margin-block:8px;padding-inline:var(--ms-s-6);border-radius:var(--ms-r);font-size:var(--ms-fs-chat);font-weight:var(--ms-fw-medium);color:var(--ms-mute);transition:color var(--ms-t-fast)}
 .ms-mnav .mgrp>.tab{cursor:default}
 .ms-mnav .tab::after{content:'';position:absolute;left:var(--ms-s-6);right:var(--ms-s-6);bottom:-9px;height:2px;border-radius:var(--ms-r-hair);background:var(--ms-accent);transform:scaleX(0);transform-origin:left;transition:transform var(--ms-t-panel) var(--ms-e)}
+.ms-mnav .tab>.dd{display:grid;place-items:center;margin-inline-end:calc(-1 * var(--ms-s-2));color:var(--ms-dim);transition:transform var(--ms-t-panel) var(--ms-e),color var(--ms-t-fast)}   /* a tab that opens a menu has a down arrow; it turns up while the menu is open */
+.ms-mnav .mgrp:hover:not(.shut *)>.tab>.dd,.ms-mnav .mgrp:focus-within>.tab>.dd{transform:rotate(180deg);color:var(--ms-text)}
 .ms-mnav .tab:hover,.ms-mnav .mgrp:hover>.tab,.ms-mnav .mgrp:focus-within>.tab,.ms-mnav .tab.on{color:var(--ms-text)}
 .ms-mnav .tab.on::after,.ms-mnav .tab:hover::after,.ms-mnav .mgrp:hover>.tab::after,.ms-mnav .mgrp:focus-within>.tab::after{transform:scaleX(1)}
 .ms-mnav::before{content:'';position:absolute;left:0;right:0;top:100%;height:100vh;z-index:1;background:var(--ms-scrim);opacity:0;pointer-events:none;transition:opacity var(--ms-t-panel)}
@@ -1114,7 +1156,7 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-mnav .sub:hover .l,.ms-mnav .sub:focus-visible .l{text-decoration-color:var(--ms-accent)}
 .ms-mnav .sub:hover em,.ms-mnav .sub:focus-visible em,.ms-mnav .sub.on em{color:var(--ms-accent)}
 @container (max-width:640px){ .ms-mnav .gr{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none;grid-auto-flow:row} }
-@media (prefers-reduced-motion:reduce){ .ms-mnav,.ms-mnav .pn,.ms-mnav .ph,.ms-mnav .gr,.ms-mnav .tab::after{transition:none} }
+@media (prefers-reduced-motion:reduce){ .ms-mnav,.ms-mnav .pn,.ms-mnav .ph,.ms-mnav .gr,.ms-mnav .tab::after,.ms-mnav .tab>.dd{transition:none} }
 
 /* Chat: grouped, cited, actionable.
    Messages group by sender (.ms-mg): the avatar, name and time once, then bubbles. Bubbles in a group get tight inner corners (6) and round outer ones (14).
@@ -1806,7 +1848,7 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 body,.ms-card,.ms-btn,.ms-seg,.ms-input{transition-property:background-color,border-color,color}
 
 /* Record pages and their tools: the record bar, form sections, value rows, the record side panel, the filter builder and the column picker.
-   Record bar (.ms-rbar): the breadcrumb (.ms-crumbs: the parent page as a button, then the record's title), its status tag, then previous and next and the
+   Record bar (.ms-rbar): the breadcrumb (.ms-crumbs: the parent page as a button, a › arrow, then the record's title), its status tag, then previous and next and the
      actions at the right end. A long title is cut with an ellipsis.
    Record head (.ms-rhead): the title (20px), its ID, then one headline figure (.fig) with a few facts under it.
    Form (.ms-fsec): a section with a 12.5px semibold title and a two-column grid (.ms-fgrid) with a 28px gutter; a .wide cell takes the full row. Fields are UI.field.
@@ -1819,11 +1861,13 @@ body,.ms-card,.ms-btn,.ms-seg,.ms-input{transition-property:background-color,bor
 .ms-crumbs{display:flex;align-items:center;flex-wrap:wrap;gap:var(--ms-s-4);min-width:0;font-size:var(--ms-fs-control);line-height:18px;color:var(--ms-mute)}
 .ms-crumbs button{color:var(--ms-mute);transition:color var(--ms-t-fast)}
 .ms-crumbs button:hover{color:var(--ms-text)}
+.ms-crumbs>.sep{display:grid;place-items:center;color:var(--ms-dim)}   /* a › after each parent, so it reads as a path you can click back along */
 .ms-crumbs>b{min-width:0;font-size:var(--ms-fs-phone);line-height:20px;font-weight:var(--ms-fw-semibold);color:var(--ms-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ms-crumbs>*{flex:none}
 .ms-crumbs>b{flex:0 1 auto}
 .ms-rbar{display:flex;align-items:center;gap:var(--ms-s-5);min-height:var(--ms-h-header);padding-block:var(--ms-s-4)}
-.ms-rbar>.ms-crumbs{flex:1 1 0;flex-wrap:nowrap;overflow:hidden;white-space:nowrap}
+.ms-rbar>.ms-crumbs{flex:0 1 auto;flex-wrap:nowrap;overflow:hidden;white-space:nowrap}
+.ms-rbar>.ms-crumbs+*{margin-inline-end:auto}   /* the status tag sits right after the title; the record's tools go to the end */
 .ms-rbar>*:not(.ms-crumbs){flex:none}
 .ms-rbar .ms-ib{box-shadow:inset 0 0 0 1px var(--ms-line)}
 .ms-rbar .ms-ib:hover{box-shadow:inset 0 0 0 1px var(--ms-line-strong)}
@@ -2919,6 +2963,10 @@ const UI = (() => {
     card: (html, { flush, cls, attrs } = {}) => `<div class="${cx('ms-card', flush && 'flush', cls)}"${at(attrs)}>${html}</div>`,
     cardh: ({ icon = '', tone, label = '', html = '' } = {}) => `<div class="ms-card-h">${icon ? ui.tile(icon, tone) : ''}<span>${e(label)}</span><span class="sp"></span>${html}</div>`,
     /* Page header: title, one line under it, actions (HTML) at the right end. */
+    /* App page title (a list or dashboard inside an app): a big title, a quiet line under it, then a row of tools at the right (search, icon buttons, New). */
+    ptitle: ({ title = '', sub = '', tools = '' } = {}) => `<header class="ms-ptitle"><h1>${e(title)}</h1>${sub ? `<p>${e(sub)}</p>` : ''}</header>${tools ? `<div class="ms-ptools"><span class="sp"></span>${tools}</div>` : ''}`,
+    /* The first cell of a record table: a page icon, the record's name in bold, a dim second line, and "Open" that shows on hover. */
+    tmain: ({ icon = '', title = '', sub = '' } = {}) => `<span class="ms-tmain">${icon ? `<i>${icon}</i>` : ''}<b>${e(title)}</b>${sub ? `<small>${e(sub)}</small>` : ''}<em class="open">Open</em></span>`,
     ph: ({ title = '', sub = '', html = '' } = {}) => `<div class="ms-ph"><div><h2>${e(title)}</h2>${sub ? `<p>${e(sub)}</p>` : ''}</div>${html}</div>`,
     /* Section header: title, grey count, then anything at the right (a search, a button). */
     sh: ({ title = '', count, html = '' } = {}) => `<div class="ms-sech"><b>${e(title)}</b>${count != null ? ui.count(count) : ''}<span class="sp"></span>${html}</div>`,
@@ -3024,7 +3072,7 @@ const UI = (() => {
     menuHTML,
     /* Section bar with a mega menu: home { label, on, attrs }, then groups [{ label, on, items: [{ label, count, on, attrs }] }]; the group's panel opens on hover or focus.
        shut closes the panels (after a pick); attrs go on each item's button, so the app can tell what was picked. */
-    mnav: ({ label = '', app, home, groups = [], shut, attrs } = {}) => `<nav class="${cx('ms-mnav', shut && 'shut')}" aria-label="${e(label)}"${at(attrs)}>${app ? `<span class="id"><i class="${cx(app.tone)}">${app.icon || ''}</i><b>${e(app.name)}</b></span><i class="vsep" aria-hidden="true"></i>` : ''}${home ? `<button type="button" class="${cx('tab', home.on && 'on')}"${home.on ? ' aria-current="page"' : ''}${at(home.attrs)}>${e(home.label)}</button>` : ''}${groups.map(g => `<div class="mgrp"><button type="button" class="${cx('tab', g.on && 'on')}" aria-haspopup="true"${g.on ? ' aria-current="page"' : ''}>${e(g.label)}</button><div class="pn" role="menu" aria-label="${e(g.label)}"><div class="ph">${e(g.label)}</div><div class="gr" style="--r:${Math.ceil(g.items.length / 3)}">${g.items.map(x => `<button type="button" class="${cx('sub', x.on && 'on')}" role="menuitem"${at(x.attrs)}><span class="l">${e(x.label)}</span><em>${x.count ? e(x.count) : ''}</em></button>`).join('')}</div></div></div>`).join('')}</nav>`,
+    mnav: ({ label = '', app, home, groups = [], shut, attrs } = {}) => `<nav class="${cx('ms-mnav', shut && 'shut')}" aria-label="${e(label)}"${at(attrs)}>${app ? `<span class="id"><i class="${cx(app.tone)}">${app.icon || ''}</i><b>${e(app.name)}</b></span><i class="vsep" aria-hidden="true"></i>` : ''}${home ? `<button type="button" class="${cx('tab', home.on && 'on')}"${home.on ? ' aria-current="page"' : ''}${at(home.attrs)}>${e(home.label)}</button>` : ''}${groups.map(g => !(g.items && g.items.length) ? `<button type="button" class="${cx('tab', g.on && 'on')}"${g.on ? ' aria-current="page"' : ''}${at(g.attrs)}>${e(g.label)}</button>` : `<div class="mgrp"><button type="button" class="${cx('tab', g.on && 'on')}" aria-haspopup="true"${g.on ? ' aria-current="page"' : ''}>${e(g.label)}<i class="dd" aria-hidden="true">${I('chevdn', 14)}</i></button><div class="pn" role="menu" aria-label="${e(g.label)}"><div class="ph">${e(g.label)}</div><div class="gr" style="--r:${Math.ceil(g.items.length / 3)}">${g.items.map(x => `<button type="button" class="${cx('sub', x.on && 'on')}" role="menuitem"${at(x.attrs)}><span class="l">${e(x.label)}</span><em>${x.count ? e(x.count) : ''}</em></button>`).join('')}</div></div></div>`).join('')}</nav>`,
     /* App header: the app's icon (tone: a tn- class) and name, a divider, then tabs { label, on, attrs, caret, badge }. html goes after the tabs (menus, actions). */
     anav: ({ name = '', icon = '', tone, tabs = [], html = '', attrs } = {}) => `<nav class="ms-anav" aria-label="${e(name)} sections"${at(attrs)}><span class="id"><i class="${cx(tone)}">${icon}</i><b>${e(name)}</b></span><i class="vsep" aria-hidden="true"></i><div class="tabs" role="tablist">${tabs.map(t =>
       `<button type="button" class="tab" role="tab" aria-selected="${!!t.on}"${at(t.attrs)}>${e(t.label)}${t.badge != null ? ui.badge(t.badge, t.badgeKind || 'red') : ''}${t.caret || ''}</button>`).join('')}<span class="ink"></span></div><span class="sp"></span>${html}</nav>`,
@@ -3044,7 +3092,7 @@ const UI = (() => {
 
     /* ---------- record pages (record.css) ---------- */
     /* Breadcrumb: the parent pages as buttons [{ label, attrs }], then the record's title. */
-    crumbs: (items = [], title = '') => `<nav class="ms-crumbs" aria-label="Breadcrumb">${items.map(c => `<button type="button"${at(c.attrs)}>${e(c.label)}</button>`).join('')}${title ? `<b>${e(title)}</b>` : ''}</nav>`,
+    crumbs: (items = [], title = '') => `<nav class="ms-crumbs" aria-label="Breadcrumb">${items.map(c => `<button type="button"${at(c.attrs)}>${e(c.label)}</button><i class="sep" aria-hidden="true">${I('right', 14)}</i>`).join('')}${title ? `<b>${e(title)}</b>` : ''}</nav>`,
     /* Record bar: the breadcrumb, the record's status tag (HTML), then previous and next and the actions (html). */
     rbar: ({ crumbs = [], title = '', tag = '', html = '', attrs } = {}) => `<div class="ms-rbar"${at(attrs)}>${ui.crumbs(crumbs, title)}${tag}${html}</div>`,
     /* Record head: the title and its ID, then one headline figure { label, value, unit } with facts [[name, value]] (or ready-made HTML spans). */
