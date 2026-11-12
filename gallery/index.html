@@ -1090,6 +1090,142 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-hscroll .ms-ctabs{width:max-content;min-width:100%}
 .ms-ctab-edge .ms-ctab[aria-selected=true]{box-shadow:inset 0 2px 0 var(--ms-accent)}
 
+/* Tab strip (.ms-tabstrip, MsTabstrip in tabstrip.js): the app tabs and tab groups at the top of a window (the canvas).
+   A 40px strip on --ms-bg with a hairline along the bottom. Pinned tabs first (Home is one: icon only, no close), then groups and tabs, then + (opens an app).
+   The open tab is --ms-panel, so it joins the content below. A group is a tint of its colour (--g, the space colour by default) holding 28px chips;
+   click its name to collapse it (count, unread dot, a 2px bar when it holds the open tab). Drag a tab to move it or drop it in a group.
+   The track scrolls sideways and fades at a cut edge; "All tabs" then appears beside the window controls.
+   State hooks: tab aria-selected · .is-pinned · .is-drag (the lifted copy) · .is-slot · i.ms-new · i.ms-badge · i.ms-tab-spin;
+   group .no-name · data-open · .has-active · .has-unread · .is-target · style="--g:#hex"; track .fade-l · .fade-r; all-tabs button .on. */
+@property --ts-fl{syntax:'<length>';inherits:false;initial-value:0px}
+@property --ts-fr{syntax:'<length>';inherits:false;initial-value:0px}
+
+.ms-tabstrip{--ts-h:40px;position:relative;display:flex;align-items:stretch;height:var(--ts-h);background:var(--ms-bg); /* lint-allow: the strip is 40 high */
+  box-shadow:inset 0 -1px 0 var(--ms-line);user-select:none;-webkit-user-select:none}
+
+/* the scrolling track: groups, tabs and +; fades at the edges when it overflows */
+.ms-ts-scroll{flex:1;min-width:0;display:flex;align-items:stretch;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent,black var(--ts-fl),black calc(100% - var(--ts-fr)),transparent); /* lint-allow: mask colours are alpha only */
+  mask-image:linear-gradient(90deg,transparent,black var(--ts-fl),black calc(100% - var(--ts-fr)),transparent); /* lint-allow: mask colours are alpha only */
+  transition:--ts-fl var(--ms-t),--ts-fr var(--ms-t)}
+.ms-ts-scroll::-webkit-scrollbar{display:none}
+.ms-ts-scroll.fade-l{--ts-fl:28px} /* lint-allow: fade width */
+.ms-ts-scroll.fade-r{--ts-fr:28px} /* lint-allow: fade width */
+
+/* + : a square cell */
+.ms-ts-add{flex:none;width:var(--ts-h);display:grid;place-items:center;color:var(--ms-mute);
+  border-inline-end:1px solid var(--ms-line);box-shadow:inset 0 -1px 0 var(--ms-line);
+  transition:background var(--ms-t-fast),color var(--ms-t-fast),box-shadow var(--ms-t-fast)}
+.ms-ts-add svg{width:18px;height:18px} /* lint-allow: icon size */
+.ms-ts-add:hover,.ms-ts-add[aria-expanded=true]{background:var(--ms-raise);color:var(--ms-text)}
+
+/* ---- tab ---- */
+.ms-tab{position:relative;flex:none;display:flex;align-items:center;height:100%;max-width:240px;padding:0 var(--ms-s-2) 0 var(--ms-s-6);overflow:hidden;white-space:nowrap; /* lint-allow: a tab is at most 240 wide */
+  font-size:var(--ms-fs-control);font-weight:var(--ms-fw-medium);color:var(--ms-mute);cursor:pointer;
+  border-inline-end:1px solid var(--ms-line);box-shadow:inset 0 -1px 0 var(--ms-line);
+  transition:background var(--ms-t-fast),color var(--ms-t-fast),box-shadow var(--ms-t-fast),padding var(--ms-t-panel) var(--ms-e)}
+.ms-tab>svg,.ms-tab-spin{width:16px;height:16px;flex:none;margin-inline-end:var(--ms-s-4);transition:margin var(--ms-t-panel) var(--ms-e)} /* lint-allow: icon size */
+.ms-tab-t{min-width:0;max-width:160px;overflow:hidden;text-overflow:ellipsis;transition:max-width var(--ms-t-panel) var(--ms-e),opacity var(--ms-t)} /* lint-allow: label is at most 160 */
+.ms-tab .ms-new,.ms-tab .ms-badge{margin-inline-start:var(--ms-s-3);flex:none}
+/* close: its space is always kept, so nothing moves on hover */
+.ms-tab-x{position:relative;flex:none;width:24px;height:28px;margin-inline-start:var(--ms-s-1);display:grid;place-items:center;color:var(--ms-dim);opacity:0; /* lint-allow: close target 24 × 28 */
+  transition:opacity var(--ms-t-fast),color var(--ms-t-fast),width var(--ms-t-panel) var(--ms-e),margin var(--ms-t-panel) var(--ms-e)}
+.ms-tab-x::before{content:"";position:absolute;inset:var(--ms-s-2) var(--ms-s-1);border-radius:var(--ms-r-xs);transition:background var(--ms-t-fast)}
+.ms-tab-x svg{position:relative;width:13px;height:13px} /* lint-allow: icon size */
+.ms-tab-x:hover{color:var(--ms-text)}
+.ms-tab-x:hover::before{background:color-mix(in srgb,var(--ms-text) 10%,transparent)}
+.ms-tab:hover .ms-tab-x,.ms-tab:focus-visible .ms-tab-x,.ms-tab[aria-selected=true] .ms-tab-x{opacity:1}
+
+.ms-tab:hover{background:var(--ms-raise);color:var(--ms-text)}
+/* open: joins the content below (no bottom line) */
+.ms-tab[aria-selected=true]{background:var(--ts-join,var(--ms-panel));color:var(--ms-text);box-shadow:none}   /* --ts-join: the colour of the content under the strip */
+.ms-tab:focus-visible,.ms-ts-add:focus-visible,.ms-tg-label:focus-visible{outline:2px solid var(--ms-accent);outline-offset:-2px}
+
+/* loading */
+.ms-tab-spin{border-radius:50%;border:1.5px solid color-mix(in srgb,var(--ms-text) 18%,transparent);border-top-color:var(--ms-accent);animation:ms-ts-spin .8s linear infinite}
+@keyframes ms-ts-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.ms-tab-spin{animation:none}}
+body.calm .ms-tab-spin{animation:none}
+
+/* pinned: icon only, no close; pinned tabs sit first, outside groups (Home is one) */
+.ms-tab.is-pinned{padding-inline:var(--ms-s-6)}
+.ms-tab.is-pinned>svg,.ms-tab.is-pinned .ms-tab-spin{margin-inline-end:0}
+.ms-tab.is-pinned .ms-tab-t{max-width:0;opacity:0}
+.ms-tab.is-pinned .ms-tab-x{width:0;margin:0;opacity:0;pointer-events:none}
+.ms-tab.is-pinned .ms-badge{display:none}
+.ms-tab.is-pinned .ms-new{position:absolute;top:var(--ms-s-4);inset-inline-end:var(--ms-s-4);margin:0}
+
+/* dragging: the lifted copy follows the pointer; the tab itself becomes the dashed slot it will land in */
+.ms-tab.is-drag{z-index:2;background:var(--ms-panel);color:var(--ms-text);border:0;border-radius:var(--ms-r-sm);height:var(--ms-h-control);align-self:center;margin-inline:var(--ms-s-2);
+  box-shadow:var(--ms-sh-2),0 0 0 1px var(--ms-line);transform:scale(1.02);opacity:.94;cursor:grabbing}
+.ms-tab.is-slot>*{opacity:0}
+.ms-tabstrip.is-dragging,.ms-tabstrip.is-dragging *{cursor:grabbing!important}
+
+/* ---- group ---- */
+.ms-tg{--g:var(--ms-accent);position:relative;flex:none;display:flex;align-items:center;height:100%;
+  background:color-mix(in srgb,var(--g) 10%,transparent);border-inline-end:1px solid var(--ms-line);
+  transition:background var(--ms-t),box-shadow var(--ms-t-fast)}
+.ms-tg-label{flex:none;display:flex;align-items:center;height:28px;margin-inline:var(--ms-s-3);padding:0 var(--ms-s-4);border-radius:var(--ms-r-sm);white-space:nowrap; /* lint-allow: 28 high in a 40 strip */
+  font-size:var(--ms-fs-control);font-weight:var(--ms-fw-semibold);color:color-mix(in srgb,var(--g) 72%,var(--ms-text));transition:background var(--ms-t-fast),color var(--ms-t)}
+.ms-tg-label:hover{background:color-mix(in srgb,var(--g) 16%,transparent)}
+.ms-tg-label>span{max-width:140px;overflow:hidden;text-overflow:ellipsis} /* lint-allow: a group name is at most 140 */
+/* an unnamed group: an 8px dot in its colour stands in for the name */
+.ms-tg-dot{display:none;width:8px;height:8px;border-radius:50%;corner-shape:round;background:var(--g);flex:none} /* lint-allow: dot size */
+.ms-tg.no-name .ms-tg-dot{display:block}
+.ms-tg.no-name .ms-tg-label>span{display:none}
+.ms-tg.no-name .ms-tg-label{min-width:28px;justify-content:center} /* lint-allow: 28 square */
+/* count and unread dot: only while collapsed */
+.ms-tg-count{flex:none;display:inline-grid;place-items:center;height:16px;max-width:0;margin:0;padding:0;overflow:hidden;opacity:0;border-radius:var(--ms-r-pill);corner-shape:round; /* lint-allow: count 16 high */
+  background:color-mix(in srgb,var(--g) 24%,transparent);font-style:normal;font-size:var(--ms-fs-tag);font-weight:var(--ms-fw-medium);line-height:1;
+  transition:max-width var(--ms-t-panel) var(--ms-e),margin var(--ms-t-panel) var(--ms-e),padding var(--ms-t-panel) var(--ms-e),opacity var(--ms-t)}
+.ms-tg[data-open=false] .ms-tg-count{max-width:28px;margin-inline-start:var(--ms-s-3);padding:0 5px;opacity:1} /* lint-allow: count width */
+.ms-tg-label .ms-new{background:var(--g);width:0;opacity:0;margin:0;transition:width var(--ms-t),margin var(--ms-t),opacity var(--ms-t)}
+.ms-tg[data-open=false].has-unread .ms-tg-label .ms-new{width:6px;margin-inline-start:var(--ms-s-3);opacity:1} /* lint-allow: dot size */
+/* the tabs fold with the grid 1fr → 0fr trick */
+.ms-tg-tabs{display:grid;grid-template-columns:1fr;transition:grid-template-columns var(--ms-t-panel) var(--ms-e),opacity var(--ms-t)}
+.ms-tg-in{min-width:0;overflow:hidden;display:flex;align-items:center;gap:var(--ms-s-3);height:var(--ts-h);padding-inline-end:var(--ms-s-3)}
+.ms-tg[data-open=false] .ms-tg-tabs{grid-template-columns:0fr;opacity:0;transition-timing-function:var(--ms-ei)}
+/* a collapsed group that holds the open tab */
+.ms-tg::after{content:"";position:absolute;inset:auto 10px 0 10px;height:2px;border-radius:var(--ms-r-hair) var(--ms-r-hair) 0 0;background:var(--g);opacity:0;transform:scaleX(.4); /* lint-allow: the 2px bar */
+  transition:opacity var(--ms-t),transform var(--ms-t-panel) var(--ms-e);pointer-events:none}
+.ms-tg[data-open=false].has-active::after{opacity:1;transform:none}
+/* drop target while a tab is dragged over it */
+.ms-tg.is-target{background:color-mix(in srgb,var(--g) 18%,transparent);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--g) 60%,transparent)}
+
+/* tabs inside a group are 28px chips */
+.ms-tg .ms-tab{height:28px;padding:0 var(--ms-s-1) 0 var(--ms-s-5);border:0;border-radius:var(--ms-r-sm);box-shadow:none; /* lint-allow: chip 28 high */
+  background:color-mix(in srgb,var(--g) 18%,transparent);color:color-mix(in srgb,var(--ms-text) 80%,var(--g))}
+.ms-tg .ms-tab:hover{background:color-mix(in srgb,var(--g) 28%,transparent);color:var(--ms-text)}
+.ms-tg .ms-tab[aria-selected=true]{background:var(--ms-panel);color:var(--ms-text);
+  box-shadow:var(--ms-sh-1),inset 0 0 0 1px color-mix(in srgb,var(--g) 45%,var(--ms-line))}
+.ms-tg .ms-tab.is-pinned{padding-inline:var(--ms-s-3)}
+.ms-tg .ms-tab.is-pinned .ms-new{top:3px;inset-inline-end:3px} /* lint-allow: dot inset */
+.ms-tg .ms-tab .ms-new{background:var(--g)}
+
+/* the slot's colours come last so they win over hover and open */
+.ms-tab.is-slot,.ms-tg .ms-tab.is-slot{background:color-mix(in srgb,var(--ms-accent) 8%,transparent);box-shadow:none;
+  outline:1.5px dashed color-mix(in srgb,var(--ms-accent) 55%,var(--ms-line));outline-offset:-5px;border-radius:var(--ms-r-md)}
+.ms-tg .ms-tab.is-slot{outline-offset:-1.5px;border-radius:var(--ms-r-sm)}
+
+/* inline rename (28/7, because it sits in a 40px strip) */
+.ms-tg-rename{flex:none;height:28px;margin-inline:var(--ms-s-3);padding:0 var(--ms-s-4);border-radius:var(--ms-r-sm);outline:0; /* lint-allow: 28 high in a 40 strip */
+  border:1px solid color-mix(in srgb,var(--g) 60%,var(--ms-line));background:var(--ms-panel);font-size:var(--ms-fs-control);font-weight:var(--ms-fw-semibold);color:var(--ms-text)}
+.ms-tg-rename::placeholder{color:var(--ms-dim);font-weight:var(--ms-fw-regular)}
+
+/* window controls (end) */
+.ms-ts-win{flex:none;display:flex;align-items:center;gap:var(--ms-s-1);padding:0 var(--ms-s-3)}
+.ms-ts-all{width:0;opacity:0;overflow:hidden;pointer-events:none;transition:width var(--ms-t) var(--ms-e),opacity var(--ms-t),background var(--ms-t-fast),color var(--ms-t-fast)}
+.ms-ts-all.on{width:28px;opacity:1;pointer-events:auto} /* lint-allow: a small icon button */
+.ms-ts-menu-on{background:color-mix(in srgb,var(--ms-accent) 12%,transparent)}
+/* the group colour swatches in a group's menu */
+.ms-ts-hues{display:grid;grid-template-columns:repeat(4,24px);gap:10px;padding:var(--ms-s-2) var(--ms-s-4) var(--ms-s-4)} /* lint-allow: swatch grid */
+.ms-ts-hues button{width:24px;height:24px;border-radius:50%;corner-shape:round;background:var(--c);transition:transform var(--ms-t-fast),box-shadow var(--ms-t-fast)} /* lint-allow: swatch size */
+.ms-ts-hues button:hover{transform:scale(1.1)}
+.ms-ts-hues button[aria-pressed=true]{box-shadow:0 0 0 2px var(--ms-raise),0 0 0 4px var(--c)}
+.ms-ts-label{margin:var(--ms-s-3) var(--ms-s-4) var(--ms-s-2);font-size:var(--ms-fs-label);font-weight:var(--ms-fw-medium);color:var(--ms-dim);letter-spacing:.02em}
+/* unread dot */
+.ms-new{width:6px;height:6px;border-radius:50%;corner-shape:round;background:var(--ms-accent);flex:none} /* lint-allow: dot size */
+
 /* App tabs: a raised 50px bar (radius 12, a lit edge) with the app's tile and name, a divider, then tabs. One 2px accent ink slides and resizes
    to the selected tab (340ms; UI.initInkTabs places it, and any .ms-anav on the page gets one). Counts on tabs are badges.
    A tab can open a menu that drops under the bar. On phones the tabs scroll sideways inside the bar with a fade at the end.
@@ -2530,20 +2666,18 @@ UI.card(UI.rows(items), { flush: true })</pre><ul class="g-rules"><li>Surfaces a
   </section>
 
   <section hidden id="tabs">
-    <h2>Tabs</h2><p>app-tabs.css · choice.css · canvas-tabs.css. One indicator that travels; counts on tabs; a canvas strip that scrolls inside itself.</p>
+    <h2>Tabs</h2><p>app-tabs.css · choice.css · tabstrip.css. One indicator that travels; counts on tabs; the canvas tab strip with pinned tabs, groups and drag.</p>
     <h3>Which tabs</h3><div class="g-dt"><div><b>App tabs</b><code>UI.anav</code><span>An app’s top sections: Overview, Invoices, Reports.</span><span>Six at most, then More. One accent line slides to the open tab. Counts are badges. A tab can open a menu of pages.</span><span></span></div><div><b>Segmented</b><code>UI.seg</code><span>Switching views inside a section: Kamal / Kamal’s Autohuman.</span><span>Two to four, short words. A dot marks unread.</span><span></span></div><div><b>Canvas strip</b><code>.ms-ctabs</code><span>Open canvases in the workspace.</span><span>Scrolls inside itself with faded edges; the open tab has an accent top edge.</span><span></span></div><div><b>Phone bottom bar</b><code>UI.tabbar</code><span>A phone app’s main sections.</span><span>Home plus up to three, then More; a tinted pill slides to the open tab.</span><span></span></div></div><div class="g-guide"><div><b>Tabs or something else?</b><p>Tabs move between places at the same level. A choice that changes values (a period, a filter) is a segmented control or chips, not tabs. Steps in order are a stepper (coming).</p></div><div><b>Names</b><p>One or two words, nouns: “Invoices”, “Leave”. Never two rows of tabs; never a verb.</p></div></div><h3>Every state</h3><div class="ms-anav g-staticnav" aria-label="States"><div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="true">Selected</button><button class="tab g-h" role="tab" aria-selected="false">Hover</button><button class="tab" role="tab" aria-selected="false">Default</button><button class="tab" role="tab" aria-selected="false">With a count<i class="ms-badge">2</i></button><button class="tab g-f" role="tab" aria-selected="false">Focus</button></div></div><h3>Measurements</h3><div class="g-meas"><div><b>App tabs</b><span>a raised 50 high bar, radius 12 · the ink 2 high, slides in 340ms</span></div><div><b>Bottom bar</b><span>62 high pill, 12 from the edges · icons 23 · the indicator slides in 380ms</span></div></div><h3>Try it</h3>
     <div class="g-stage">
       <div class="ms-anav" aria-label="Accounting"><span class="id"><i class="ms-tile info"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M4.42 9.24L9.29 6.2Q12 4.5 14.71 6.2L19.58 9.24Q20 9.5 20 10L20 10Q20 10.5 19.5 10.5L4.5 10.5Q4 10.5 4 10L4 10Q4 9.5 4.42 9.24ZM6.5 10.5L6.5 17.5M10.5 10.5L10.5 17.5M13.5 10.5L13.5 17.5M17.5 10.5L17.5 17.5M4.5 17.5L19.5 17.5M3.5 20L20.5 20"/></svg></i><b>Accounting</b></span><i class="vsep"></i>
         <div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="true">Overview</button><button class="tab" role="tab" aria-selected="false">Invoices<i class="ms-badge">2</i></button><button class="tab" role="tab" aria-selected="false">Expenses</button><button class="tab" role="tab" aria-selected="false">Banking<i class="ms-badge quiet">12</i></button><button class="tab" role="tab" aria-selected="false">Reports</button><span class="ink"></span></div></div>
       <div class="ms-seg" role="tablist"><button aria-pressed="true">Kamal</button><button aria-pressed="false">Kamal’s Autohuman<i class="dot"></i></button><button aria-pressed="false">With your Autohuman</button></div>
-      <div class="ms-hscroll ms-ctab-edge"><div class="ms-ctabs" id="gCtabs">
-        <div class="pins"><button class="ms-ctab pin" aria-label="Home"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M6.53 8.24L9.47 5.96Q12 4 14.53 5.96L17.47 8.24Q20 10.2 20 13.4L20 18A2.5 2.5 0 0 1 17.5 20.5L6.5 20.5A2.5 2.5 0 0 1 4 18L4 13.4Q4 10.2 6.53 8.24Z"/><path d="M10 20.5L10 16A2 2 0 0 1 14 16L14 20.5"/></svg></button><button class="ms-ctab pin" aria-label="Calendar"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><rect x="3.500" y="5" width="17" height="15.500" rx="3"/><path d="M3.5 10L20.5 10M8 3L8 7M16 3L16 7M8 14.5L8.5 14.5M12 14.5L12.5 14.5M16 14.5L16.5 14.5"/></svg></button></div><i class="sep"></i>
-        <div class="ms-tgroup" style="--gc:var(--ms-space-violet)"><button class="gl">Design</button><button class="ms-ctab"><span class="ti"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 3.5L10.75 3.5Q13 3.5 14.59 5.09L16.24 6.74Q18.5 9 18.5 12.2L18.5 17.5A3 3 0 0 1 15.5 20.5L8.5 20.5A3 3 0 0 1 5.5 17.5L5.5 6.5A3 3 0 0 1 8.5 3.5Z"/><path d="M13 3.5L13 7A2 2 0 0 0 15 9L18.5 9M9 13L15 13M9 16.5L13 16.5"/></svg></span><span class="tl">Handoff spec</span><span class="tx"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5L17.5 17.5M17.5 6.5L6.5 17.5"/></svg></span></button><button class="ms-ctab" aria-selected="true"><span class="ti"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6.500" height="6.500" rx="1.800"/><rect x="13.500" y="4" width="6.500" height="6.500" rx="1.800"/><rect x="4" y="13.500" width="6.500" height="6.500" rx="1.800"/><rect x="13.500" y="13.500" width="6.500" height="6.500" rx="1.800"/></svg></span><span class="tl">Board</span><span class="tx"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5L17.5 17.5M17.5 6.5L6.5 17.5"/></svg></span></button></div>
-        <div class="ms-tgroup shut" style="--gc:var(--ms-space-sky)"><button class="gl">Research</button></div>
-        <button class="ms-ctab"><span class="ti"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M4.42 9.24L9.29 6.2Q12 4.5 14.71 6.2L19.58 9.24Q20 9.5 20 10L20 10Q20 10.5 19.5 10.5L4.5 10.5Q4 10.5 4 10L4 10Q4 9.5 4.42 9.24ZM6.5 10.5L6.5 17.5M10.5 10.5L10.5 17.5M13.5 10.5L13.5 17.5M17.5 10.5L17.5 17.5M4.5 17.5L19.5 17.5M3.5 20L20.5 20"/></svg></span><span class="tl">Accounting</span><span class="tx"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5L17.5 17.5M17.5 6.5L6.5 17.5"/></svg></span></button>
-        <button class="ms-ctab"><span class="ti"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.500" cy="8" r="3.500"/><path d="M3.5 19.5C3.5 16.5 6.2 14.5 9.5 14.5S15.5 16.5 15.5 19.5L3.5 19.5Z"/><path d="M15.5 4.8A3.5 3.5 0 0 1 15.5 11.2M17.5 14.8C19.3 15.5 20.5 17.1 20.5 19.5L18.5 19.5"/></svg></span><span class="tl">Human resources</span><span class="tx"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5L17.5 17.5M17.5 6.5L6.5 17.5"/></svg></span></button>
-        <button class="add" aria-label="New tab"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5L12 19M5 12L19 12"/></svg></button>
-      </div></div>
+      <div style="border:1px solid var(--ms-line);border-radius:var(--ms-r-lg);overflow:hidden;background:var(--ms-panel)">
+        <div class="ms-tabstrip" id="gTabstrip" role="tablist" aria-label="Open apps"><div class="ms-ts-scroll"><button class="ms-ts-add" aria-label="Open an app" aria-haspopup="menu" data-tip="Open an app"></button></div>
+          <div class="ms-ts-win"><button class="ms-ib sm ms-ts-all" aria-label="All tabs" aria-haspopup="menu" data-tip="All tabs"></button><button class="ms-ib sm" aria-label="Full screen" data-tip="Full screen"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5L16.5 5Q19 5 19 7.5L19 10M19 5L13 11M10 19L7.5 19Q5 19 5 16.5L5 14M5 19L11 13"/></svg></button><button class="ms-ib sm" aria-label="Close window" data-tip="Close window"><svg width="18" height="18" aria-hidden="true" viewBox="2 2 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5L17.5 17.5M17.5 6.5L6.5 17.5"/></svg></button></div></div>
+        <div id="gTabBody" style="display:grid;place-items:center;min-height:120px;color:var(--ms-mute)">Overview</div>
+      </div>
+      <p class="g-note">tabstrip.css · tabstrip.js (MsTabstrip). The canvas strip: drag a tab to move it or drop it in a group · click a group's name to collapse it · right-click a tab or a group for its menu · + opens a New tab · ← → move, Enter opens, Delete closes.</p>
     </div>
       <h3>Code</h3><pre class="g-code">UI.anav({ name: 'Accounting', icon: UI.icon('bank', 16), tone: 'info',
   tabs: [{ label: 'Overview', on: true }, { label: 'Invoices', badge: 2 }, { label: 'Reports' }] })
@@ -4131,6 +4265,313 @@ function gallery(anchor, g, opt = {}) {
 window.MSW = { define, preset, grid, gallery, head, body, types: TYPES, presets: PRESETS, sizes: SIZES, span: SPAN, sizesOf, tone, esc };
 })();
 
+/* Tab strip (MsTabstrip): app tabs and tab groups at the top of a window. Styles: tabstrip.css. Uses ui.js (UI.icon) for icons and the library menu (.ms-menu).
+   MsTabstrip.init(stripEl, {
+     items: [{ id, icon, label, pinned, fixed, active, dot, badge, loading }   // fixed: a placeholder like New: it can be opened and closed, never moved, grouped or pinned, and nothing lands after it
+             | { group, id, color, open, tabs: [...] }],   // icon: a UI.icon name or SVG markup; color: a space colour name (violet, sky, gold, pink, coral, sage, slate)
+     onAdd(api) {},                            // what + does: usually open the app's New tab page (api.add a 'New' tab). Without it, + opens a menu of apps:
+     apps: [{ id, icon, label, pinned }],      // what that menu offers (the open ones are left out)
+     more: { label, onClick },                 // an extra last item in that menu
+     onChange(id, tabEl) {},                   // the open tab changed (null: nothing is left open)
+     onReorder(id, tabEl) {},                  // a tab was dropped somewhere new
+     onState(stripEl) {}                       // anything changed (order, groups, names, colours, pins, closes): read the state back with MsTabstrip.read(stripEl)
+   }) → { add, close, activate, toggle, rename, ungroup, pin, flip }
+   Motion: add 300ms and collapse 260ms (--ms-e), close 220ms (--ms-ei); reduced motion and body.calm skip to the end. */
+const MsTabstrip = (() => {
+  const E = 'cubic-bezier(.22,1,.36,1)', EI = 'cubic-bezier(.4,0,.2,1)';
+  const NAMES = { x: 'close', down: 'chevdn', fold: 'collapse', minus: 'popout' };
+  const ic = (n, s = 16) => !n ? '' : String(n).trim().startsWith('<') ? n : UI.icon(NAMES[n] || n, s);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const calm = () => matchMedia('(prefers-reduced-motion:reduce)').matches || document.body.classList.contains('calm');
+  const anim = (el, kf, o) => calm() ? Promise.resolve() : el.animate(kf, o).finished.catch(() => {});
+  /* group colours are the space colours, by name */
+  const HUES = [['Violet', 'violet'], ['Sky', 'sky'], ['Gold', 'gold'], ['Pink', 'pink'], ['Coral', 'coral'], ['Sage', 'sage'], ['Slate', 'slate']];
+  const gVar = c => c ? `var(--ms-space-${c})` : '';
+
+  const tabHTML = t => `<div class="ms-tab${t.pinned ? ' is-pinned' : ''}${t.cls ? ' ' + t.cls : ''}" role="tab" aria-selected="${!!t.active}" tabindex="${t.active ? 0 : -1}" data-id="${esc(t.id || t.label)}" data-label="${esc(t.label)}"${t.fixed ? ' data-fixed="1"' : ''}${t.pinned ? ` data-tip="${esc(t.label)}"` : ''}>${t.loading ? '<i class="ms-tab-spin"></i>' : ic(t.icon)}<span class="ms-tab-t">${esc(t.label)}</span>${t.dot ? '<i class="ms-new"></i>' : ''}${t.badge ? `<i class="ms-badge">${esc(t.badge)}</i>` : ''}<button class="ms-tab-x" tabindex="-1" aria-label="Close ${esc(t.label)}">${ic('x', 13)}</button></div>`;
+  const groupHTML = g => `<div class="ms-tg${g.group ? '' : ' no-name'}${g.cls ? ' ' + g.cls : ''}" role="group" aria-label="${esc(g.group || 'Unnamed group')}" data-g="${esc(g.id || '')}" data-c="${esc(g.color || '')}" data-open="${g.open !== false}"${g.color ? ` style="--g:${gVar(g.color)}"` : ''}><button class="ms-tg-label" aria-expanded="${g.open !== false}"><i class="ms-tg-dot"></i><span>${esc(g.group || '')}</span><i class="ms-new"></i><em class="ms-tg-count">${g.tabs.length}</em></button><div class="ms-tg-tabs"><div class="ms-tg-in">${g.tabs.map(tabHTML).join('')}</div></div></div>`;
+  const itemHTML = it => it.tabs ? groupHTML(it) : tabHTML(it);
+  /* the strip as data: pinned tab ids, then the rest in order (a tab id, or a group with its tabs) */
+  const read = strip => { const track = strip.querySelector('.ms-ts-scroll'), live = t => !t.dataset.closing;
+    return [...track.children].filter(el => el.matches('.ms-tab,.ms-tg') && live(el)).map(el => el.matches('.ms-tg')
+      ? { group: el.classList.contains('no-name') ? '' : el.querySelector('.ms-tg-label>span').textContent, id: el.dataset.g, color: el.dataset.c, open: el.dataset.open !== 'false', tabs: [...el.querySelectorAll('.ms-tab')].filter(live).map(t => t.dataset.id) }
+      : { id: el.dataset.id, pinned: el.classList.contains('is-pinned') }).filter(x => !x.tabs || x.tabs.length); };
+
+  /* ---- the menu (library .ms-menu) ---- */
+  let menuEl = null, menuFrom = null;
+  function closeMenu(refocus){
+    if (!menuEl) return; const m = menuEl, f = menuFrom; menuEl = menuFrom = null;
+    if (f && f.setAttribute) { f.classList.remove('ms-ts-menu-on'); if (f.hasAttribute('aria-expanded') && !f.classList.contains('ms-tg-label')) f.setAttribute('aria-expanded', 'false'); }
+    anim(m, [{ opacity: 1 }, { opacity: 0, transform: 'translateY(-4px)' }], { duration: 120, easing: EI, fill: 'forwards' }).then(() => m.remove());
+    if (refocus && f && f.focus) f.focus();
+  }
+  function openMenu(from, x, y, build){
+    closeMenu(); const m = document.createElement('div'); m.className = 'ms-menu'; m.setAttribute('role', 'menu'); m.style.cssText = 'position:fixed;z-index:80';
+    const item = (icon, label, fn) => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.innerHTML = ic(icon) + `<b>${esc(label)}</b>`; b.onclick = () => { closeMenu(); fn(); }; m.append(b); return b; };
+    build(m, item, () => m.append(document.createElement('hr')));
+    document.body.append(m);
+    m.style.left = Math.max(8, Math.min(x, innerWidth - m.offsetWidth - 8)) + 'px';
+    m.style.top = (y + m.offsetHeight > innerHeight - 8 ? Math.max(8, y - m.offsetHeight - 12) : y) + 'px';
+    anim(m, [{ opacity: 0, transform: 'translateY(-4px)' }, { opacity: 1, transform: 'none' }], { duration: 150, easing: E });
+    menuEl = m; menuFrom = from;
+    if (from && from.hasAttribute && from.hasAttribute('aria-haspopup')) { from.setAttribute('aria-expanded', 'true'); from.classList.add('ms-ts-menu-on'); }
+    m.addEventListener('keydown', e => { const bs = [...m.querySelectorAll('button')], i = bs.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); bs[(i + 1) % bs.length].focus(); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); bs[(i - 1 + bs.length) % bs.length].focus(); } });
+    const first = m.querySelector('button'); if (first) first.focus({ preventScroll: true });
+  }
+  document.addEventListener('pointerdown', e => { if (menuEl && !menuEl.contains(e.target)) closeMenu(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && menuEl) closeMenu(true); });
+  const below = el => { const r = el.getBoundingClientRect(); return [r.left, r.bottom + 6]; };
+
+  function init(strip, opt = {}){
+    const track = strip.querySelector('.ms-ts-scroll'), addBtn = strip.querySelector('.ms-ts-add'), allBtn = strip.querySelector('.ms-ts-all');
+    if (!addBtn.innerHTML.trim()) addBtn.innerHTML = ic('plus', 18); if (allBtn && !allBtn.innerHTML.trim()) allBtn.innerHTML = ic('down');
+    if (opt.items) addBtn.insertAdjacentHTML('beforebegin', opt.items.map(itemHTML).join(''));
+
+    const allTabs = () => [...track.querySelectorAll('.ms-tab:not([data-closing])')];
+    const visTabs = () => allTabs().filter(t => !t.closest('.ms-tg[data-open=false]'));
+    const selected = () => strip.querySelector('[role=tab][aria-selected=true]');
+    const labelOf = t => t.dataset.label || t.querySelector('.ms-tab-t').textContent;
+    let quiet = 0; const told = () => { if (!quiet && opt.onState) opt.onState(strip); };
+
+    function sync(){
+      track.querySelectorAll('.ms-tg').forEach(g => {
+        const open = g.dataset.open !== 'false', n = g.querySelectorAll('.ms-tab:not([data-closing])').length;
+        g.querySelector('.ms-tg-count').textContent = n;
+        g.querySelector('.ms-tg-tabs').inert = !open;
+        g.classList.toggle('has-active', !!g.querySelector('.ms-tab[aria-selected=true]'));
+        g.classList.toggle('has-unread', !!g.querySelector('.ms-tab .ms-new,.ms-tab .ms-badge'));
+      });
+      const sel = selected(), reach = sel && !sel.closest('.ms-tg[data-open=false]');
+      const stop = reach ? sel : visTabs()[0]; allTabs().forEach(t => t.tabIndex = t === stop ? 0 : -1);
+      edges(); told();
+    }
+    function edges(){
+      const over = track.scrollWidth - track.clientWidth > 1;
+      track.classList.toggle('fade-l', track.scrollLeft > 1);
+      track.classList.toggle('fade-r', over && track.scrollLeft + track.clientWidth < track.scrollWidth - 1);
+      if (allBtn) allBtn.classList.toggle('on', over);
+    }
+    track.addEventListener('scroll', edges, { passive: true });
+    new ResizeObserver(edges).observe(track);
+    track.addEventListener('transitionend', e => { if (e.propertyName === 'grid-template-columns') edges(); });
+
+    /* move things without a jump: record → change → slide from the old place */
+    function flip(change){
+      const els = [...track.querySelectorAll('.ms-tab,.ms-tg-label,.ms-ts-add')], was = new Map(els.map(e => [e, e.getBoundingClientRect().left]));
+      change();
+      els.forEach(e => { if (!e.isConnected) return; const d = was.get(e) - e.getBoundingClientRect().left;
+        if (Math.abs(d) > .5) anim(e, [{ transform: `translateX(${d}px)` }, { transform: 'none' }], { duration: 300, easing: E }); });
+      sync();
+    }
+    const grow = (el, gap = 0) => { const w = el.getBoundingClientRect().width, o = el.style.overflow; el.style.overflow = 'hidden';
+      return anim(el, [{ width: 0, paddingLeft: 0, paddingRight: 0, marginInlineEnd: -gap + 'px', opacity: 0 }, { width: w + 'px', opacity: 1 }], { duration: 300, easing: E }).then(() => { el.style.overflow = o; edges(); }); };
+    const shrink = (el, gap = 0) => { const w = el.getBoundingClientRect().width; el.style.overflow = 'hidden'; el.style.pointerEvents = 'none';
+      return anim(el, [{ width: w + 'px', opacity: 1 }, { width: 0, paddingLeft: 0, paddingRight: 0, marginInlineEnd: -gap + 'px', borderWidth: 0, opacity: 0 }], { duration: 220, easing: EI, fill: 'forwards' }); };
+
+    function activate(tab, focus){
+      if (!tab || tab.dataset.closing) return;
+      const g = tab.closest('.ms-tg'); if (g && g.dataset.open === 'false') toggle(g, true);
+      const prev = selected(), changed = prev !== tab;
+      if (changed) { if (prev) prev.setAttribute('aria-selected', 'false'); tab.setAttribute('aria-selected', 'true'); }
+      sync(); tab.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: calm() ? 'auto' : 'smooth' });
+      if (focus) tab.focus({ preventScroll: true });
+      if (changed && opt.onChange) opt.onChange(tab.dataset.id, tab);
+    }
+    function close(tab, keepFocus){
+      if (!tab || tab.dataset.closing) return;
+      const list = allTabs(), i = list.indexOf(tab), next = list[i + 1] || list[i - 1], was = tab.getAttribute('aria-selected') === 'true';
+      tab.dataset.closing = 1;
+      const g = tab.closest('.ms-tg'), last = g && !g.querySelector('.ms-tab:not([data-closing])'), target = last ? g : tab;
+      if (last) g.dataset.closing = 1;
+      shrink(target, g && !last ? 6 : 0).then(() => { target.remove(); sync(); });
+      sync();
+      if (was) next ? activate(next, keepFocus) : opt.onChange && opt.onChange(null); else if (keepFocus && next) next.focus({ preventScroll: true });
+    }
+    function add(t, group){
+      const g = group && group.isConnected ? group : null;
+      if (g) { g.querySelector('.ms-tg-in').insertAdjacentHTML('beforeend', tabHTML(t)); if (g.dataset.open === 'false') toggle(g, true); }
+      else if (t.pinned) { const pins = track.querySelectorAll(':scope > .ms-tab.is-pinned'); pins.length ? pins[pins.length - 1].insertAdjacentHTML('afterend', tabHTML(t)) : track.insertAdjacentHTML('afterbegin', tabHTML(t)); }
+      else (t.fixed ? addBtn : track.querySelector(':scope > .ms-tab[data-fixed]') || addBtn).insertAdjacentHTML('beforebegin', tabHTML(t));
+      const pins = track.querySelectorAll(':scope > .ms-tab.is-pinned'), el = g ? g.querySelector('.ms-tg-in').lastElementChild : t.pinned ? pins[pins.length - 1] : track.querySelector(`:scope > .ms-tab[data-id="${CSS.escape(t.id || t.label)}"]`);
+      grow(el, g ? 6 : 0); activate(el); return el;
+    }
+    function toggle(g, open = g.dataset.open === 'false'){
+      g.dataset.open = open; g.querySelector('.ms-tg-label').setAttribute('aria-expanded', open); sync();
+    }
+    function rename(g){
+      const lab = g.querySelector('.ms-tg-label'), name = lab.querySelector('span'), inp = document.createElement('input'); let done = false;
+      inp.className = 'ms-tg-rename'; inp.value = name.textContent; inp.maxLength = 24; inp.setAttribute('aria-label', 'Group name'); inp.placeholder = 'Name (optional)';
+      lab.style.display = 'none'; lab.before(inp);
+      /* the field is as wide as its text (the placeholder while empty), plus its padding, and grows as you type */
+      const cs = getComputedStyle(inp), cx = document.createElement('canvas').getContext('2d'); cx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth) + 2;
+      const fit = () => { cx.font = `${inp.value ? cs.fontWeight : 400} ${cs.fontSize} ${cs.fontFamily}`; inp.style.width = Math.ceil(cx.measureText(inp.value || inp.placeholder).width + pad) + 'px'; }; fit(); inp.oninput = fit;
+      inp.focus(); inp.select();
+      anim(inp, [{ opacity: 0 }, { opacity: 1 }], { duration: 150 });
+      const end = save => { if (done) return; done = true; const v = inp.value.trim();
+        if (save) { name.textContent = v; g.setAttribute('aria-label', v || 'Unnamed group'); g.classList.toggle('no-name', !v); }
+        inp.remove(); lab.style.display = ''; anim(lab, [{ opacity: 0 }, { opacity: 1 }], { duration: 150 }); lab.focus({ preventScroll: true }); edges(); told(); };
+      inp.onkeydown = e => { e.stopPropagation(); if (e.key === 'Enter' || e.key === 'Escape') { e.preventDefault(); end(e.key === 'Enter'); } };
+      inp.onblur = () => end(true);
+    }
+    /* every new group gets its own colour: the first space colour no other group uses, and not near the space's own colour */
+    const hueOf = h => { const m = /^#?([0-9a-f]{6})$/i.exec(String(h).trim()); if (!m) return -1; const [r, g, b] = [0, 2, 4].map(i => parseInt(m[1].slice(i, i + 2), 16) / 255), mx = Math.max(r, g, b), d = mx - Math.min(r, g, b);
+      return !d ? -1 : (60 * (mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4) + 360) % 360; };
+    const near = (a, b) => { const x = hueOf(a), y = hueOf(b); return x >= 0 && y >= 0 && Math.min(Math.abs(x - y), 360 - Math.abs(x - y)) < 25; };
+    const hex = c => getComputedStyle(strip).getPropertyValue('--ms-space-' + c).trim();
+    function nextColor(){
+      const used = [...track.querySelectorAll('.ms-tg')].map(g => g.dataset.c ? hex(g.dataset.c) : getComputedStyle(strip).getPropertyValue('--ms-accent').trim());
+      used.push(getComputedStyle(strip).getPropertyValue('--ms-accent').trim());
+      const free = HUES.map(h => h[1]).filter(c => !used.some(u => near(u, hex(c))));
+      return free[0] || HUES[track.querySelectorAll('.ms-tg').length % HUES.length][1];
+    }
+    const setColor = (g, c) => { g.dataset.c = c || ''; c ? g.style.setProperty('--g', gVar(c)) : g.style.removeProperty('--g'); told(); };
+    const fadeIn = els => els.forEach(t => anim(t, [{ opacity: .35 }, { opacity: 1 }], { duration: 260, easing: E }));
+    function ungroup(g){ const ts = [...g.querySelectorAll('.ms-tab')]; flip(() => { g.before(...ts); g.remove(); }); fadeIn(ts); }
+    function closeGroup(g){ const sel = g.querySelector('.ms-tab[aria-selected=true]'); g.querySelectorAll('.ms-tab').forEach(t => t.dataset.closing = 1); g.dataset.closing = 1;
+      shrink(g).then(() => { g.remove(); sync(); }); sync();
+      if (sel) { const l = allTabs(), n = g.nextElementSibling && g.nextElementSibling.matches('.ms-tab') ? g.nextElementSibling : l[l.length - 1]; n ? activate(n) : opt.onChange && opt.onChange(null); } }
+    function newGroup(tab){ let g; flip(() => { tab.insertAdjacentHTML('beforebegin', groupHTML({ group: '', id: 'g' + Date.now().toString(36), color: nextColor(), tabs: [] })); g = tab.previousElementSibling; g.querySelector('.ms-tg-in').append(tab); }); fadeIn([tab, g.querySelector('.ms-tg-label')]); rename(g); }
+    function moveTo(tab, g){ const old = tab.closest('.ms-tg'); flip(() => { if (g) { g.querySelector('.ms-tg-in').append(tab); g.dataset.open = true; g.querySelector('.ms-tg-label').setAttribute('aria-expanded', true); } else old.after(tab);
+      if (old && !old.querySelector('.ms-tab')) old.remove(); }); fadeIn([tab]); }
+    /* pinned tabs sit first, outside groups; unpinning leaves the tab right after them */
+    function pin(tab){ const on = !tab.classList.contains('is-pinned'), old = tab.closest('.ms-tg');
+      flip(() => { tab.classList.toggle('is-pinned', on); on ? tab.dataset.tip = labelOf(tab) : delete tab.dataset.tip;
+        const pins = [...track.children].filter(e => e !== tab && e.matches('.ms-tab.is-pinned')), last = pins[pins.length - 1];
+        last ? last.after(tab) : track.prepend(tab); if (old && !old.querySelector('.ms-tab')) old.remove(); });
+      fadeIn([tab]); setTimeout(edges, 280); }
+
+    function tabMenu(tab, x, y){
+      const g = tab.closest('.ms-tg'), pinned = tab.classList.contains('is-pinned');
+      openMenu(tab, x, y, (m, item, hr) => {
+        item('pin', pinned ? 'Unpin tab' : 'Pin tab', () => pin(tab));
+        if (!g && !pinned) item('folder', 'Add to a new group', () => newGroup(tab));
+        if (!pinned) track.querySelectorAll('.ms-tg').forEach(o => { if (o !== g) item('fold', 'Move to ' + o.getAttribute('aria-label'), () => moveTo(tab, o)); });
+        if (g) item('minus', 'Remove from group', () => moveTo(tab, null));
+        hr(); item('x', 'Close tab', () => close(tab));
+        if (allTabs().some(t => t !== tab && !t.classList.contains('is-pinned'))) item('', 'Close other tabs', () => { activate(tab); allTabs().forEach(t => t !== tab && !t.classList.contains('is-pinned') && close(t)); });
+      });
+    }
+    function groupMenu(g, x, y){
+      const lab = g.querySelector('.ms-tg-label'), open = g.dataset.open !== 'false';
+      openMenu(lab, x, y, (m, item, hr) => {
+        item('pencil', g.classList.contains('no-name') ? 'Name group' : 'Rename group', () => rename(g));
+        item('fold', open ? 'Collapse group' : 'Expand group', () => toggle(g));
+        hr(); m.insertAdjacentHTML('beforeend', `<p class="ms-ts-label">Group colour</p><div class="ms-ts-hues">` +
+          `<button type="button" style="--c:var(--ms-accent)" data-c="" aria-label="Space colour" data-tip="Space colour" aria-pressed="${!g.dataset.c}"></button>` +
+          HUES.map(([n, c]) => `<button type="button" style="--c:${gVar(c)}" data-c="${c}" aria-label="${n}" data-tip="${n}" aria-pressed="${g.dataset.c === c}"></button>`).join('') + `</div>`);
+        m.querySelector('.ms-ts-hues').onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return; setColor(g, b.dataset.c);
+          m.querySelectorAll('[data-c]').forEach(s => s.setAttribute('aria-pressed', s === b)); };
+        hr(); item('minus', 'Ungroup', () => ungroup(g)); item('x', 'Close group', () => closeGroup(g));
+      });
+    }
+
+    /* ---- drag: hold a tab 300ms (or press and move 5px) to move it, or drop it into a group ---- */
+    let drag = null, swallow = false;
+    function startDrag(){
+      const d = drag; if (!d || d.on) return; clearTimeout(d.hold); d.on = true; closeMenu(); quiet++;
+      const t = d.tab, r = t.getBoundingClientRect(), sr = strip.getBoundingClientRect(), g = t.cloneNode(true);
+      d.from = [t.parentNode, t.nextElementSibling];
+      g.removeAttribute('data-tip'); g.removeAttribute('role'); g.classList.add('is-drag');
+      g.style.cssText = `position:fixed;z-index:90;margin:0;pointer-events:none;left:${r.left}px;top:${sr.top + (sr.height - 32) / 2}px;width:${r.width}px`;
+      document.body.append(g); d.ghost = g; t.classList.add('is-slot'); strip.classList.add('is-dragging'); document.body.style.userSelect = 'none';
+      anim(g, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(1.02)', opacity: .94 }], { duration: 150, easing: E });
+    }
+    function place(x){
+      const d = drag, t = d.tab, pinned = t.classList.contains('is-pinned'); let parent = track, before = addBtn, target = null;
+      for (const el of [...track.children].filter(el => el !== t && el.matches('.ms-tab,.ms-tg'))) {
+        if (el.dataset.fixed) { before = el; break; }                                                    /* nothing lands after a fixed tab */
+        const r = el.getBoundingClientRect(), isPin = el.matches('.ms-tab.is-pinned');
+        if (pinned) { if (!isPin || x < r.left + r.width / 2) { before = el; break; } continue; }      /* pinned tabs only move among pinned tabs */
+        if (isPin) continue;                                                                          /* nothing lands before a pinned tab */
+        if (el.matches('.ms-tg') && x >= r.left && x <= r.right) {
+          if (el.dataset.open === 'false') { target = el; break; }                                    /* a collapsed group: drop on it */
+          const lab = el.querySelector('.ms-tg-label').getBoundingClientRect();
+          if (x < lab.left + lab.width / 2) { before = el; break; }                                   /* the start of the name: before the group */
+          parent = el.querySelector('.ms-tg-in'); before = null;
+          for (const c of parent.children) { if (c === t) continue; const cr = c.getBoundingClientRect(); if (x < cr.left + cr.width / 2) { before = c; break; } }
+          break;
+        }
+        if (x < r.left + r.width / 2) { before = el; break; }
+      }
+      track.querySelectorAll('.ms-tg.is-target').forEach(g => g !== target && g.classList.remove('is-target'));
+      d.target = target; if (target) return target.classList.add('is-target');
+      if (t.parentNode === parent && t.nextElementSibling === before) return;
+      flip(() => parent.insertBefore(t, before)); d.lock = performance.now() + 180;                  /* let things settle before measuring again */
+    }
+    function endDrag(cancel){
+      const d = drag; if (!d) return; drag = null; clearTimeout(d.hold); if (!d.on) return;
+      const t = d.tab, g = d.ghost, into = !cancel && d.target;
+      swallow = true; setTimeout(() => swallow = false, 80);
+      strip.classList.remove('is-dragging'); document.body.style.userSelect = '';
+      track.querySelectorAll('.ms-tg.is-target').forEach(x => x.classList.remove('is-target'));
+      if (cancel) flip(() => d.from[0].insertBefore(t, d.from[1] && d.from[1].isConnected ? d.from[1] : (d.from[0] === track ? addBtn : null)));
+      else if (into) flip(() => into.querySelector('.ms-tg-in').append(t));
+      const to = (into ? into.querySelector('.ms-tg-label') : t).getBoundingClientRect();
+      anim(g, [{ left: g.style.left, transform: 'scale(1.02)', opacity: .94 }, { left: to.left + 'px', transform: into ? 'scale(.6)' : 'scale(1)', opacity: into ? 0 : 1 }], { duration: 200, easing: E, fill: 'forwards' }).then(() => {
+        g.remove(); t.classList.remove('is-slot'); quiet--;
+        track.querySelectorAll('.ms-tg').forEach(x => { if (!x.querySelector('.ms-tab')) { x.dataset.closing = 1; shrink(x).then(() => { x.remove(); sync(); }); } });
+        sync(); if (!d.moved && !cancel) activate(t); else if (!cancel && opt.onReorder) opt.onReorder(t.dataset.id, t);
+      });
+    }
+    strip.addEventListener('pointerdown', e => {
+      const tab = e.target.closest('.ms-tab');
+      if (!tab || e.button !== 0 || e.pointerType === 'touch' || tab.dataset.closing || tab.dataset.fixed || e.target.closest('.ms-tab-x')) return;
+      drag = { tab, id: e.pointerId, x0: e.clientX, dx: e.clientX - tab.getBoundingClientRect().left, hold: setTimeout(startDrag, 300) };
+    });
+    window.addEventListener('pointermove', e => {
+      const d = drag; if (!d || e.pointerId !== d.id) return;
+      if (Math.abs(e.clientX - d.x0) > 5) { d.moved = true; startDrag(); }
+      if (!d.on) return;
+      const tr = track.getBoundingClientRect();
+      d.ghost.style.left = (e.clientX - d.dx) + 'px';
+      if (e.clientX < tr.left + 32) track.scrollLeft -= 10; else if (e.clientX > tr.right - 32) track.scrollLeft += 10;
+      if (!(performance.now() < d.lock)) place(Math.max(tr.left, Math.min(e.clientX, tr.right)));
+    });
+    window.addEventListener('pointerup', e => { if (drag && e.pointerId === drag.id) endDrag(false); });
+    window.addEventListener('pointercancel', () => endDrag(true));
+    window.addEventListener('keydown', e => { if (e.key === 'Escape' && drag && drag.on) endDrag(true); });
+
+    strip.addEventListener('click', e => {
+      if (swallow) { swallow = false; return; }
+      const x = e.target.closest('.ms-tab-x'); if (x) return close(x.closest('.ms-tab'));
+      const t = e.target.closest('[role=tab]'); if (t) return activate(t);
+      const l = e.target.closest('.ms-tg-label'); if (l) return toggle(l.closest('.ms-tg'));
+      if (e.target.closest('.ms-ts-add') && opt.onAdd) return opt.onAdd(api);
+      if (e.target.closest('.ms-ts-add')) { if (menuFrom === addBtn) return closeMenu(); const open = new Set(allTabs().map(t => t.dataset.id)), apps = (opt.apps || []).filter(a => !open.has(a.id));
+        return openMenu(addBtn, ...below(addBtn), (m, item, hr) => { m.insertAdjacentHTML('beforeend', `<p class="ms-ts-label">${apps.length ? 'Open an app' : 'Every app is already open'}</p>`); apps.forEach(a => item(a.icon, a.label, () => add(a)));
+          if (opt.more) { hr(); item('plus', opt.more.label, opt.more.onClick); } }); }
+      if (allBtn && e.target.closest('.ms-ts-all')) { if (menuFrom === allBtn) return closeMenu(); const r = allBtn.getBoundingClientRect();
+        return openMenu(allBtn, r.right - 236, r.bottom + 6, m => { let cur = null;
+          allTabs().forEach(t => { const g = t.closest('.ms-tg'); if (g !== cur) { cur = g; if (g) m.insertAdjacentHTML('beforeend', `<p class="ms-ts-label">${esc(g.getAttribute('aria-label'))}</p>`); else if (m.children.length) m.append(document.createElement('hr')); }
+            const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.innerHTML = (t.querySelector(':scope>svg') || { outerHTML: '' }).outerHTML + `<b>${esc(labelOf(t))}</b>`; b.onclick = () => { closeMenu(); activate(t, true); }; m.append(b); }); }); }
+    });
+    strip.addEventListener('pointerdown', e => { if (e.target.closest('.ms-ts-add,.ms-ts-all')) e.stopPropagation(); });
+    strip.addEventListener('auxclick', e => { const t = e.target.closest('.ms-tab'); if (t && e.button === 1) { e.preventDefault(); close(t); } });
+    strip.addEventListener('contextmenu', e => {
+      const t = e.target.closest('.ms-tab'), l = e.target.closest('.ms-tg-label'); if (!t && !l) return; e.preventDefault();
+      const [x, y] = e.clientX || e.clientY ? [e.clientX, e.clientY + 6] : below(t || l);
+      if (t && t.dataset.fixed) return;
+      t ? tabMenu(t, x, y) : groupMenu(l.closest('.ms-tg'), x, y);
+    });
+    strip.addEventListener('keydown', e => {
+      const t = e.target.closest('[role=tab]'); if (!t || e.target.matches('input')) return;
+      const l = visTabs(), i = l.indexOf(t), go = n => { e.preventDefault(); l[(n + l.length) % l.length].focus(); };
+      if (e.key === 'ArrowRight') go(i + 1); else if (e.key === 'ArrowLeft') go(i - 1);
+      else if (e.key === 'Home') go(0); else if (e.key === 'End') go(l.length - 1);
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(t, true); }
+      else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); close(t, true); }
+      else if ((e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) && !t.dataset.fixed) { e.preventDefault(); tabMenu(t, ...below(t)); }
+    });
+    quiet++; sync(); quiet--;
+    const api = { add, close, activate, toggle, rename, ungroup, pin, flip };
+    return api;
+  }
+  return { init, read, tabHTML, groupHTML, itemHTML, ic };
+})();
+
 msInit('gallery');
 UI.useTips();
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)], I = UI.icon;
@@ -4244,6 +4685,11 @@ $('#appTableStage').innerHTML = UI.table({ app: true, flat: true, select: { all:
     { grp: { caption: 'Status', tag: UI.tag('Draft', 'warn'), count: 1, closed: true } },
     { nocb: true, cells: ['<small>3 records</small>', '', '818,147,750'] }],
   newRow: { label: 'New plan' }, foot: { html: '<span>1–3 of 3</span>' }, bulk: [{ label: 'Copy IDs' }], bulkOn: true, bulkText: '1 selected' });
+MsTabstrip.init($('#gTabstrip'), {
+  items: [{ id: 'ov', icon: 'grid', label: 'Overview', pinned: true, active: true }, { group: 'My work', id: 'g1', tabs: [{ id: 'wt', icon: 'clock', label: 'My Worktime' }, { id: 'tm', icon: 'check', label: 'Task Management', dot: true }] }, { id: 'fin', icon: 'wallet', label: 'Finance' }],
+  apps: [{ id: 'ov', icon: 'grid', label: 'Overview', pinned: true }, { id: 'acc', icon: 'bank', label: 'Accounting' }, { id: 'hr', icon: 'users', label: 'Human resources' }, { id: 'docs', icon: 'file', label: 'Documents' }],
+  onAdd: api => { const n = $('#gTabstrip .ms-tab[data-id="new"]'); n ? api.activate(n) : api.add({ id: 'new', icon: 'plus', label: 'New', fixed: true }); },
+  onChange: (id, el) => { $('#gTabBody').textContent = id === 'new' ? 'What do you want to open? (the New tab page)' : id ? el.dataset.label : 'Nothing is open. Open something with +.'; } });
 $('#mnavStage').innerHTML = UI.mnav({ label: 'Sections', app: { name: 'Finance', icon: I('wallet', 15), tone: 'tn-purple' }, home: { label: 'Home' }, groups: [
   { label: 'Collections', on: true, items: ['Payment plan', 'Schedule version', 'Billing record', 'Payment intent', 'Receipt evidence', 'Instrument'].map((l, i) => ({ label: l, count: i ? 12 * i : '', on: !i })) },
   { label: 'Finance', items: ['Posting batch', 'Posting attempt', 'Fee obligation'].map(l => ({ label: l, count: 6 })) }] })

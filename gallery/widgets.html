@@ -1095,6 +1095,142 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-hscroll .ms-ctabs{width:max-content;min-width:100%}
 .ms-ctab-edge .ms-ctab[aria-selected=true]{box-shadow:inset 0 2px 0 var(--ms-accent)}
 
+/* Tab strip (.ms-tabstrip, MsTabstrip in tabstrip.js): the app tabs and tab groups at the top of a window (the canvas).
+   A 40px strip on --ms-bg with a hairline along the bottom. Pinned tabs first (Home is one: icon only, no close), then groups and tabs, then + (opens an app).
+   The open tab is --ms-panel, so it joins the content below. A group is a tint of its colour (--g, the space colour by default) holding 28px chips;
+   click its name to collapse it (count, unread dot, a 2px bar when it holds the open tab). Drag a tab to move it or drop it in a group.
+   The track scrolls sideways and fades at a cut edge; "All tabs" then appears beside the window controls.
+   State hooks: tab aria-selected · .is-pinned · .is-drag (the lifted copy) · .is-slot · i.ms-new · i.ms-badge · i.ms-tab-spin;
+   group .no-name · data-open · .has-active · .has-unread · .is-target · style="--g:#hex"; track .fade-l · .fade-r; all-tabs button .on. */
+@property --ts-fl{syntax:'<length>';inherits:false;initial-value:0px}
+@property --ts-fr{syntax:'<length>';inherits:false;initial-value:0px}
+
+.ms-tabstrip{--ts-h:40px;position:relative;display:flex;align-items:stretch;height:var(--ts-h);background:var(--ms-bg); /* lint-allow: the strip is 40 high */
+  box-shadow:inset 0 -1px 0 var(--ms-line);user-select:none;-webkit-user-select:none}
+
+/* the scrolling track: groups, tabs and +; fades at the edges when it overflows */
+.ms-ts-scroll{flex:1;min-width:0;display:flex;align-items:stretch;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent,black var(--ts-fl),black calc(100% - var(--ts-fr)),transparent); /* lint-allow: mask colours are alpha only */
+  mask-image:linear-gradient(90deg,transparent,black var(--ts-fl),black calc(100% - var(--ts-fr)),transparent); /* lint-allow: mask colours are alpha only */
+  transition:--ts-fl var(--ms-t),--ts-fr var(--ms-t)}
+.ms-ts-scroll::-webkit-scrollbar{display:none}
+.ms-ts-scroll.fade-l{--ts-fl:28px} /* lint-allow: fade width */
+.ms-ts-scroll.fade-r{--ts-fr:28px} /* lint-allow: fade width */
+
+/* + : a square cell */
+.ms-ts-add{flex:none;width:var(--ts-h);display:grid;place-items:center;color:var(--ms-mute);
+  border-inline-end:1px solid var(--ms-line);box-shadow:inset 0 -1px 0 var(--ms-line);
+  transition:background var(--ms-t-fast),color var(--ms-t-fast),box-shadow var(--ms-t-fast)}
+.ms-ts-add svg{width:18px;height:18px} /* lint-allow: icon size */
+.ms-ts-add:hover,.ms-ts-add[aria-expanded=true]{background:var(--ms-raise);color:var(--ms-text)}
+
+/* ---- tab ---- */
+.ms-tab{position:relative;flex:none;display:flex;align-items:center;height:100%;max-width:240px;padding:0 var(--ms-s-2) 0 var(--ms-s-6);overflow:hidden;white-space:nowrap; /* lint-allow: a tab is at most 240 wide */
+  font-size:var(--ms-fs-control);font-weight:var(--ms-fw-medium);color:var(--ms-mute);cursor:pointer;
+  border-inline-end:1px solid var(--ms-line);box-shadow:inset 0 -1px 0 var(--ms-line);
+  transition:background var(--ms-t-fast),color var(--ms-t-fast),box-shadow var(--ms-t-fast),padding var(--ms-t-panel) var(--ms-e)}
+.ms-tab>svg,.ms-tab-spin{width:16px;height:16px;flex:none;margin-inline-end:var(--ms-s-4);transition:margin var(--ms-t-panel) var(--ms-e)} /* lint-allow: icon size */
+.ms-tab-t{min-width:0;max-width:160px;overflow:hidden;text-overflow:ellipsis;transition:max-width var(--ms-t-panel) var(--ms-e),opacity var(--ms-t)} /* lint-allow: label is at most 160 */
+.ms-tab .ms-new,.ms-tab .ms-badge{margin-inline-start:var(--ms-s-3);flex:none}
+/* close: its space is always kept, so nothing moves on hover */
+.ms-tab-x{position:relative;flex:none;width:24px;height:28px;margin-inline-start:var(--ms-s-1);display:grid;place-items:center;color:var(--ms-dim);opacity:0; /* lint-allow: close target 24 × 28 */
+  transition:opacity var(--ms-t-fast),color var(--ms-t-fast),width var(--ms-t-panel) var(--ms-e),margin var(--ms-t-panel) var(--ms-e)}
+.ms-tab-x::before{content:"";position:absolute;inset:var(--ms-s-2) var(--ms-s-1);border-radius:var(--ms-r-xs);transition:background var(--ms-t-fast)}
+.ms-tab-x svg{position:relative;width:13px;height:13px} /* lint-allow: icon size */
+.ms-tab-x:hover{color:var(--ms-text)}
+.ms-tab-x:hover::before{background:color-mix(in srgb,var(--ms-text) 10%,transparent)}
+.ms-tab:hover .ms-tab-x,.ms-tab:focus-visible .ms-tab-x,.ms-tab[aria-selected=true] .ms-tab-x{opacity:1}
+
+.ms-tab:hover{background:var(--ms-raise);color:var(--ms-text)}
+/* open: joins the content below (no bottom line) */
+.ms-tab[aria-selected=true]{background:var(--ts-join,var(--ms-panel));color:var(--ms-text);box-shadow:none}   /* --ts-join: the colour of the content under the strip */
+.ms-tab:focus-visible,.ms-ts-add:focus-visible,.ms-tg-label:focus-visible{outline:2px solid var(--ms-accent);outline-offset:-2px}
+
+/* loading */
+.ms-tab-spin{border-radius:50%;border:1.5px solid color-mix(in srgb,var(--ms-text) 18%,transparent);border-top-color:var(--ms-accent);animation:ms-ts-spin .8s linear infinite}
+@keyframes ms-ts-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.ms-tab-spin{animation:none}}
+body.calm .ms-tab-spin{animation:none}
+
+/* pinned: icon only, no close; pinned tabs sit first, outside groups (Home is one) */
+.ms-tab.is-pinned{padding-inline:var(--ms-s-6)}
+.ms-tab.is-pinned>svg,.ms-tab.is-pinned .ms-tab-spin{margin-inline-end:0}
+.ms-tab.is-pinned .ms-tab-t{max-width:0;opacity:0}
+.ms-tab.is-pinned .ms-tab-x{width:0;margin:0;opacity:0;pointer-events:none}
+.ms-tab.is-pinned .ms-badge{display:none}
+.ms-tab.is-pinned .ms-new{position:absolute;top:var(--ms-s-4);inset-inline-end:var(--ms-s-4);margin:0}
+
+/* dragging: the lifted copy follows the pointer; the tab itself becomes the dashed slot it will land in */
+.ms-tab.is-drag{z-index:2;background:var(--ms-panel);color:var(--ms-text);border:0;border-radius:var(--ms-r-sm);height:var(--ms-h-control);align-self:center;margin-inline:var(--ms-s-2);
+  box-shadow:var(--ms-sh-2),0 0 0 1px var(--ms-line);transform:scale(1.02);opacity:.94;cursor:grabbing}
+.ms-tab.is-slot>*{opacity:0}
+.ms-tabstrip.is-dragging,.ms-tabstrip.is-dragging *{cursor:grabbing!important}
+
+/* ---- group ---- */
+.ms-tg{--g:var(--ms-accent);position:relative;flex:none;display:flex;align-items:center;height:100%;
+  background:color-mix(in srgb,var(--g) 10%,transparent);border-inline-end:1px solid var(--ms-line);
+  transition:background var(--ms-t),box-shadow var(--ms-t-fast)}
+.ms-tg-label{flex:none;display:flex;align-items:center;height:28px;margin-inline:var(--ms-s-3);padding:0 var(--ms-s-4);border-radius:var(--ms-r-sm);white-space:nowrap; /* lint-allow: 28 high in a 40 strip */
+  font-size:var(--ms-fs-control);font-weight:var(--ms-fw-semibold);color:color-mix(in srgb,var(--g) 72%,var(--ms-text));transition:background var(--ms-t-fast),color var(--ms-t)}
+.ms-tg-label:hover{background:color-mix(in srgb,var(--g) 16%,transparent)}
+.ms-tg-label>span{max-width:140px;overflow:hidden;text-overflow:ellipsis} /* lint-allow: a group name is at most 140 */
+/* an unnamed group: an 8px dot in its colour stands in for the name */
+.ms-tg-dot{display:none;width:8px;height:8px;border-radius:50%;corner-shape:round;background:var(--g);flex:none} /* lint-allow: dot size */
+.ms-tg.no-name .ms-tg-dot{display:block}
+.ms-tg.no-name .ms-tg-label>span{display:none}
+.ms-tg.no-name .ms-tg-label{min-width:28px;justify-content:center} /* lint-allow: 28 square */
+/* count and unread dot: only while collapsed */
+.ms-tg-count{flex:none;display:inline-grid;place-items:center;height:16px;max-width:0;margin:0;padding:0;overflow:hidden;opacity:0;border-radius:var(--ms-r-pill);corner-shape:round; /* lint-allow: count 16 high */
+  background:color-mix(in srgb,var(--g) 24%,transparent);font-style:normal;font-size:var(--ms-fs-tag);font-weight:var(--ms-fw-medium);line-height:1;
+  transition:max-width var(--ms-t-panel) var(--ms-e),margin var(--ms-t-panel) var(--ms-e),padding var(--ms-t-panel) var(--ms-e),opacity var(--ms-t)}
+.ms-tg[data-open=false] .ms-tg-count{max-width:28px;margin-inline-start:var(--ms-s-3);padding:0 5px;opacity:1} /* lint-allow: count width */
+.ms-tg-label .ms-new{background:var(--g);width:0;opacity:0;margin:0;transition:width var(--ms-t),margin var(--ms-t),opacity var(--ms-t)}
+.ms-tg[data-open=false].has-unread .ms-tg-label .ms-new{width:6px;margin-inline-start:var(--ms-s-3);opacity:1} /* lint-allow: dot size */
+/* the tabs fold with the grid 1fr → 0fr trick */
+.ms-tg-tabs{display:grid;grid-template-columns:1fr;transition:grid-template-columns var(--ms-t-panel) var(--ms-e),opacity var(--ms-t)}
+.ms-tg-in{min-width:0;overflow:hidden;display:flex;align-items:center;gap:var(--ms-s-3);height:var(--ts-h);padding-inline-end:var(--ms-s-3)}
+.ms-tg[data-open=false] .ms-tg-tabs{grid-template-columns:0fr;opacity:0;transition-timing-function:var(--ms-ei)}
+/* a collapsed group that holds the open tab */
+.ms-tg::after{content:"";position:absolute;inset:auto 10px 0 10px;height:2px;border-radius:var(--ms-r-hair) var(--ms-r-hair) 0 0;background:var(--g);opacity:0;transform:scaleX(.4); /* lint-allow: the 2px bar */
+  transition:opacity var(--ms-t),transform var(--ms-t-panel) var(--ms-e);pointer-events:none}
+.ms-tg[data-open=false].has-active::after{opacity:1;transform:none}
+/* drop target while a tab is dragged over it */
+.ms-tg.is-target{background:color-mix(in srgb,var(--g) 18%,transparent);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--g) 60%,transparent)}
+
+/* tabs inside a group are 28px chips */
+.ms-tg .ms-tab{height:28px;padding:0 var(--ms-s-1) 0 var(--ms-s-5);border:0;border-radius:var(--ms-r-sm);box-shadow:none; /* lint-allow: chip 28 high */
+  background:color-mix(in srgb,var(--g) 18%,transparent);color:color-mix(in srgb,var(--ms-text) 80%,var(--g))}
+.ms-tg .ms-tab:hover{background:color-mix(in srgb,var(--g) 28%,transparent);color:var(--ms-text)}
+.ms-tg .ms-tab[aria-selected=true]{background:var(--ms-panel);color:var(--ms-text);
+  box-shadow:var(--ms-sh-1),inset 0 0 0 1px color-mix(in srgb,var(--g) 45%,var(--ms-line))}
+.ms-tg .ms-tab.is-pinned{padding-inline:var(--ms-s-3)}
+.ms-tg .ms-tab.is-pinned .ms-new{top:3px;inset-inline-end:3px} /* lint-allow: dot inset */
+.ms-tg .ms-tab .ms-new{background:var(--g)}
+
+/* the slot's colours come last so they win over hover and open */
+.ms-tab.is-slot,.ms-tg .ms-tab.is-slot{background:color-mix(in srgb,var(--ms-accent) 8%,transparent);box-shadow:none;
+  outline:1.5px dashed color-mix(in srgb,var(--ms-accent) 55%,var(--ms-line));outline-offset:-5px;border-radius:var(--ms-r-md)}
+.ms-tg .ms-tab.is-slot{outline-offset:-1.5px;border-radius:var(--ms-r-sm)}
+
+/* inline rename (28/7, because it sits in a 40px strip) */
+.ms-tg-rename{flex:none;height:28px;margin-inline:var(--ms-s-3);padding:0 var(--ms-s-4);border-radius:var(--ms-r-sm);outline:0; /* lint-allow: 28 high in a 40 strip */
+  border:1px solid color-mix(in srgb,var(--g) 60%,var(--ms-line));background:var(--ms-panel);font-size:var(--ms-fs-control);font-weight:var(--ms-fw-semibold);color:var(--ms-text)}
+.ms-tg-rename::placeholder{color:var(--ms-dim);font-weight:var(--ms-fw-regular)}
+
+/* window controls (end) */
+.ms-ts-win{flex:none;display:flex;align-items:center;gap:var(--ms-s-1);padding:0 var(--ms-s-3)}
+.ms-ts-all{width:0;opacity:0;overflow:hidden;pointer-events:none;transition:width var(--ms-t) var(--ms-e),opacity var(--ms-t),background var(--ms-t-fast),color var(--ms-t-fast)}
+.ms-ts-all.on{width:28px;opacity:1;pointer-events:auto} /* lint-allow: a small icon button */
+.ms-ts-menu-on{background:color-mix(in srgb,var(--ms-accent) 12%,transparent)}
+/* the group colour swatches in a group's menu */
+.ms-ts-hues{display:grid;grid-template-columns:repeat(4,24px);gap:10px;padding:var(--ms-s-2) var(--ms-s-4) var(--ms-s-4)} /* lint-allow: swatch grid */
+.ms-ts-hues button{width:24px;height:24px;border-radius:50%;corner-shape:round;background:var(--c);transition:transform var(--ms-t-fast),box-shadow var(--ms-t-fast)} /* lint-allow: swatch size */
+.ms-ts-hues button:hover{transform:scale(1.1)}
+.ms-ts-hues button[aria-pressed=true]{box-shadow:0 0 0 2px var(--ms-raise),0 0 0 4px var(--c)}
+.ms-ts-label{margin:var(--ms-s-3) var(--ms-s-4) var(--ms-s-2);font-size:var(--ms-fs-label);font-weight:var(--ms-fw-medium);color:var(--ms-dim);letter-spacing:.02em}
+/* unread dot */
+.ms-new{width:6px;height:6px;border-radius:50%;corner-shape:round;background:var(--ms-accent);flex:none} /* lint-allow: dot size */
+
 /* App tabs: a raised 50px bar (radius 12, a lit edge) with the app's tile and name, a divider, then tabs. One 2px accent ink slides and resizes
    to the selected tab (340ms; UI.initInkTabs places it, and any .ms-anav on the page gets one). Counts on tabs are badges.
    A tab can open a menu that drops under the bar. On phones the tabs scroll sideways inside the bar with a fade at the end.
