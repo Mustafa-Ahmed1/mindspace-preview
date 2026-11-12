@@ -201,7 +201,7 @@ body.theme-light .tn-slate{--tb:#e3e9fb;--tf:#3a4f94} /* lint-allow: an app tone
 .ms-seg>button:hover,.ms-seg>button[aria-pressed=true],.ms-seg>button[aria-selected=true]{color:var(--ms-text)}
 .ms-seg>button em{font-style:normal;font-size:var(--ms-fs-label);font-weight:var(--ms-fw-medium);color:var(--ms-dim);font-variant-numeric:tabular-nums}
 .ms-seg>button svg{width:14px;height:14px}
-.ms-seg>.thumb{position:absolute;z-index:0;top:3px;left:0;width:0;height:var(--ms-h-compact);border-radius:var(--ms-r-sm);background:var(--ms-thumb);pointer-events:none;
+.ms-seg>.thumb{position:absolute;z-index:0;top:3px;bottom:3px;left:0;width:0;height:auto;border-radius:var(--ms-r-sm);background:var(--ms-thumb);pointer-events:none;
   box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-thumb-line),0 1px 3px color-mix(in srgb,var(--ms-black) 22%,transparent);transition:transform .32s var(--ms-e),width .32s var(--ms-e)}
 /* before the thumb is placed, the pressed option carries its own look so nothing jumps */
 .ms-seg:not(:has(>.thumb[data-ready]))>button[aria-pressed=true],.ms-seg:not(:has(>.thumb[data-ready]))>button[aria-selected=true]{background:var(--ms-thumb);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-thumb-line)}
@@ -210,7 +210,7 @@ body.theme-light .tn-slate{--tb:#e3e9fb;--tf:#3a4f94} /* lint-allow: an app tone
 .ms-seg .dot{width:6px;height:6px;flex:none;border-radius:var(--ms-r-round);background:var(--ms-accent);box-shadow:none}
 .ms-seg.xs{padding:var(--ms-s-1);border-radius:var(--ms-r)}
 .ms-seg.xs>button{height:24px;padding:0 9px;font-size:var(--ms-fs-caption);border-radius:var(--ms-r-xs)}
-.ms-seg.xs>.thumb{top:2px;height:24px;border-radius:var(--ms-r-xs)}
+.ms-seg.xs>.thumb{top:2px;bottom:2px;height:auto;border-radius:var(--ms-r-xs)}
 
 .ms-switch{position:relative;width:36px;height:22px;flex:none;padding:0;border:0;border-radius:var(--ms-r-pill);background:var(--ms-track);cursor:pointer;
   box-shadow:var(--ms-sh-inset),0 0 0 1px var(--ms-line);transition:background-color var(--ms-t),box-shadow var(--ms-t)}
@@ -8322,7 +8322,9 @@ const UI = (() => {
   const sig = (n, sel) => $$(sel, n).map(b => b.textContent.trim()).join('|');
   function slide(host, ind, b, instant, dx = 0, dw = 0, key) {
     if (!ind || !b || !b.offsetWidth) return;
-    const w = b.offsetWidth - dw, x = b.offsetLeft + dx, was = key && carry[key], first = !ind.dataset.ready;
+    /* exact sizes (buttons are often a fraction of a pixel wide; rounding pushed the last one past the edge), measured without the host's own scale */
+    const hr = host.getBoundingClientRect(), br = b.getBoundingClientRect(), k = host.offsetWidth ? hr.width / host.offsetWidth : 1;
+    const w = br.width / k - dw, x = (br.left - hr.left) / k - host.clientLeft + dx, was = key && carry[key], first = !ind.dataset.ready;
     if (first && was && Date.now() - was.t < 1200) { ind.style.transition = 'none'; ind.style.width = was.w + 'px'; ind.style.transform = `translateX(${was.x}px)`; ind.offsetWidth; ind.style.transition = ''; }
     else if (instant || first) ind.style.transition = 'none';
     ind.style.width = w + 'px'; ind.style.transform = `translateX(${x}px)`; ind._x = x; ind._w = w;
