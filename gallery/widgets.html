@@ -211,6 +211,61 @@ body.theme-light .tn-slate{--tb:#e3e9fb;--tf:#3a4f94} /* lint-allow: an app tone
 .ms-control.sm,.ms-input.sm,.ms-select.sm,.ms-search.sm,.ms-dd.sm{height:var(--ms-h-control);padding-inline-start:var(--ms-s-5);font-size:var(--ms-fs-control)}
 .ms-control.sm input,.ms-search.sm input,.ms-control.sm .v,.ms-dd.sm>span{font-size:var(--ms-fs-control)}
 
+/* ---------- lookup field (UI.lookup) ----------
+   A search field that picks another record; once picked it shows the name and its ID (dim), with Open (→) and Clear (×) on hover.
+   Its list: up to 8 matches (name, then ID · detail), then "Create a new …"; ↑ ↓ Enter and Esc. */
+.ms-lookup .req{margin-inline-start:var(--ms-s-1);font-style:normal;color:var(--ms-bad-text)}
+.ms-lookup .ms-control{position:relative}
+.ms-lookup .ms-control>svg{flex:none;color:var(--ms-dim)}
+.ms-lookup input{flex:1;min-width:0}
+.ms-lookup .id{flex:none;font-size:var(--ms-fs-sm);color:var(--ms-dim);font-variant-numeric:tabular-nums}
+.ms-lookup .id:empty{display:none}
+.ms-lookup .go,.ms-lookup .x{flex:none;width:var(--ms-h-compact);height:var(--ms-h-compact);margin-inline-end:calc(-1 * var(--ms-s-2));display:none;place-items:center;border-radius:var(--ms-r-sm);color:var(--ms-dim);transition:background var(--ms-t-fast),color var(--ms-t-fast)}
+.ms-lookup .go:hover,.ms-lookup .x:hover{background:var(--ms-hover);color:var(--ms-text)}
+.ms-lookup.set .ms-control:hover .go,.ms-lookup.set .ms-control:focus-within .go,.ms-lookup .ms-control:hover input:not(:placeholder-shown)~.x{display:grid}
+.ms-lookup.set .ms-control:hover .x{display:grid}
+.ms-lookpop{padding:var(--ms-s-2)}
+.ms-looklist{display:grid;gap:var(--ms-s-1);max-height:320px;overflow-y:auto} /* lint-allow: list height */
+.ms-looklist button{display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:var(--ms-s-3) var(--ms-s-5);border-radius:var(--ms-r);text-align:start}
+.ms-looklist button b{font-size:var(--ms-fs-control);font-weight:var(--ms-fw-medium);color:var(--ms-text)}
+.ms-looklist button small{font-size:var(--ms-fs-sm);color:var(--ms-dim);font-variant-numeric:tabular-nums}
+.ms-looklist button.hl,.ms-looklist button:hover{background:var(--ms-hover)}
+.ms-looklist button.new{flex-direction:row;align-items:center;gap:var(--ms-s-4);color:var(--ms-tint-text);font-size:var(--ms-fs-control);font-weight:var(--ms-fw-medium);box-shadow:inset 0 1px 0 var(--ms-line);border-radius:0 0 var(--ms-r) var(--ms-r)}
+.ms-looklist .none{margin:0;padding:var(--ms-s-4) var(--ms-s-5);font-size:var(--ms-fs-control);color:var(--ms-dim)}
+
+.ms-lookup .lbl:empty{display:none}   /* a lookup without a label (a filter) */
+/* ---------- date range (UI.daterange) ----------
+   A field showing the range; its popover: presets on the left, two months on the right, the picked range shaded, then Cancel and Apply. */
+.ms-drange{gap:var(--ms-s-4);cursor:pointer}
+.ms-drange>svg:first-child{color:var(--ms-dim)}
+.ms-drange .v{flex:1;text-align:start;font-variant-numeric:tabular-nums}
+.ms-drange>svg:last-child{color:var(--ms-dim);transition:transform var(--ms-t) var(--ms-e)}
+.ms-drange[aria-expanded=true]>svg:last-child{transform:rotate(180deg)}
+.ms-drpop{padding:0}
+.ms-drpick{display:flex}
+.ms-drpick .pre{display:grid;align-content:start;gap:var(--ms-s-1);width:148px;padding:var(--ms-s-4);box-shadow:inset -1px 0 0 var(--ms-line)} /* lint-allow: preset column */
+.ms-drpick .pre button{height:var(--ms-h-control);padding:0 var(--ms-s-5);border-radius:var(--ms-r);text-align:start;font-size:var(--ms-fs-control);color:var(--ms-mute)}
+.ms-drpick .pre button:hover{background:var(--ms-hover);color:var(--ms-text)}
+.ms-drpick .pre button[aria-pressed=true]{background:var(--ms-tint);color:var(--ms-tint-text);font-weight:var(--ms-fw-medium)}
+.ms-drpick .cal{display:grid;gap:var(--ms-s-4);padding:var(--ms-s-5) var(--ms-s-6)}
+.ms-drpick .cal>header{display:flex;align-items:center;margin-bottom:calc(-1 * var(--ms-s-12))}
+.ms-drpick .cal>header .sp{flex:1}
+.ms-drpick .mons{display:flex;gap:var(--ms-s-9)}
+.ms-drpick .mon{width:236px} /* lint-allow: a month is 7 × 32 + gaps */
+.ms-drpick .mon b{display:block;height:var(--ms-h-compact);line-height:var(--ms-h-compact);text-align:center;font-size:var(--ms-fs-body);font-weight:var(--ms-fw-semibold)}
+.ms-drpick .wk,.ms-drpick .days{display:grid;grid-template-columns:repeat(7,1fr);row-gap:var(--ms-s-1)}
+.ms-drpick .wk span{height:24px;display:grid;place-items:center;font-size:var(--ms-fs-eyebrow);font-weight:var(--ms-fw-medium);color:var(--ms-dim)} /* lint-allow: weekday row */
+.ms-drpick .days button{height:var(--ms-h-control);font-size:var(--ms-fs-control);font-variant-numeric:tabular-nums;color:var(--ms-text);border-radius:var(--ms-r);transition:background-color var(--ms-t-fast)}
+.ms-drpick .days button:hover{background:var(--ms-hover)}
+.ms-drpick .days button.today{box-shadow:inset 0 0 0 1px var(--ms-sel-line);color:var(--ms-tint-text);font-weight:var(--ms-fw-semibold)}
+.ms-drpick .days button.in{border-radius:0;background:var(--ms-tint)}
+.ms-drpick .days button.start,.ms-drpick .days button.end{background:var(--ms-accent);color:var(--ms-on);font-weight:var(--ms-fw-semibold);box-shadow:none}
+.ms-drpick .cal>footer{display:flex;align-items:center;gap:var(--ms-s-3);padding-top:var(--ms-s-5);box-shadow:inset 0 1px 0 var(--ms-line)}
+.ms-drpick .sum{flex:1;font-size:var(--ms-fs-control);color:var(--ms-mute);font-variant-numeric:tabular-nums}
+@media (max-width:640px){.ms-drpick{flex-direction:column}.ms-drpick .pre{width:auto;grid-template-columns:repeat(3,1fr);box-shadow:inset 0 -1px 0 var(--ms-line)}.ms-drpick .mons>.mon+.mon{display:none}}
+
+@media (prefers-reduced-motion:reduce){.ms-drange>svg:last-child{transition:none}}
+
 /* Choices, picked by case:
    - Segmented (.ms-seg): 2–4 options that apply right away. A recessed tray; one thumb slides and resizes to the pressed option (320ms). Counts sit inside (em).
      UI.initSeg (ui.js) adds the thumb; any .ms-seg on the page gets one. Also the tabs inside a view.
@@ -382,6 +437,20 @@ body.theme-light .ms-check:indeterminate{background-image:url("data:image/svg+xm
 .ms-tag.code{corner-shape:superellipse(1.6)}
 /* a filter chip that can't be used right now */
 .ms-chip:disabled,.ms-chip[aria-disabled=true]{opacity:.45;pointer-events:none}
+
+/* ---------- status steps (UI.steps) ----------
+   A record's lifecycle as a bar: the steps (Draft → Submitted → Cancelled) with the current one marked, a line on what it means, and its actions. */
+.ms-steps{display:flex;align-items:center;flex-wrap:wrap;gap:var(--ms-s-4) var(--ms-s-8);padding:var(--ms-s-6) var(--ms-s-8);border-radius:var(--ms-r-lg);background:var(--ms-panel);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line)}
+.ms-steps .track{display:flex;align-items:center;gap:var(--ms-s-2);margin:0;padding:0;list-style:none;font-size:var(--ms-fs-sm);color:var(--ms-dim)}
+.ms-steps .track li{display:flex;align-items:center;gap:var(--ms-s-3);white-space:nowrap}
+.ms-steps .track li+li::before{content:"";width:var(--ms-s-8);height:1px;margin-inline-end:var(--ms-s-2);background:var(--ms-line)}
+.ms-steps .track i{width:8px;height:8px;border-radius:50%;corner-shape:round;box-shadow:inset 0 0 0 1.5px var(--ms-line-strong)} /* lint-allow: step dot */
+.ms-steps .track .done i{background:var(--ms-dim);box-shadow:none}
+.ms-steps .track .on{color:var(--ms-text);font-weight:var(--ms-fw-semibold)}
+.ms-steps .track .on i{background:var(--ms-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--ms-accent) 20%,transparent)}
+.ms-steps[data-state=cancelled] .track .on i{background:var(--ms-red);box-shadow:0 0 0 3px color-mix(in srgb,var(--ms-red) 18%,transparent)}
+.ms-steps .note{flex:1;min-width:200px;margin:0;font-size:var(--ms-fs-control);color:var(--ms-mute)} /* lint-allow: wraps under the steps when narrow */
+.ms-steps .acts{display:flex;gap:var(--ms-s-3)}
 
 /* People, spaces and Autohumans: each person keeps one colour (--h, from the space palette) everywhere, and shape says what it is.
    Initials are tinted: --ms-av-fill of the colour for the fill and --ms-av-text for the letters (24% and 72% in dark, 20% and 58% in light).
@@ -760,6 +829,82 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-xscroll>.ms-tblwrap .ms-tbl{min-width:max-content}
 .ms-thic{display:inline-grid;place-items:center;min-width:14px;margin-inline-end:var(--ms-s-3);font-size:var(--ms-fs-label);font-weight:var(--ms-fw-semibold);color:var(--ms-dim)}
 
+/* ---------- editable table (UI.etable) ----------
+   A record's lines edited in place: a title with a count, row numbers, cells that look like text until hovered or focused, a × per row on hover,
+   "+ Add a row" (Enter on the last row adds one) and the total underneath. Rows slide in and fold out. */
+.ms-etable .req{margin-inline-start:var(--ms-s-1);font-style:normal;color:var(--ms-bad-text)}
+.ms-etable{display:grid;gap:var(--ms-s-4);min-width:0}
+.ms-etable>header{display:flex;align-items:center;gap:var(--ms-s-4)}
+.ms-etable>header b{font-size:var(--ms-fs-control);font-weight:var(--ms-fw-semibold)}
+.ms-etable>header .n{font-style:normal;font-size:var(--ms-fs-sm);color:var(--ms-dim);font-variant-numeric:tabular-nums}
+.ms-etable .cscroll{overflow-x:auto;border-radius:var(--ms-r-lg);background:var(--ms-panel);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line)}
+.ms-etable .grid{min-width:min-content}   /* columns keep their minimum widths, not the inputs' natural ones */
+.ms-etable .tr{display:grid;grid-template-columns:var(--cols);align-items:center;gap:var(--ms-s-5);min-height:var(--ms-h-field);padding:0 var(--ms-s-3);box-shadow:inset 0 -1px 0 var(--ms-line)}
+.ms-etable .tr.th{min-height:var(--ms-h-control);font-size:var(--ms-fs-sm);font-weight:var(--ms-fw-medium);color:var(--ms-mute);background:var(--ms-table-head)}
+.ms-etable .no{font-size:var(--ms-fs-sm);color:var(--ms-dim);text-align:center;font-variant-numeric:tabular-nums}
+.ms-etable .td{min-width:0}
+.ms-etable .td.num{text-align:end}
+.ms-etable .cellw{display:flex;align-items:center;gap:var(--ms-s-2);height:var(--ms-h-control);padding:0 var(--ms-s-3);border-radius:var(--ms-r-sm);transition:background var(--ms-t-fast),box-shadow var(--ms-t-fast)}
+.ms-etable .cellw>svg{flex:none;color:var(--ms-dim)}
+.ms-etable .cellw:hover{background:var(--ms-hover)}
+.ms-etable .cellw:focus-within{background:var(--ms-panel);box-shadow:inset 0 0 0 1px var(--ms-sel-line)}
+.ms-etable .in{width:100%;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:var(--ms-fs-control);color:var(--ms-text)}
+.ms-etable .in.n,.ms-etable output.in{text-align:end;font-variant-numeric:tabular-nums}
+.ms-etable select.in{height:var(--ms-h-control);padding:0 var(--ms-s-3);border-radius:var(--ms-r-sm)}
+.ms-etable select.in:hover{background:var(--ms-hover)}
+.ms-etable output.in{display:block;padding:0 var(--ms-s-3);color:var(--ms-mute)}
+.ms-etable .rm{width:var(--ms-h-compact);height:var(--ms-h-compact);display:grid;place-items:center;border-radius:var(--ms-r-sm);color:var(--ms-dim);opacity:0;transition:opacity var(--ms-t-fast),background var(--ms-t-fast),color var(--ms-t-fast)}
+.ms-etable .tr:hover .rm,.ms-etable .rm:focus-visible{opacity:1}
+.ms-etable .rm:hover{background:color-mix(in srgb,var(--ms-red) 12%,transparent);color:var(--ms-bad-text)}
+.ms-etable .add{display:flex;align-items:center;gap:var(--ms-s-3);width:100%;height:var(--ms-h-field);padding:0 var(--ms-s-6);font-size:var(--ms-fs-control);color:var(--ms-dim);transition:color var(--ms-t-fast),background var(--ms-t-fast)}
+.ms-etable .add:hover{color:var(--ms-text);background:var(--ms-hover)}
+.ms-etable>footer{display:flex;justify-content:flex-end;align-items:baseline;gap:var(--ms-s-6);padding:0 var(--ms-s-6);font-size:var(--ms-fs-control);color:var(--ms-mute)}
+.ms-etable>footer b{font-size:var(--ms-fs-title);font-weight:var(--ms-fw-semibold);color:var(--ms-text);font-variant-numeric:tabular-nums}
+
+/* ---------- tree table (UI.treetable) ----------
+   Rows in a tree, 20px per level, group rows bold with a chevron that folds them, numbers right-aligned in tabular digits,
+   zero as a dash, negatives in brackets, the grand total on a double line. For reports: ledgers, balances, budgets. */
+.ms-tree{overflow-x:auto;border-radius:var(--ms-r-lg);background:var(--ms-panel);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line)}
+.ms-tree .grid{min-width:min-content}   /* columns keep their minimum widths; a long label truncates instead of widening the table */
+.ms-tree .tr{display:grid;grid-template-columns:var(--cols);align-items:center;gap:var(--ms-s-6);min-height:var(--ms-h-field);padding:0 var(--ms-s-8);font-size:var(--ms-fs-control);box-shadow:inset 0 -1px 0 var(--ms-line)}
+.ms-tree .tr.th{min-height:var(--ms-h-control);position:sticky;top:0;z-index:1;font-size:var(--ms-fs-sm);font-weight:var(--ms-fw-medium);color:var(--ms-mute);background:var(--ms-table-head)}
+.ms-tree .num{text-align:end;font-variant-numeric:tabular-nums}
+.ms-tree .num.neg{color:var(--ms-bad-text)}
+.ms-tree .num .z{color:var(--ms-done)}
+.ms-tree .lab{display:flex;align-items:center;gap:var(--ms-s-3);min-width:0;padding-inline-start:calc(var(--lv) * var(--ms-s-9))}
+.ms-tree .lab b{flex:0 0 auto;max-width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:var(--ms-fw-regular)}
+.ms-tree .lab small{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--ms-fs-sm);color:var(--ms-dim)}
+.ms-tree .lab .sp,.ms-tree .lab .chev{flex:none;width:16px;height:16px;display:grid;place-items:center} /* lint-allow: chevron box */
+.ms-tree .lab .chev{color:var(--ms-dim);transition:transform var(--ms-t-panel) var(--ms-e)}
+.ms-tree .tr.fgrp{cursor:pointer;transition:background var(--ms-t-fast)}
+.ms-tree .tr.fgrp:hover{background:var(--ms-hover)}
+.ms-tree .tr.fgrp:focus-visible{outline:2px solid var(--ms-accent);outline-offset:-2px}
+.ms-tree .tr.fgrp .lab b,.ms-tree .tr.fgrp .num{font-weight:var(--ms-fw-semibold)}
+.ms-tree .tr.fgrp[aria-expanded=false] .chev{transform:rotate(-90deg)}
+.ms-tree .tr.grand{min-height:var(--ms-h-row);font-weight:var(--ms-fw-semibold);box-shadow:inset 0 3px 0 -1px var(--ms-panel),inset 0 3px 0 0 var(--ms-line-strong),inset 0 1px 0 0 var(--ms-line-strong)}
+.ms-tree .tr.grand .lab b{font-weight:var(--ms-fw-semibold)}
+@media (prefers-reduced-motion:reduce){.ms-tree .lab .chev{transition:none}}
+
+/* ---------- striped tables (the flat record table and the tree table) ----------
+   No card: the header sits on the page (its ground) with a hairline under it; rows alternate white (--ms-panel) and a faint grey
+   halfway between the page and white, so they read apart without lines. Hidden rows (a search, a folded group) are skipped, so the
+   stripes stay even. The hover is square and one step darker; the selected row keeps its accent tint. */
+.ms-tblwrap.flat .ms-tr:not(.th):not(.new){background:var(--ms-panel);box-shadow:none}
+.ms-tblwrap.flat .ms-tr:nth-child(even of .ms-tr:not(.th,.new,.grp,[hidden])){background:color-mix(in srgb,var(--ms-ground) 55%,var(--ms-panel))}
+.ms-tblwrap.flat .ms-tr:not(.th):not(.new):hover{border-radius:0;background:var(--ms-row-hover)}
+.ms-tblwrap.flat .ms-tr[aria-selected=true]{border-radius:0;background:color-mix(in srgb,var(--ms-accent) 10%,var(--ms-panel))}
+.ms-tblwrap.flat .ms-tr[aria-selected=true]:hover{background:color-mix(in srgb,var(--ms-accent) 14%,var(--ms-panel))}
+.ms-tblwrap.flat .ms-tbl>.ms-tr:not(.th):last-of-type,.ms-tblwrap.flat .ms-tr.new{box-shadow:inset 0 -1px 0 var(--ms-line)}
+.ms-tree{border-radius:0;background:none;box-shadow:none}
+.ms-tree .tr{box-shadow:none;background:var(--ms-panel)}
+.ms-tree .tr.th{background:var(--ms-ground);box-shadow:inset 0 -1px 0 var(--ms-line)}
+.ms-tree .tr:nth-child(even of .tr:not(.th,.grand,[hidden])){background:color-mix(in srgb,var(--ms-ground) 55%,var(--ms-panel))}
+.ms-tree .tr.fgrp:hover{background:var(--ms-row-hover)}
+/* on a page (a list or a report straight inside .ms-apage) a table runs edge to edge; its first and last columns line up with the title */
+.ms-apage>.ms-xscroll,.ms-apage>.ms-tree{margin-inline:calc(-1 * var(--ms-apage-pad))}
+.ms-apage>.ms-xscroll .ms-tr,.ms-apage>.ms-tree .tr{padding-inline:var(--ms-apage-pad)}
+.ms-tree:not(:has(.fgrp)) .lab .sp{display:none}   /* no groups (a ledger): no room kept for a chevron */
+
 /* Page and section headers; empty, loading and error states; and the phone patterns.
    Page header: title 20px semibold, one line under it, actions at the right end. Phones: 22px.
    Section header: 14px semibold title, a grey count, an optional action at the right; 28px above and 12px below it.
@@ -919,8 +1064,8 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
    .ms-apage: 16px sides; its section bar (UI.mnav) runs edge to edge across the top.
    .ms-ptitle (UI.ptitle): a 32px bold title with a quiet line under it; .ms-ptools: the tools row (search, icon buttons, New) at the right.
    .ms-rpage: a record page: the record bar (UI.rbar), then the record (UI.rhead, UI.fsec + UI.vrows) beside a 260px side panel (UI.rside). */
-.ms-apage{padding:0 var(--ms-s-8) var(--ms-s-12)}
-.ms-apage>.ms-mnav{margin-inline:calc(-1 * var(--ms-s-8));padding-inline-start:var(--ms-s-8)}
+.ms-apage{--ms-apage-pad:var(--ms-s-8);padding:0 var(--ms-apage-pad) var(--ms-s-12);container-type:inline-size}   /* --ms-apage-pad: the side inset; a host that has no padding of its own sets it wider */
+.ms-apage>.ms-mnav{margin-inline:calc(-1 * var(--ms-apage-pad));padding-inline-start:var(--ms-apage-pad)}
 .ms-ptitle{padding:var(--ms-s-12) 0 var(--ms-s-2)}
 .ms-ptitle h1{margin:0;font-size:var(--ms-fs-large-title);line-height:1.15;font-weight:var(--ms-fw-semibold);letter-spacing:-.02em;text-wrap:balance}
 .ms-ptitle p{margin:var(--ms-s-3) 0 0;font-size:var(--ms-fs-body);color:var(--ms-mute)}
@@ -929,8 +1074,13 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 .ms-ptools>.ms-control{flex:none;width:220px;height:var(--ms-h-control)}   /* the search (UI.search) */
 .ms-apage .x-whead{padding-top:var(--ms-s-9)}
 .ms-rpage{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:var(--ms-s-12);padding-top:var(--ms-s-6)}
-.ms-rpage>.main{display:grid;gap:var(--ms-s-9);align-content:start;max-width:720px;width:100%;margin-inline:auto}
+.ms-rpage>.main{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ms-s-9);align-content:start;max-width:720px;width:100%;margin-inline:auto}
 @media (max-width:960px){.ms-rpage{grid-template-columns:minmax(0,1fr)}.ms-rpage>.ms-rside{display:none}}
+@container (max-width:720px){.ms-rpage{grid-template-columns:minmax(0,1fr)}.ms-rpage>.ms-rside{display:none}}   /* a narrow app area (the chat panel open beside it) folds the side panel away too */
+
+/* filters in a page's tools row (UI.ptitle): lookup fields and date ranges sit in one row that wraps, lookups 220px with no label */
+.ms-ptools:has(.ms-lookup,.ms-drange){flex-wrap:wrap}
+.ms-ptools>.ms-lookup{flex:none;width:220px}
 
 /* Bottom bar: a 62px pill floating 12px from the sides and above the safe area; the panel at 80% with a blur, a lit edge and --ms-sh-float.
    One tinted indicator (.ind) slides and resizes to the open tab (380ms; UI.initBottomBar places it, and any .ms-tabbar on the page gets one).
@@ -1000,6 +1150,12 @@ button.ms-rec:active{--ms-surface:color-mix(in srgb,var(--ms-text) 3%,var(--ms-p
 
 /* phones: submenus open below their item */
 .ms-phone .ms-submenu{left:auto;right:6px;top:calc(100% + 2px)}
+
+/* ---------- confirm (a small popover that asks before an action: UI.steps uses it for Submit and Cancel) ---------- */
+.ms-confirm{display:grid;gap:var(--ms-s-3);width:280px;padding:var(--ms-s-2)} /* lint-allow: confirm width */
+.ms-confirm b{font-size:var(--ms-fs-control);font-weight:var(--ms-fw-semibold)}
+.ms-confirm p{margin:0;font-size:var(--ms-fs-control);color:var(--ms-mute)}
+.ms-confirm .row{display:flex;justify-content:flex-end;gap:var(--ms-s-3);margin-top:var(--ms-s-2)}
 
 /* Dialogs (radius 16, 20 padding), phone sheets and toasts (under 8 words, gone after 2.4s; above the app bar). The empty state is in page.css.
    A dialog: .ms-scrim > .ms-dlg with a header (.t: title and one line, then a close icon button), the body, and a footer (.sp pushes the buttons right).
@@ -2017,7 +2173,7 @@ body,.ms-card,.ms-btn,.ms-seg,.ms-input{transition-property:background-color,bor
 .ms-rhead .fig>p{display:flex;flex-wrap:wrap;gap:var(--ms-s-3) var(--ms-s-10);margin:var(--ms-s-5) 0 0;font-size:var(--ms-fs-body)}
 .ms-rhead .fig>p em{font-style:normal;color:var(--ms-mute);margin-inline-end:var(--ms-s-2)}
 
-.ms-fsec{max-width:700px;margin-inline:auto;padding:var(--ms-s-9) 0;box-shadow:inset 0 1px 0 var(--ms-line)}
+.ms-fsec{width:100%;max-width:700px;margin-inline:auto;padding:var(--ms-s-9) 0;box-shadow:inset 0 1px 0 var(--ms-line)}
 .ms-fsec:first-child{box-shadow:none}
 .ms-fsec>h4{margin:0 0 var(--ms-s-7);font-size:var(--ms-fs-control);line-height:18px;font-weight:var(--ms-fw-semibold)}
 .ms-fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ms-s-7) var(--ms-s-11)}
@@ -2243,7 +2399,7 @@ body.g-init *,body.g-init *::before,body.g-init *::after{transition:none!importa
   <header><i class="g-logo"></i><span><b>Mindspace</b><small>Design system</small></span></header>
   <nav class="g-snav" aria-label="Pages">
     <h4>Foundations</h4><a href="index.html#colours" data-go="colours" data-g="Foundations">Colours</a><a href="index.html#charts" data-go="charts" data-g="Foundations">Charts</a><a href="index.html#typography" data-go="typography" data-g="Foundations">Typography</a><a href="index.html#shape" data-go="shape" data-g="Foundations">Shape &amp; spacing</a><a href="index.html#elevation" data-go="elevation" data-g="Foundations">Elevation</a><a href="index.html#motion" data-go="motion" data-g="Foundations">Motion</a><a href="index.html#breakpoints" data-go="breakpoints" data-g="Foundations">Breakpoints</a><a href="index.html#icons" data-go="icons" data-g="Foundations">Icons</a>
-    <h4>Components</h4><a href="index.html#buttons" data-go="buttons" data-g="Components">Buttons</a><a href="index.html#fields" data-go="fields" data-g="Components">Fields</a><a href="index.html#choices" data-go="choices" data-g="Components">Choices</a><a href="index.html#people" data-go="people" data-g="Components">Status &amp; people</a><a href="index.html#numbers" data-go="numbers" data-g="Components">Numbers</a><a href="index.html#lists" data-go="lists" data-g="Components">Lists &amp; activity</a><a href="index.html#table" data-go="table" data-g="Components">Record table</a><a href="index.html#menus" data-go="menus" data-g="Components">Menus &amp; dialogs</a><a href="index.html#surfaces" data-go="surfaces" data-g="Components">Surfaces</a><a href="index.html#tabs" data-go="tabs" data-g="Components">Tabs</a>
+    <h4>Components</h4><a href="index.html#buttons" data-go="buttons" data-g="Components">Buttons</a><a href="index.html#fields" data-go="fields" data-g="Components">Fields</a><a href="index.html#choices" data-go="choices" data-g="Components">Choices</a><a href="index.html#people" data-go="people" data-g="Components">Status &amp; people</a><a href="index.html#numbers" data-go="numbers" data-g="Components">Numbers</a><a href="index.html#lists" data-go="lists" data-g="Components">Lists &amp; activity</a><a href="index.html#table" data-go="table" data-g="Components">Tables</a><a href="index.html#menus" data-go="menus" data-g="Components">Menus &amp; dialogs</a><a href="index.html#surfaces" data-go="surfaces" data-g="Components">Surfaces</a><a href="index.html#tabs" data-go="tabs" data-g="Components">Tabs</a>
     <h4>Patterns</h4><a href="index.html#apps" data-go="apps" data-g="Patterns">App pages</a><a href="index.html#chat" data-go="chat" data-g="Patterns">Chat</a><a href="index.html#phone" data-go="phone" data-g="Patterns">Phone</a><a href="widgets.html">Widgets</a>
   </nav>
 </aside>
@@ -3268,6 +3424,208 @@ const UI = (() => {
     initLargeTitle, initCarousel, initSwipeList, initSheet, rowIn, rowOut, fmtD, addD, relDay, iso, fromIso, SW, CB
   };
   return ui;
+})();
+
+/* More form and report parts, built on the UI above (styles: field.css, list.css, tag.css, menu.css):
+   UI.lookup + UI.initLookup       a field that picks another record (a customer, an account, a person): search, pick, open, clear, create
+   UI.etable + UI.initEtable       an editable table inside a form (an invoice's items, a plan's rows): edit cells, add and remove rows, totals
+   UI.steps + UI.initSteps         a record's lifecycle: Draft → Submitted → Cancelled, with Save, Submit, Cancel and Amend (each confirmed)
+   UI.daterange + UI.initDaterange a from–to date picker with presets and two months
+   UI.treetable + UI.initTreetable rows in a tree with their numbers, groups that fold, negatives in brackets (ledgers, balances, budgets) */
+(() => {
+  const U = UI, e = U.esc, at = U.attrs, I = U.icon, cx = (...c) => c.filter(Boolean).join(' ');
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], MONL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const day = d => new Date(d.getFullYear(), d.getMonth(), d.getDate()), add = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  const fd = d => d ? `${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear()}` : '';
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const fromIso = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? new Date(+m[1], m[2] - 1, +m[3]) : null; };
+  const num = v => { const n = parseFloat(String(v).replace(/[^\d.-]/g, '')); return isNaN(n) ? 0 : n; };
+  const money = (n, dp = 2) => Number(n).toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
+
+  /* ---------- lookup field ---------- */
+  U.lookup = ({ label = '', doctype = 'record', value = null, placeholder, required, help = '', attrs } = {}) =>
+    `<div class="${cx('ms-field ms-lookup', value && 'set')}" data-doctype="${e(doctype)}"${at(attrs)}><span class="lbl">${e(label)}${required ? '<i class="req" aria-hidden="true">*</i>' : ''}</span>` +
+    `<span class="ms-control">${I('search', 15)}<input value="${e(value ? value.name : '')}" placeholder="${e(placeholder || 'Search ' + doctype.toLowerCase())}" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false"${required ? ' aria-required="true"' : ''}>` +
+    `<span class="id">${e(value ? value.id : '')}</span><button type="button" class="go" aria-label="Open this ${e(doctype.toLowerCase())}" data-tip="Open">${I('right', 14)}</button><button type="button" class="x" aria-label="Clear" data-tip="Clear">${I('close', 13)}</button></span>` +
+    `${help ? `<span class="ms-help"><span>${e(help)}</span></span>` : ''}</div>`;
+  /* opt: search(q) → [{ name, id, sub }], onPick(item), onOpen(item), onCreate(text) */
+  U.initLookup = (field, opt = {}) => {
+    if (field._lookup) return; field._lookup = 1;
+    const ctl = field.querySelector('.ms-control'), input = ctl.querySelector('input'), idEl = ctl.querySelector('.id'), dt = field.dataset.doctype;
+    let val = input.value ? { name: input.value, id: idEl.textContent } : null, list = [], hl = 0;
+    const mine = () => { const p = U.popOpen(); return p && p.anchor === ctl ? p : null; };
+    const rows = q => list.map((it, i) => `<button type="button" role="option" class="${i === hl ? 'hl' : ''}" data-i="${i}"><b>${e(it.name)}</b><small>${e([it.id, it.sub].filter(Boolean).join(' · '))}</small></button>`).join('')
+      + (opt.onCreate && q ? `<button type="button" role="option" class="${cx('new', hl === list.length && 'hl')}" data-i="${list.length}">${I('plus', 14)}<span>Create a new ${e(dt.toLowerCase())} “${e(q)}”</span></button>` : '')
+      + (!list.length && !(opt.onCreate && q) ? `<p class="none">No ${e(dt.toLowerCase())} matches “${e(q)}”</p>` : '');
+    const html = q => `<div class="ms-looklist" role="listbox" aria-label="${e(dt)}">${rows(q)}</div>`;
+    const count = () => list.length + (opt.onCreate && input.value.trim() ? 1 : 0);
+    function show(){
+      const q = input.value.trim(); list = (opt.search ? opt.search(q) : []).slice(0, 8); hl = Math.min(hl, Math.max(0, count() - 1));
+      if (mine()) { U.repopulate(html(q)); return; }
+      U.openPop(ctl, html(q), { cls: 'ms-lookpop', onMount(node) { node.style.minWidth = ctl.offsetWidth + 'px'; node.addEventListener('pointerdown', ev => ev.preventDefault());
+        node.addEventListener('click', ev => { const b = ev.target.closest('[data-i]'); if (b) choose(+b.dataset.i); }); } });
+      input.setAttribute('aria-expanded', 'true');
+    }
+    function set(v, quiet){ val = v; input.value = v ? v.name : ''; idEl.textContent = v ? v.id : ''; field.classList.toggle('set', !!v); if (!quiet) field.dispatchEvent(new CustomEvent('lookup', { bubbles: true, detail: v })); }
+    function choose(i){
+      const q = input.value.trim();
+      if (i === list.length && opt.onCreate) { U.closePop(); input.setAttribute('aria-expanded', 'false'); const made = opt.onCreate(q); if (made) set(made); return; }
+      const it = list[i]; if (!it) return; set(it); U.closePop(); input.setAttribute('aria-expanded', 'false'); if (opt.onPick) opt.onPick(it);
+      if (!U.calm()) U.anim(idEl, [{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
+    }
+    input.addEventListener('focus', () => { input.select(); show(); });
+    input.addEventListener('input', () => { hl = 0; field.classList.remove('set'); idEl.textContent = ''; show(); });
+    input.addEventListener('keydown', ev => {
+      if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') { ev.preventDefault(); if (!mine()) return show(); const n = count(); if (!n) return; hl = (hl + (ev.key === 'ArrowDown' ? 1 : -1) + n) % n; U.repopulate(html(input.value.trim())); }
+      else if (ev.key === 'Enter' && mine()) { ev.preventDefault(); if (count()) choose(hl); }
+      else if (ev.key === 'Escape' && mine()) { ev.preventDefault(); U.closePop(); input.setAttribute('aria-expanded', 'false'); }
+    });
+    input.addEventListener('blur', () => { setTimeout(() => { if (mine()) { U.closePop(); input.setAttribute('aria-expanded', 'false'); } set(val, true); }, 120); });   /* leaving without a pick keeps the last value */
+    ctl.querySelector('.x').addEventListener('click', () => { set(null); input.focus(); });
+    ctl.querySelector('.go').addEventListener('click', () => { if (val && opt.onOpen) opt.onOpen(val); });
+    return { get: () => val, set };
+  };
+
+  /* ---------- editable table ---------- */
+  const cell = (c, v) => {
+    const a = `data-k="${e(c.key)}" aria-label="${e(c.label)}"`;
+    if (c.type === 'select') return `<select class="in" ${a}>${(c.options || []).map(o => `<option${String(o) === String(v) ? ' selected' : ''}>${e(o)}</option>`).join('')}</select>`;
+    if (c.type === 'calc') return `<output class="in calc" ${a}>${v === '' || v == null ? '' : money(v)}</output>`;
+    const n = c.type === 'num' || c.type === 'money';
+    return `<span class="${cx('cellw', c.type === 'lookup' && 'lnk')}">${c.type === 'lookup' ? I('search', 13) : ''}<input class="${cx('in', n && 'n')}" ${a} value="${e(v == null ? '' : n && c.type === 'money' && v !== '' ? money(v) : v)}"${n ? ' inputmode="decimal"' : ''} placeholder="${e(c.placeholder || '')}" autocomplete="off"></span>`;
+  };
+  const crow = (cols, r, i) => `<div class="tr" role="row"><span class="no">${i + 1}</span>${cols.map(c => `<span class="${cx('td', (c.type === 'num' || c.type === 'money' || c.type === 'calc') && 'num')}">${cell(c, r[c.key])}</span>`).join('')}<button type="button" class="rm" aria-label="Remove row ${i + 1}" data-tip="Remove">${I('close', 13)}</button></div>`;
+  /* cols: [{ key, label, type: text | num | money | lookup | select | calc, w, required, options, placeholder }]; total: the key summed in the footer */
+  U.etable = ({ title = '', cols = [], rows = [], total, addLabel = 'Add a row', attrs } = {}) => {
+    const grid = ['28px', ...cols.map(c => c.w || 'minmax(120px,1fr)'), '32px'].join(' ');
+    return `<section class="ms-etable"${total ? ` data-total="${e(total)}"` : ''}${at(attrs)}><header><b>${e(title)}</b><em class="n">${rows.length}</em></header>
+      <div class="cscroll ms-xfade"><div class="grid" role="table" style="--cols:${grid}"><div class="tr th" role="row"><span class="no">No.</span>${cols.map(c => `<span class="${cx('td', (c.type === 'num' || c.type === 'money' || c.type === 'calc') && 'num')}">${e(c.label)}${c.required ? '<i class="req">*</i>' : ''}</span>`).join('')}<span></span></div>
+      <div class="cbody">${rows.map((r, i) => crow(cols, r, i)).join('')}</div>
+      <button type="button" class="add">${I('plus', 14)}${e(addLabel)}</button></div></div>
+      ${total ? `<footer><span>Total</span><b class="tot">${money(rows.reduce((t, r) => t + num(r[total]), 0))}</b></footer>` : ''}</section>`;
+  };
+  /* opt: cols (the same list), calc(row) → the row with its worked-out values, onChange(rows) */
+  U.initEtable = (sec, opt = {}) => {
+    if (sec._ct) return; sec._ct = 1;
+    const cols = opt.cols || [], body = sec.querySelector('.cbody'), tk = sec.dataset.total;
+    const read = tr => Object.fromEntries([...tr.querySelectorAll('[data-k]')].map(x => [x.dataset.k, x.tagName === 'OUTPUT' ? num(x.value || x.textContent) : x.value]));
+    const rowsOf = () => [...body.children].filter(tr => !tr.dataset.gone).map(read);
+    function sync(){
+      [...body.children].filter(tr => !tr.dataset.gone).forEach((tr, i) => { tr.querySelector('.no').textContent = i + 1; tr.querySelector('.rm').setAttribute('aria-label', 'Remove row ' + (i + 1)); });
+      const n = sec.querySelector('header .n'); if (n) n.textContent = rowsOf().length;
+      if (tk) { const t = sec.querySelector('.tot'), v = money(rowsOf().reduce((a, r) => a + num(r[tk]), 0)); if (t.textContent !== v) { if (sec._shown && U.swap) U.swap(t, v); else t.textContent = v; } }
+      if (opt.onChange) opt.onChange(rowsOf());
+    }
+    function calc(tr){ if (!opt.calc) return; const r = opt.calc(read(tr)); Object.entries(r).forEach(([k, v]) => { const o = tr.querySelector(`output[data-k="${k}"]`); if (o) o.textContent = v === '' ? '' : money(num(v)); }); }
+    function addRow(){
+      const blank = Object.fromEntries(cols.map(c => [c.key, c.type === 'num' ? 1 : '']));
+      body.insertAdjacentHTML('beforeend', crow(cols, blank, body.children.length)); const tr = body.lastElementChild;
+      U.rowIn(tr, body);
+      calc(tr); sync(); const first = tr.querySelector('input,select'); if (first) first.focus();
+    }
+    sec.querySelector('.add').addEventListener('click', addRow);
+    body.addEventListener('click', ev => { const b = ev.target.closest('.rm'); if (!b) return; const tr = b.closest('.tr'); tr.dataset.gone = 1; U.rowOut(tr, sync); sync(); });
+    body.addEventListener('input', ev => { const tr = ev.target.closest('.tr'); if (tr) { calc(tr); sync(); } });
+    body.addEventListener('focusout', ev => { const x = ev.target; if (x.matches('input.n') && x.closest('.td.num') && cols.find(c => c.key === x.dataset.k && c.type === 'money') && x.value !== '') x.value = money(num(x.value)); });
+    body.addEventListener('keydown', ev => { if (ev.key !== 'Enter' || !ev.target.matches('input')) return; ev.preventDefault(); const tr = ev.target.closest('.tr'); if (tr === body.lastElementChild) addRow(); else { const nx = tr.nextElementSibling.querySelector('input,select'); if (nx) nx.focus(); } });
+    [...body.children].forEach(calc); sync(); sec._shown = 1;   /* the first total is written straight in; later ones fade over */
+    return { rows: rowsOf, add: addRow };
+  };
+
+  /* ---------- status steps ---------- */
+  const DS = {
+    draft: { step: 0, tag: ['Draft', ''], note: 'Not submitted yet. After you submit it, it can’t be edited.', acts: [['save', 'Save', ''], ['submit', 'Submit', 'primary']] },
+    submitted: { step: 1, tag: ['Submitted', 'info'], note: 'Submitted. It can’t be edited; cancel it to undo it.', acts: [['cancel', 'Cancel', 'danger']] },
+    cancelled: { step: 2, tag: ['Cancelled', 'bad'], note: 'Cancelled. Amend it to make a corrected copy.', acts: [['amend', 'Amend', 'primary']] }
+  };
+  U.steps = ({ state = 'draft', note, name = '', attrs } = {}) => { const s = DS[state] || DS.draft;
+    return `<div class="ms-steps" data-state="${e(state)}" data-name="${e(name)}"${at(attrs)}><ol class="track" aria-label="Status">${['Draft', 'Submitted', 'Cancelled'].map((l, i) => `<li class="${cx(i < s.step && 'done', i === s.step && 'on')}"${i === s.step ? ' aria-current="step"' : ''}><i></i>${l}</li>`).join('')}</ol>
+      <p class="note">${e(note || s.note)}</p><span class="acts">${s.acts.map(([v, l, k]) => U.btn({ label: l, kind: k, size: 'sm', attrs: { 'data-doc': v } })).join('')}</span></div>`; };
+  /* opt: onAction(action, nextState) → return false to stop; ask: { submit: [verb, why], cancel: [verb, why] } to word the confirms. Submit and Cancel ask first. */
+  U.initSteps = (box, opt = {}) => {
+    if (box._st) return; box._st = 1;
+    const NEXT = { submit: 'submitted', cancel: 'cancelled', amend: 'draft' };
+    const ASK = Object.assign({ submit: ['Submit', 'It can’t be edited after this.'], cancel: ['Cancel', 'It’s undone. You can amend it afterwards.'] }, opt.ask);
+    function go(act){
+      if (act === 'save') { U.toast('Saved'); if (opt.onAction) opt.onAction('save', box.dataset.state); return; }
+      const next = NEXT[act]; if (opt.onAction && opt.onAction(act, next) === false) return;
+      const nm = box.dataset.name, note = act === 'amend' && nm ? `A corrected copy of ${nm}. Submit it when it’s ready.` : null;
+      const fresh = document.createElement('div'); fresh.innerHTML = U.steps({ state: next, note, name: act === 'amend' && nm ? nm + '-1' : nm });
+      const nb = fresh.firstElementChild; [...box.attributes].forEach(a => { if (!['data-state', 'data-name'].includes(a.name)) nb.setAttribute(a.name, a.value); });
+      box.innerHTML = nb.innerHTML; box.dataset.state = next; box.dataset.name = nb.dataset.name;
+      U.anim(box, [{ opacity: .4 }, { opacity: 1 }], { duration: 260, easing: U.E });
+      U.toast({ submitted: 'Submitted', cancelled: 'Cancelled', draft: 'Amended: a new draft' }[next]);
+    }
+    box.addEventListener('click', ev => {
+      const b = ev.target.closest('[data-doc]'); if (!b) return; const act = b.dataset.doc;
+      if (!ASK[act]) return go(act);
+      const [verb, why] = ASK[act], nm = box.dataset.name;
+      U.openPop(b, `<div class="ms-confirm"><b>${e(verb)} ${e(nm || 'this record')}?</b><p>${e(why)}</p><span class="row">${U.btn({ label: 'Not now', size: 'sm', attrs: { 'data-c': 'no' } })}${U.btn({ label: verb, size: 'sm', kind: act === 'cancel' ? 'danger' : 'primary', attrs: { 'data-c': 'yes' } })}</span></div>`,
+        { align: 'end', onMount(node){ node.addEventListener('click', ev2 => { const c = ev2.target.closest('[data-c]'); if (!c) return; U.closePop(); if (c.dataset.c === 'yes') go(act); }); const y = node.querySelector('[data-c=yes]'); if (y) y.focus(); } });
+    });
+  };
+
+  /* ---------- date range ---------- */
+  const PRESETS = t => { const y = t.getFullYear(), m = t.getMonth(), q = Math.floor(m / 3) * 3, dow = (t.getDay() + 6) % 7;
+    return [['Today', t, t], ['Yesterday', add(t, -1), add(t, -1)], ['This week', add(t, -dow), t], ['Last 7 days', add(t, -6), t], ['This month', new Date(y, m, 1), t],
+      ['Last month', new Date(y, m - 1, 1), new Date(y, m, 0)], ['This quarter', new Date(y, q, 1), t], ['This year', new Date(y, 0, 1), t], ['Last year', new Date(y - 1, 0, 1), new Date(y - 1, 11, 31)]]; };
+  const rangeText = (a, b) => !a ? 'Pick dates' : !b || +a === +b ? fd(a) : a.getFullYear() === b.getFullYear() ? `${a.getDate()} ${MON[a.getMonth()]} – ${fd(b)}` : `${fd(a)} – ${fd(b)}`;
+  U.daterange = ({ label = '', from, to, attrs } = {}) => { const a = fromIso(from), b = fromIso(to);
+    const btn = `<button type="button" class="ms-control btnlike ms-drange" data-from="${e(from || '')}" data-to="${e(to || '')}" aria-haspopup="dialog"${at(attrs)}>${I('cal', 15)}<span class="v">${e(rangeText(a, b))}</span>${I('chevdn', 14)}</button>`;
+    return label ? `<div class="ms-field"><span class="lbl">${e(label)}</span>${btn}</div>` : btn; };
+  /* opt: today (Date), onChange(fromIso, toIso) */
+  U.initDaterange = (btn, opt = {}) => {
+    if (btn._dr) return; btn._dr = 1;
+    const today = day(opt.today || new Date());
+    btn.addEventListener('click', () => {
+      let a = fromIso(btn.dataset.from), b = fromIso(btn.dataset.to), hov = null, view = new Date((a || today).getFullYear(), (a || today).getMonth(), 1);
+      const month = v => { const y = v.getFullYear(), m = v.getMonth(), first = new Date(y, m, 1), off = (first.getDay() + 6) % 7, n = Math.ceil((off + new Date(y, m + 1, 0).getDate()) / 7) * 7, st = add(first, -off), end = b || (a && hov) || null;
+        let d0 = ''; for (let i = 0; i < n; i++) { const d = add(st, i), lo = a && end ? Math.min(+a, +end) : null, hi = a && end ? Math.max(+a, +end) : null, out = d.getMonth() !== m;
+          d0 += out ? '<span class="out"></span>' : `<button type="button" data-d="${+d}" class="${cx(+d === +today && 'today', a && +d === +a && 'start', end && +d === +end && 'end', lo && +d > lo && +d < hi && 'in')}" aria-label="${fd(d)}" aria-pressed="${!!(a && (+d === +a || (end && +d === +end)))}">${d.getDate()}</button>`; }
+        return `<div class="mon"><b>${MONL[m]} ${y}</b><div class="wk">${['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(x => `<span>${x}</span>`).join('')}</div><div class="days">${d0}</div></div>`; };
+      const pre = PRESETS(today), cur = () => pre.findIndex(p => a && b && +p[1] === +a && +p[2] === +b);
+      const html = () => `<div class="ms-drpick" role="dialog" aria-label="Pick a date range"><nav class="pre">${pre.map((p, i) => `<button type="button" data-p="${i}" aria-pressed="${i === cur()}">${p[0]}</button>`).join('')}</nav>
+        <div class="cal"><header><button type="button" class="ms-ib sm" data-nav="-1" aria-label="Earlier months">${I('left')}</button><span class="sp"></span><button type="button" class="ms-ib sm" data-nav="1" aria-label="Later months">${I('right')}</button></header>
+        <div class="mons">${month(view)}${month(new Date(view.getFullYear(), view.getMonth() + 1, 1))}</div>
+        <footer><span class="sum">${e(a ? rangeText(a, b || a) : 'Pick the first day')}</span>${U.btn({ label: 'Cancel', size: 'sm', attrs: { 'data-x': 'no' } })}${U.btn({ label: 'Apply', size: 'sm', kind: 'primary', attrs: { 'data-x': 'ok', disabled: !a } })}</footer></div></div>`;
+      U.togglePop(btn, html(), { cls: 'ms-drpop', onMount(node){
+        btn.classList.add('focus');
+        const draw = dir => { U.repopulate(html()); if (dir) U.anim(node.querySelector('.mons'), [{ opacity: 0, transform: `translateX(${dir * 14}px)` }, { opacity: 1, transform: 'none' }], { duration: 240, easing: U.E }); };
+        node.addEventListener('click', ev => { const t = ev.target.closest('button'); if (!t) return;
+          if (t.dataset.nav) { view = new Date(view.getFullYear(), view.getMonth() + +t.dataset.nav, 1); return draw(+t.dataset.nav); }
+          if (t.dataset.p) { const p = pre[+t.dataset.p]; a = p[1]; b = p[2]; view = new Date(a.getFullYear(), a.getMonth(), 1); return draw(0); }
+          if (t.dataset.d) { const d = new Date(+t.dataset.d); if (!a || b) { a = d; b = null; } else { b = d; if (+b < +a) [a, b] = [b, a]; } return draw(0); }
+          if (t.dataset.x === 'no') return U.closePop();
+          if (t.dataset.x === 'ok' && a) { b = b || a; btn.dataset.from = iso(a); btn.dataset.to = iso(b); btn.querySelector('.v').textContent = rangeText(a, b); U.closePop(); if (opt.onChange) opt.onChange(iso(a), iso(b)); }
+        });
+        node.addEventListener('pointerover', ev => { const t = ev.target.closest('[data-d]'); if (!t || !a || b) return; hov = new Date(+t.dataset.d); node.querySelectorAll('.days').forEach((dd, i) => { const m = new Date(view.getFullYear(), view.getMonth() + i, 1), w = document.createElement('div'); w.innerHTML = month(m); dd.replaceWith(w.querySelector('.days')); }); });
+      }, onClose(){ btn.classList.remove('focus'); } });
+    });
+  };
+
+  /* ---------- tree table ---------- */
+  const fv = (v, neg) => v === '' || v == null ? '' : +v === 0 ? '<span class="z">–</span>' : +v < 0 && neg !== 'minus' ? `(${money(-v)})` : money(v);
+  /* cols: the number columns' titles; rows: [{ label, id, level (0…), group, grand, values: [...] }]; neg: 'brackets' (default) or 'minus' */
+  U.treetable = ({ title = 'Account', cols = [], rows = [], neg = 'brackets', attrs } = {}) => {
+    const grid = `minmax(180px,2.4fr) ${cols.map(() => 'minmax(120px,1fr)').join(' ')}`;
+    return `<div class="ms-tree ms-xfade" role="treegrid"${at(attrs)}><div class="grid" style="--cols:${grid}"><div class="tr th" role="row"><span>${e(title)}</span>${cols.map(c => `<span class="num">${e(c)}</span>`).join('')}</div>
+      ${rows.map(r => `<div class="${cx('tr', r.group && 'fgrp', r.grand && 'grand')}" role="row" data-lv="${r.level || 0}"${r.group ? ' aria-expanded="true" tabindex="0"' : ''} aria-level="${(r.level || 0) + 1}" style="--lv:${r.level || 0}"><span class="lab">${r.group ? `<i class="chev">${I('chevdn', 14)}</i>` : '<i class="sp"></i>'}<b>${e(r.label)}</b>${r.id ? `<small>${e(r.id)}</small>` : ''}</span>${(r.values || []).map(v => `<span class="${cx('num', +v < 0 && 'neg')}">${fv(v, neg)}</span>`).join('')}</div>`).join('')}</div></div>`;
+  };
+  U.initTreetable = box => {
+    if (box._tree) return box._tree;
+    const rows = () => [...box.querySelectorAll('.tr:not(.th)')];
+    const kids = g => { const L = rows(), i = L.indexOf(g), lv = +g.dataset.lv, out = []; for (let j = i + 1; j < L.length && +L[j].dataset.lv > lv; j++) out.push(L[j]); return out; };
+    const shown = g => { const out = []; const L = kids(g); for (let i = 0; i < L.length; i++) { out.push(L[i]); if (L[i].classList.contains('fgrp') && L[i].getAttribute('aria-expanded') === 'false') i += kids(L[i]).length; } return out; };
+    function toggle(g, open = g.getAttribute('aria-expanded') === 'false'){
+      const ks = open ? shown(g) : kids(g).filter(k => !k.hidden); g.setAttribute('aria-expanded', open);
+      ks.forEach(k => { if (open) { k.hidden = false; U.anim(k, [{ opacity: 0, transform: 'translateY(-4px)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: U.E }); }
+        else U.after(U.anim(k, [{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: U.EI }), () => { if (g.getAttribute('aria-expanded') === 'false') k.hidden = true; }); });
+    }
+    box.addEventListener('click', ev => { const g = ev.target.closest('.tr.fgrp'); if (g) toggle(g); });
+    box.addEventListener('keydown', ev => { const g = ev.target.closest('.tr.fgrp'); if (!g) return; if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(g); } if (ev.key === 'ArrowLeft') toggle(g, false); if (ev.key === 'ArrowRight') toggle(g, true); });
+    const all = open => rows().filter(r => r.classList.contains('fgrp') && +r.dataset.lv === 0).forEach(r => { kids(r).filter(k => k.classList.contains('fgrp')).forEach(k => k.setAttribute('aria-expanded', open)); toggle(r, open); });
+    return box._tree = { toggle, expandAll: () => all(true), collapseAll: () => all(false) };
+  };
 })();
 
 /* the widget module talks to ui.js through MS: the same helpers, with icons drawn by UI.icon (class "i" so widget.css can size them) */
