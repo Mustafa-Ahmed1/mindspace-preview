@@ -7844,6 +7844,9 @@ button.at-rc{transition:box-shadow var(--ms-t-fast),background var(--ms-t-fast)}
 .li{position:fixed;inset:0;z-index:900;display:grid;place-items:center;overflow-y:auto;padding:var(--ms-s-10) var(--ms-s-8);background:var(--ms-bg);color:var(--ms-text);
   transition:opacity var(--ms-t-panel) var(--ms-e),visibility 0s}
 .li[hidden]{display:none}
+.li-bg{position:fixed;inset:0;pointer-events:none;overflow:hidden}   /* the landing's pattern, behind the card */
+.li-bg svg{position:absolute;inset:0;width:100%;height:100%}
+.li-card{position:relative}
 body.m-boot>#login{visibility:visible}   /* phones hide everything but the space while they boot; the sign-in stays */
 .li.out{opacity:0;visibility:hidden;transition:opacity var(--ms-t-panel) var(--ms-e),visibility 0s var(--ms-t-panel)}
 .li.instant,.li.instant .li-card{transition:none}
@@ -22283,6 +22286,10 @@ const LX_BGS = [['octa', 'Whisper tiles'], ['rings', 'Soft rings'], ['shapes', '
       <button type="submit" class="ms-btn primary li-go"><span class="lbl">Sign in</span></button>
     </form>`;
   document.body.appendChild(el);
+  /* the landing's background (42-landing-bg.js: this visit's pattern) shows behind the sign-in too, and follows light and dark */
+  const bg = document.createElement('div'); bg.className = 'li-bg'; bg.setAttribute('aria-hidden', 'true'); el.prepend(bg);
+  const lb = $('#lxbg'), copy = () => { const l = lb && lb.lastElementChild; bg.innerHTML = l ? l.innerHTML : ''; };
+  if (lb) { copy(); new MutationObserver(copy).observe(lb, { childList: true }); }
   const $l = s => el.querySelector(s), email = $l('[data-lf=email]'), pass = $l('[data-lf=pass]');
 
   const err = (k, msg) => { $l(`[data-lc=${k}]`).classList.toggle('err', !!msg); const r = $l(`[data-le=${k}]`); if (msg) r.querySelector('small').textContent = msg; r.classList.toggle('on', !!msg); };
