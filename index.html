@@ -2549,7 +2549,7 @@ button.open:hover{background:color-mix(in srgb,var(--hue) 22%,transparent)}
 
 /* chat column */
 .x-chat{width:416px;flex:none;display:flex;flex-direction:column;min-height:0;padding-inline:17px}
-.x-ch{flex:none;height:68px;display:flex;align-items:center;gap:8px;padding:4px 0 0 7px}
+.x-ch{flex:none;height:68px;display:flex;align-items:center;gap:8px;padding:0 0 10px 7px}   /* centred on the tab strip (29px) */
 .x-ch .pi{height:24px;display:grid;place-items:center;color:var(--x-mute)}
 .x-ch .pi img{width:24px;height:24px;border-radius:var(--ms-r-round)}
 .x-ch b{flex:1;font-size:var(--ms-fs-body);line-height:18px;font-weight:var(--ms-fw-medium);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2618,7 +2618,7 @@ button.open:hover{background:color-mix(in srgb,var(--hue) 22%,transparent)}
 .ws.nocanvas .x-ch .x-btn{margin-inline-end:-1px}
 /* the chat as a floating window over the canvas */
 .ws.float .x-chat{position:absolute;right:24px;bottom:24px;z-index:12;width:min(416px,calc(100% - 32px));height:min(660px,calc(100% - 48px));padding-inline:16px;background:var(--x-bg);border:1px solid var(--x-line);border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.3);overflow:hidden;animation:rise .28s var(--ease)}
-.ws.float .x-ch{height:60px;padding-top:0;cursor:grab;touch-action:none}
+.ws.float .x-ch{height:60px;padding-top:0;padding-bottom:0;cursor:grab;touch-action:none}
 .ws.float .x-ch:active{cursor:grabbing}
 .ws.float .x-comp{margin-bottom:16px}
 .ws.float .x-canvas{margin-inline-start:8px}
@@ -3388,7 +3388,7 @@ button.x-tab:not(.on):hover{color:var(--x-text)}
 .x-app2 .x-atbl{margin-top:var(--ms-s-11)}
 /* ---------- work environment: primary rail ---------- */
 .x-prim{position:relative;z-index:25;width:var(--ms-h-tile);flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 0 14px;background:#111419;border-inline-end:1px solid var(--x-line)}
-.x-prim .x-logo{width:40px;height:40px;border-radius:var(--ms-r-lg);margin-bottom:4px}
+.x-prim .x-logo{width:40px;height:40px;border-radius:var(--ms-r-lg);margin:-7px 0 11px}   /* lifted 7px so it lines up with the tab strip; the icons under it stay put */
 .x-spc{position:relative;width:40px;height:40px;border-radius:var(--ms-r-lg);display:grid;place-items:center;background:var(--x-raise);transition:background var(--ms-t-fast)}
 .x-spc canvas{width:28px;height:28px;border-radius:var(--ms-r-round)}
 .x-spc>i{position:absolute;right:-3px;bottom:-3px;width:16px;height:16px;border-radius:var(--ms-r-round);display:grid;place-items:center;background:#2a2f39;color:var(--x-text);box-shadow:0 0 0 2px #111419;transition:background var(--ms-t-fast)}
@@ -3418,7 +3418,7 @@ button.x-tab:not(.on):hover{color:var(--x-text)}
 /* ---------- secondary sidebars ---------- */
 .x-sh2{flex:none;height:var(--ms-h-tile);display:flex;align-items:center;gap:4px;padding:8px 10px 0 16px}
 .x-sh2 b{flex:1;min-width:0;font-size:17px;line-height:22px;font-weight:var(--ms-fw-semibold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.x-sh3{height:var(--ms-h-tile);align-items:center;padding-top:8px}
+.x-sh3{height:var(--ms-h-tile);align-items:center;padding-top:0;padding-bottom:6px}   /* centred on the tab strip (29px) */
 .x-ib{width:32px;height:32px;flex:none;display:grid;place-items:center;border-radius:var(--ms-r);color:var(--x-mute);transition:background var(--ms-t-fast),color var(--ms-t-fast)}
 .x-ib:hover{background:var(--x-raise);color:var(--x-text)}
 .x-ib.sm{width:28px;height:28px;border-radius:var(--ms-r-sm)}
@@ -7621,6 +7621,222 @@ body.lx.list .planet:hover .lx-stats,body.lx.list .planet.hot .lx-stats{border-t
 #ws.mob .m-ap .when{display:block;margin-bottom:var(--ms-s-1);color:var(--x-text);font-weight:var(--ms-fw-medium)}
 #ws.mob .tom-meta{display:flex;flex-wrap:wrap;gap:var(--ms-s-3)}
 @media (prefers-reduced-motion:reduce){#ws.mob .tom-ring circle,#ws.mob .tom-month .g button,#ws.mob .tom-tc{transition:none}#ws.mob .tom-ans{animation:none}}
+/* ---------- Attendance (js/45-attendance.js): today, history, the team, approvals and HR's setup, inside a company space ----------
+   Built from the design system and Time off's page parts (.to-*); these rules draw what's new: the hours ring, the day's timeline,
+   the punch list, the month of coloured days, the roster grid and the location maps. Colours are the space's (--ms-accent, --ms-accent-ink). */
+.ms-apage[data-apapp=att]{container-type:inline-size}
+.at-st{font-size:var(--ms-fs-sm);color:var(--ms-mute);font-variant-numeric:tabular-nums}
+.at-st .brk{color:var(--ms-warn-text);font-weight:var(--ms-fw-medium)}
+.at-shift{display:flex;align-items:center;gap:var(--ms-s-4);margin-bottom:var(--ms-s-8);padding:var(--ms-s-5) var(--ms-s-6);border-radius:var(--ms-r-md);background:var(--ms-tint);color:var(--ms-tint-text);font-size:var(--ms-fs-control)}
+.at-shift svg{flex:none}
+
+/* the hours ring: worked in the accent, overtime in green on top, a break in amber */
+.at-now{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--ms-s-10);align-items:center}
+.at-ring{position:relative;width:176px;height:176px;flex:none} /* lint-allow: the ring's size */
+.at-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.at-ring circle{fill:none;stroke-width:11;stroke-linecap:round;transition:stroke-dasharray .6s var(--ms-e),stroke var(--ms-t)}
+.at-ring .bg{stroke:var(--ms-raise)}
+.at-ring .fg{stroke:var(--ms-accent)}
+.at-ring .fg.brk{stroke:var(--ms-amber)}
+.at-ring .ot{stroke:var(--ms-green)}
+.at-ring .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--ms-s-1);text-align:center}
+.at-ring .c b{font-size:var(--ms-fs-title);font-weight:var(--ms-fw-semibold);font-variant-numeric:tabular-nums}
+.at-ring .c small{max-width:120px;font-size:var(--ms-fs-sm);color:var(--ms-mute)} /* lint-allow: keeps the line inside the ring */
+.at-ring em{font-style:normal;font-weight:var(--ms-fw-medium)}
+.at-ring em.ot{color:var(--ms-ok-text)}
+.at-ring em.brk{color:var(--ms-warn-text)}
+.at-side{display:flex;flex-direction:column;gap:var(--ms-s-5);min-width:0}
+.at-ddv{display:inline-flex;align-items:center;gap:var(--ms-s-4)}
+.at-zone{display:flex;align-items:center;gap:var(--ms-s-3);margin:0;font-size:var(--ms-fs-sm);color:var(--ms-mute)}
+.at-zone.ok svg{color:var(--ms-ok-text)}
+.at-zone.bad{color:var(--ms-bad-text)}
+.at-acts{display:flex;flex-wrap:wrap;gap:var(--ms-s-4);margin-top:var(--ms-s-3)}
+.at-acts .ms-btn{flex:1;min-width:140px} /* lint-allow: two buttons share the row */
+
+/* a day's timeline: 7 AM to 9 PM, work in the accent, breaks in amber, a missing check-out dashed, now as a line */
+.at-tl{margin:var(--ms-s-2) 0 var(--ms-s-6)}
+.at-tl .bar{position:relative;height:40px;border-radius:var(--ms-r-md);background:var(--ms-bg);box-shadow:inset 0 0 0 1px var(--ms-line)} /* lint-allow: the timeline's height */
+.at-tl .bar i{position:absolute;top:5px;bottom:5px;display:grid;place-items:center;border-radius:var(--ms-r-sm);background:var(--ms-accent);color:var(--ms-on)}
+.at-tl .bar i.b{background:var(--ms-amber);color:var(--ms-on-brand)}
+.at-tl .bar i.q{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ms-bad-text);background-image:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--ms-red) 16%,transparent) 5px 10px)}
+.at-tl .bar .now{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;border-radius:var(--ms-r-pill);background:var(--ms-text)} /* lint-allow: the now line */
+.at-tl .ax{position:relative;height:18px;margin-top:var(--ms-s-3);font-size:var(--ms-fs-label);color:var(--ms-dim)} /* lint-allow: axis labels */
+.at-tl .ax span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+
+/* the punch list: time, what happened and how, then In / Break / Out / Auto */
+.at-pl{display:flex;flex-direction:column}
+.at-pl>div{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:var(--ms-s-6);align-items:center;padding:var(--ms-s-5) 0} /* lint-allow: the time column */
+.at-pl>div+div{border-top:1px solid var(--ms-line)}
+.at-pl .tm{font-size:var(--ms-fs-control);color:var(--ms-mute);font-variant-numeric:tabular-nums}
+.at-pl .t{display:flex;flex-direction:column;min-width:0}
+.at-pl b{font-size:var(--ms-fs-body);font-weight:var(--ms-fw-medium)}
+.at-pl small{font-size:var(--ms-fs-sm);color:var(--ms-mute)}
+.at-pl .soon b{color:var(--ms-mute);font-weight:var(--ms-fw-regular)}
+.at-pt{display:inline-grid;place-items:center;min-width:52px;height:var(--ms-h-tag);padding-inline:var(--ms-s-4);border-radius:var(--ms-r-pill);font-size:var(--ms-fs-sm);font-style:normal;font-weight:var(--ms-fw-medium);background:var(--ms-raise);color:var(--ms-mute)} /* lint-allow: a punch tag's width */
+.at-pt.in{background:var(--ms-tint);color:var(--ms-tint-text)}
+.at-pt.brk{background:color-mix(in srgb,var(--ms-amber) 16%,transparent);color:var(--ms-warn-text)}
+.at-pt.auto{background:color-mix(in srgb,var(--ms-red) 12%,transparent);color:var(--ms-bad-text)}
+
+/* the missing punch banner */
+.at-alert{display:flex;align-items:center;gap:var(--ms-s-5);padding:var(--ms-s-5) var(--ms-s-5) var(--ms-s-5) var(--ms-s-7);border-radius:var(--ms-r-lg);background:color-mix(in srgb,var(--ms-red) 8%,var(--ms-panel));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ms-red) 28%,var(--ms-line));color:var(--ms-bad-text);font-size:var(--ms-fs-control)}
+.at-alert span{flex:1}
+
+/* numbers down a card */
+.at-kv{display:flex;flex-direction:column}
+.at-kv>div{display:flex;justify-content:space-between;gap:var(--ms-s-6);padding:var(--ms-s-4) 0;font-size:var(--ms-fs-control)}
+.at-kv>div+div{border-top:1px solid var(--ms-line)}
+.at-kv span{color:var(--ms-mute)}
+.at-kv b{font-weight:var(--ms-fw-semibold);font-variant-numeric:tabular-nums}
+.at-was{display:flex;flex-direction:column;gap:var(--ms-s-2);font-size:var(--ms-fs-control)}
+.at-was>div{display:flex;gap:var(--ms-s-6)}
+.at-was span{width:80px;flex:none;color:var(--ms-mute)} /* lint-allow: label column */
+.at-was b{font-weight:var(--ms-fw-medium)}
+.to-warn.ok{color:var(--ms-ok-text)}
+
+/* the month: each day coloured by what happened, with its hours */
+.at-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--ms-s-3);padding:var(--ms-s-7);border-radius:var(--ms-r-lg);background:var(--ms-panel);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line)}
+.at-cal .wd{padding-bottom:var(--ms-s-3);text-align:center;font-size:var(--ms-fs-sm);color:var(--ms-dim)}
+.at-cal button{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:var(--ms-s-2);min-height:64px;min-width:0;padding:var(--ms-s-4) var(--ms-s-5);border-radius:var(--ms-r-md);text-align:start;color:var(--ms-text);background:var(--ms-bg);transition:box-shadow var(--ms-t-fast)} /* lint-allow: a day's height */
+.at-cal button:hover:not([disabled]){box-shadow:inset 0 0 0 1px var(--ms-line-strong)}
+.at-cal button .n{font-size:var(--ms-fs-control);font-weight:var(--ms-fw-semibold);font-variant-numeric:tabular-nums}
+.at-cal button small{max-width:100%;font-size:var(--ms-fs-label);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.at-cal .ok{background:color-mix(in srgb,var(--ms-green) 13%,transparent);color:var(--ms-ok-text)}
+.at-cal .late{background:color-mix(in srgb,var(--ms-amber) 18%,transparent);color:var(--ms-warn-text)}
+.at-cal .miss,.at-cal .abs{background:color-mix(in srgb,var(--ms-red) 11%,transparent);color:var(--ms-bad-text)}
+.at-cal .leave{background:var(--ms-tint);color:var(--ms-tint-text)}
+.at-cal .off{color:var(--ms-dim)}
+.at-cal .future{color:var(--ms-dim);background:transparent;box-shadow:inset 0 0 0 1px var(--ms-line);cursor:default}
+.at-cal .today{background:var(--ms-accent);color:var(--ms-on)}
+.at-legend i.ok{background:color-mix(in srgb,var(--ms-green) 30%,transparent)}
+.at-legend i.late{background:color-mix(in srgb,var(--ms-amber) 40%,transparent)}
+.at-legend i.miss{background:color-mix(in srgb,var(--ms-red) 26%,transparent)}
+.at-legend i.leave{background:var(--ms-tint)}
+.at-legend i.off{background:var(--ms-bg);box-shadow:inset 0 0 0 1px var(--ms-line)}
+
+/* the team now */
+.at-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--ms-s-6)}
+.at-stat{display:flex;flex-direction:column;gap:var(--ms-s-4);padding:var(--ms-s-7);border-radius:var(--ms-r-lg);background:var(--ms-panel);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line)}
+.at-stat b{font-size:var(--ms-fs-title);font-weight:var(--ms-fw-semibold);font-variant-numeric:tabular-nums}
+@container (max-width:760px){.at-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.at-now{grid-template-columns:minmax(0,1fr);justify-items:center}.at-side{width:100%}}
+
+/* a shift card: the name with its hours, the work days, then the rules with lines between */
+.at-sc .hd .t{flex:1;display:flex;flex-direction:column;gap:var(--ms-s-1);min-width:0}
+.at-sc .hd .t b{font-size:var(--ms-fs-lg);font-weight:var(--ms-fw-semibold)}
+.at-sc .hd .t small{font-size:var(--ms-fs-sm);color:var(--ms-mute);font-variant-numeric:tabular-nums}
+.at-wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--ms-s-2)}
+.at-wk i{display:grid;place-items:center;height:var(--ms-h-tag);border-radius:var(--ms-r-sm);font-size:var(--ms-fs-label);font-style:normal;font-weight:var(--ms-fw-medium);background:var(--ms-bg);color:var(--ms-dim)}
+.at-wk i.on{background:var(--ms-tint);color:var(--ms-tint-text)}
+.at-sc ul{gap:0}
+.at-sc li{padding:var(--ms-s-4) 0}
+.at-sc li+li{border-top:1px solid var(--ms-line)}
+.at-sc li:last-child{padding-bottom:0}
+
+/* the roster: people down, the week across */
+.at-roster{display:grid;grid-template-columns:minmax(180px,1.4fr) repeat(7,minmax(104px,1fr));min-width:920px;border-radius:var(--ms-r-lg);overflow:hidden;background:var(--ms-panel);box-shadow:inset 0 1px 0 var(--ms-edge),0 0 0 1px var(--ms-line)} /* lint-allow: roster columns */
+.at-roster>*{min-width:0;padding:var(--ms-s-3);border-top:1px solid var(--ms-line)}
+.at-roster .h{padding:var(--ms-s-5) var(--ms-s-4);border-top:0;font-size:var(--ms-fs-sm);font-weight:var(--ms-fw-medium);color:var(--ms-dim)}
+.at-roster .h.today{color:var(--ms-accent-ink)}
+.at-roster .p{display:flex;align-items:center;gap:var(--ms-s-4);padding-inline:var(--ms-s-6);font-size:var(--ms-fs-control)}
+.at-roster .p b{font-weight:var(--ms-fw-medium);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.at-rc{display:flex;flex-direction:column;justify-content:center;width:100%;height:44px;padding:0 var(--ms-s-4);border-radius:var(--ms-r-md);font-size:var(--ms-fs-sm);text-align:start;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* lint-allow: a roster cell's height */
+.at-rc b{font-weight:var(--ms-fw-medium)}
+.at-rc small{font-size:var(--ms-fs-label);color:var(--ms-mute)}
+button.at-rc{transition:box-shadow var(--ms-t-fast),background var(--ms-t-fast)}
+.at-rc.sh{background:var(--ms-bg);box-shadow:inset 0 0 0 1px var(--ms-line)}
+.at-rc.sh:hover{box-shadow:inset 0 0 0 1px var(--ms-line-strong)}
+.at-rc.ch{box-shadow:inset 0 0 0 1.5px var(--ms-accent-ink)}
+.at-rc.leave{background:var(--ms-tint);color:var(--ms-tint-text)}
+.at-rc.off{color:var(--ms-dim)}
+.at-lg{width:16px;height:10px;border-radius:var(--ms-r-xs)} /* lint-allow: legend swatch */
+.to-legend i.at-lg.sh{background:var(--ms-bg);box-shadow:inset 0 0 0 1px var(--ms-line-strong)}
+.to-legend i.at-lg.ch{box-shadow:inset 0 0 0 1.5px var(--ms-accent-ink)}
+.to-legend i.at-lg.leave{background:var(--ms-tint)}
+.to-legend i.at-lg.off{background:transparent;box-shadow:inset 0 0 0 1px var(--ms-line)}
+
+/* a location's map: a plain grid, two roads, the check-in circle */
+.at-map{height:120px;border-radius:var(--ms-r-md);overflow:hidden;background:var(--ms-bg);box-shadow:inset 0 0 0 1px var(--ms-line)} /* lint-allow: the map's height */
+.at-map svg{display:block;width:100%;height:100%}
+.at-map .gr{stroke:var(--ms-line);stroke-width:1}
+.at-map .rd{fill:none;stroke:var(--ms-panel);stroke-width:8}
+.at-map .zn{fill:color-mix(in srgb,var(--ms-accent) 16%,transparent);stroke:var(--ms-accent-ink);stroke-width:1.5;stroke-dasharray:4 3}
+.at-map .pt{fill:var(--ms-accent-ink)}
+.at-map.home{display:grid;place-items:center;color:var(--ms-dim)}
+.at-map.home svg{width:32px;height:32px} /* lint-allow: the remote card's icon */
+@media (prefers-reduced-motion:reduce){.at-ring circle,.at-cal button,button.at-rc{transition:none}}
+/* ---------- Attendance on phones (js/46-attendance-phone.js) ----------
+   Phone sizes (16px text, 44px taps); the hours ring, timeline and punch tags come from 45-attendance.css and Time off's phone rows (.tom-*). */
+#ws.mob .atm-dh{display:flex;align-items:baseline;justify-content:space-between;gap:var(--ms-s-6);margin:var(--ms-s-2) 0 var(--ms-s-6)}
+#ws.mob .atm-dh b{font-size:var(--ms-fs-phone-lg);font-weight:var(--ms-fw-semibold)}
+#ws.mob .atm-dh span{font-size:var(--ms-fs-body);color:var(--x-mute);font-variant-numeric:tabular-nums;white-space:nowrap}
+#ws.mob .atm-dh span.brk{color:var(--ms-warn-text);font-weight:var(--ms-fw-medium)}
+#ws.mob .atm-now{display:flex;flex-direction:column;align-items:center;gap:var(--ms-s-7);padding:var(--ms-s-8)}
+#ws.mob .atm-shift{align-self:stretch;display:flex;align-items:center;gap:var(--ms-s-5);margin:calc(var(--ms-s-8) * -1) calc(var(--ms-s-8) * -1) 0;padding:var(--ms-s-6) var(--ms-s-8);border-bottom:1px solid var(--x-line);background:var(--ms-tint);color:var(--ms-tint-text);font-size:var(--ms-fs-body);border-radius:var(--ms-r-xl) var(--ms-r-xl) 0 0}
+#ws.mob .atm-shift svg{flex:none}
+#ws.mob .atm-ring{width:176px;height:176px} /* lint-allow: the ring's size */
+#ws.mob .atm-ring .c b{font-size:var(--ms-fs-phone-title)}
+#ws.mob .atm-ring .c small{font-size:var(--ms-fs-body)}
+#ws.mob .atm-lbl{align-self:stretch;font-size:var(--ms-fs-body);color:var(--x-mute)}
+#ws.mob .atm-loc{align-self:stretch;display:flex;align-items:center;gap:var(--ms-s-5);height:var(--ms-h-tap);margin-top:calc(var(--ms-s-4) * -1);padding:0 var(--ms-s-7);border-radius:var(--ms-r-lg);box-shadow:inset 0 0 0 1px var(--x-line);background:var(--x-panel);color:var(--x-text);text-align:start}
+#ws.mob .atm-loc b{flex:1;font-size:var(--ms-fs-phone);font-weight:var(--ms-fw-medium)}
+#ws.mob .atm-loc svg:first-child{color:var(--x-mute)}
+#ws.mob .atm-zone{display:flex;align-items:center;gap:var(--ms-s-3);margin:0;font-size:var(--ms-fs-body);color:var(--x-mute);text-align:center}
+#ws.mob .atm-zone.ok svg{color:var(--ms-ok-text)}
+#ws.mob .atm-zone.bad{color:var(--ms-bad-text)}
+#ws.mob .atm-acts{align-self:stretch;display:flex;flex-direction:column;gap:var(--ms-s-5);padding-top:var(--ms-s-7);border-top:1px solid var(--x-line)}
+#ws.mob .atm-big{width:100%;height:var(--ms-h-tap);font-size:var(--ms-fs-phone);border-radius:var(--ms-r-lg)}
+#ws.mob .atm-big[disabled]{opacity:.5}
+
+/* the missing punch, on top */
+#ws.mob .atm-alert{display:flex;align-items:center;gap:var(--ms-s-5);width:100%;margin-bottom:var(--ms-s-6);padding:var(--ms-s-6) var(--ms-s-7);border-radius:var(--ms-r-xl);background:color-mix(in srgb,var(--ms-red) 8%,var(--x-panel));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ms-red) 28%,var(--x-line));color:var(--ms-bad-text);font-size:var(--ms-fs-body);line-height:1.4;text-align:start}
+#ws.mob .atm-alert span{flex:1}
+#ws.mob .atm-alert svg{flex:none}
+
+/* the timeline and the punches */
+#ws.mob .atm-tlc{padding:var(--ms-s-7) var(--ms-s-7) var(--ms-s-3)}
+#ws.mob .atm-tlc .at-tl{margin:0}
+#ws.mob .atm-tlc .at-tl .bar{height:48px} /* lint-allow: a phone timeline */
+#ws.mob .atm-tlc .at-tl .ax{font-size:var(--ms-fs-sm)}
+#ws.mob .atm-pl{margin-top:var(--ms-s-6)}
+#ws.mob .atm-pl>div{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:var(--ms-s-6);align-items:center;min-height:64px;padding:var(--ms-s-5) var(--ms-s-8)} /* lint-allow: a phone row with its time column */
+#ws.mob .atm-pl>div+div{border-top:1px solid var(--x-line)}
+#ws.mob .atm-pl .tm{font-size:var(--ms-fs-body);color:var(--x-mute);font-variant-numeric:tabular-nums}
+#ws.mob .atm-pl .t{display:flex;flex-direction:column;gap:var(--ms-s-1);min-width:0}
+#ws.mob .atm-pl b{font-size:var(--ms-fs-phone);font-weight:var(--ms-fw-medium)}
+#ws.mob .atm-pl small{font-size:var(--ms-fs-body);color:var(--x-mute)}
+#ws.mob .atm-pl .soon b{color:var(--x-mute);font-weight:var(--ms-fw-regular)}
+#ws.mob .atm-pl .at-pt{height:30px;min-width:56px;font-size:var(--ms-fs-body)} /* lint-allow: a phone punch tag */
+
+/* the month: coloured day squares */
+#ws.mob .atm-month .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--ms-s-5)}
+#ws.mob .atm-month .hd b{font-size:var(--ms-fs-phone);font-weight:var(--ms-fw-semibold)}
+#ws.mob .atm-month .g{display:grid;grid-template-columns:repeat(7,1fr);gap:var(--ms-s-3)}
+#ws.mob .atm-month .g>span{text-align:center;font-size:var(--ms-fs-body);color:var(--x-dim);padding-bottom:var(--ms-s-2)}
+#ws.mob .atm-month .g button{display:grid;place-items:center;padding:0;height:var(--ms-h-tap);border-radius:var(--ms-r-lg);font-size:var(--ms-fs-phone);font-weight:var(--ms-fw-medium);font-variant-numeric:tabular-nums;color:var(--x-text)}
+#ws.mob .atm-month .g .ok{background:color-mix(in srgb,var(--ms-green) 14%,transparent);color:var(--ms-ok-text)}
+#ws.mob .atm-month .g .late{background:color-mix(in srgb,var(--ms-amber) 20%,transparent);color:var(--ms-warn-text)}
+#ws.mob .atm-month .g .miss,#ws.mob .atm-month .g .abs{background:color-mix(in srgb,var(--ms-red) 12%,transparent);color:var(--ms-bad-text)}
+#ws.mob .atm-month .g .leave{background:var(--ms-tint);color:var(--ms-tint-text)}
+#ws.mob .atm-month .g .off{background:var(--x-raise);color:var(--x-dim)}
+#ws.mob .atm-month .g .future{color:var(--x-dim);font-weight:var(--ms-fw-regular)}
+#ws.mob .atm-month .g .today{background:var(--x-accent);color:var(--ms-on);font-weight:var(--ms-fw-semibold)}
+#ws.mob .atm-month .tom-legend .ok{background:color-mix(in srgb,var(--ms-green) 30%,transparent)}
+#ws.mob .atm-month .tom-legend .late{background:color-mix(in srgb,var(--ms-amber) 40%,transparent)}
+#ws.mob .atm-month .tom-legend .miss{background:color-mix(in srgb,var(--ms-red) 26%,transparent)}
+#ws.mob .atm-month .tom-legend .leave{background:var(--ms-tint)}
+#ws.mob .atm-month .tom-legend .off{background:var(--x-raise)}
+
+/* a day's sheet and the correction */
+#ws.mob .atm-sh{display:flex;align-items:baseline;justify-content:space-between}
+#ws.mob .atm-sh span{font-size:var(--ms-fs-body);color:var(--x-mute);font-variant-numeric:tabular-nums}
+#ws.mob .atm-note{margin:0 0 var(--ms-s-6);padding:var(--ms-s-6) var(--ms-s-7);border-radius:var(--ms-r-lg);font-size:var(--ms-fs-body);line-height:1.45;text-align:center}
+#ws.mob .atm-note.bad{background:color-mix(in srgb,var(--ms-red) 10%,transparent);color:var(--ms-bad-text)}
+#ws.mob .atm-note.warn{background:color-mix(in srgb,var(--ms-amber) 16%,transparent);color:var(--ms-warn-text)}
+#ws.mob .atm-note.ok{background:color-mix(in srgb,var(--ms-green) 12%,transparent);color:var(--ms-ok-text)}
+#ws.mob .atm-kinds{display:grid;grid-template-columns:1fr 1fr;gap:var(--ms-s-5)}
+#ws.mob .atm-kinds .tom-tc{flex-direction:row;align-items:center;gap:var(--ms-s-5);padding:var(--ms-s-5) var(--ms-s-6)}
+#ws.mob .atm-kinds .tom-tc b{font-size:var(--ms-fs-body);line-height:1.3}
+#ws.mob .atm-kinds .tom-ic{width:36px;height:36px} /* lint-allow: a smaller icon tile */
+#ws.mob .atm-on{color:var(--ms-accent-ink)}
 /* ===== Accounting app (Al-Ghadeer AG Finance) — built on the Mindspace design system ===== */
 .agx{container-type:inline-size;padding:20px 0 112px;max-width:1240px}
 .agx *{box-sizing:border-box}
@@ -21213,7 +21429,7 @@ const LX_BGS = [['octa', 'Whisper tiles'], ['rings', 'Soft rings'], ['shapes', '
   }
 
   /* the same data and rules for the phone app (44-time-off-phone.js) */
-  window.TOX = { TODAY, TYPES, T, REQ, R, HOL, holOf, offDay, work, each, add, D, iso, short, span, fmtDays, bal, leftLine, daysOf, live, offOn, ME, BOSS, MINE, P, ini, MON, MONL, DOW, ANS, WEEKEND };
+  window.TOX = { TODAY, TYPES, T, REQ, R, HOL, holOf, offDay, work, each, add, D, iso, short, span, fmtDays, bal, leftLine, daysOf, live, offOn, ME, BOSS, MINE, P, PPL, ini, MON, MONL, DOW, ANS, WEEKEND };
 
   /* ---------- the app's pages inside the space ---------- */
   const prevHTML = appHTML;
@@ -21361,6 +21577,9 @@ const LX_BGS = [['octa', 'Whisper tiles'], ['rings', 'Soft rings'], ['shapes', '
       go(){ const h = api.d.querySelector('[data-f=d]'); st.d = (h && h.value) || st.d; if (HOL.some(x => x.d === st.d)) return toast('There’s already a holiday on that day'); HOL.push({ d: st.d, n: st.n.trim() }); api.close(); flash(st.d); redraw(); toast(`${st.n.trim()} added`); } };
   }
 
+  /* the dialog parts, for other HR apps (45-attendance.js) */
+  Object.assign(window.TOX, { dialog, head, foot, xb, warnHTML, av });
+
   /* ---------- clicks, filters and search ---------- */
   const IN = '#ws .ms-apage[data-apapp=leave]';
   document.addEventListener('click', ev => {
@@ -21503,6 +21722,473 @@ const LX_BGS = [['octa', 'Whisper tiles'], ['rings', 'Soft rings'], ['shapes', '
   /* the note and the half-day box in the request sheet */
   document.addEventListener('input', e => { if (e.target.matches && e.target.matches('#mSheet [data-to-note]')) { const st = MA.st.leave; if (st && st.q) st.q.note = e.target.value; } });
   document.addEventListener('change', e => { if (e.target.matches && e.target.matches('#mSheet [data-ma-half]')) { const st = MA.st.leave; if (!st || !st.q) return; st.q.half = e.target.checked ? 1 : 0; mobSheet(MA_APPS.leave.form(st)); } });
+})();
+/* ---------- Attendance: an app in every company space (redesign of Frappe HRMS "Attendance", "Employee Checkin", "Shift Type", "Shift Assignment") ----------
+   One place for the three people who touch attendance:
+   - you (Today: check in where you are, take a break, check out; a ring of the hours worked, a timeline and every punch ·
+     History: the month as coloured days, each day with its punches, and Request correction when a punch is wrong or missing)
+   - your manager (Team: who is in, on break, remote, not in yet or off, right now · Approvals: corrections and remote days)
+   - HR (Manage: shifts and their rules, the weekly roster, check-in locations with their radius, the month report).
+   Frappe splits this into check-ins, attendance records, requests and shift assignments, marked by a nightly job; here a day is just its punches,
+   and its status (on time, late, missing check-out, not recorded, leave, holiday) is worked out from the shift, the punches and Time off.
+   Leave and holidays come from Time off (window.TOX), so the two apps agree. */
+(() => {
+  const X5 = window.TOX; if (!X5) return;
+  const { TODAY, REQ: LREQ, holOf, each, add, D, iso, span, ME, BOSS, MINE, PPL, MON, MONL, DOW, T: LT, WEEKEND, dialog, head, foot, xb, warnHTML, av } = X5;
+  XP.checkin = softenSVG('<path d="M14.500 4h3A2.500 2.500 0 0 1 20 6.500v11a2.500 2.500 0 0 1-2.500 2.500h-3"/><path d="m10 16 4-4-4-4M14 12H4"/>', 3.2);
+  XP.checkout = softenSVG('<path d="M9.500 20h-3A2.500 2.500 0 0 1 4 17.500v-11A2.500 2.500 0 0 1 6.500 4h3"/><path d="m16 16 4-4-4-4M20 12H10"/>', 3.2);
+  XP.mappin = '<path d="M19 10c0 4.600-5 9.300-6.400 10.500a.900.900 0 0 1-1.200 0C10 19.300 5 14.600 5 10a7 7 0 0 1 14 0"/><circle cx="12" cy="10" r="2.600"/>';
+
+  const NAV = [['Today'], ['History'], ['Team'], ['Approvals'], ['Manage', ['Shifts', 'Roster', 'Locations', 'Report']]];
+  APPS.push({ id: 'att', name: 'Attendance', d: 'Check-ins, hours, shifts & corrections', ic: 'clock', tone: 'slate', title: 'Attendance', sub: 'Check in, your hours and the team today.', cta: 'Check in',
+    nav: NAV, spaces: ['swibit', 'najaf', 'karbala'], stats: [], tt: '', cols: [], rows: [] });
+
+  /* ---------- time: minutes after midnight; the clock starts at 1:40 PM and runs with the real one ---------- */
+  const T0 = Date.now(), NOW = () => Math.min(1439, 820 + Math.floor((Date.now() - T0) / 60000));
+  const hm = m => { const h = Math.floor(m / 60), mm = m % 60; return `${(h + 11) % 12 + 1}:${String(mm).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`; };
+  const dur = m => { m = Math.max(0, Math.round(m)); const h = Math.floor(m / 60), r = m % 60; return h ? `${h}h ${String(r).padStart(2, '0')}m` : `${r}m`; };
+  const toMin = v => { const [h, m] = String(v).split(':').map(Number); return h * 60 + (m || 0); };
+  const toHHMM = m => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+  const dayName = s => { const d = D(s); return `${DOW[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`; };
+  const TARGET = 480;                                         /* 8 hours of work a day */
+
+  /* ---------- shifts (Frappe: Shift Type) and who works which (Frappe: Shift Assignment); the roster holds the changes ---------- */
+  const SHIFTS = [
+    { id: 'gen', name: 'General', start: 480, end: 990, grace: 5, brk: 30, half: 240, tone: 'info', ic: 'brief' },
+    { id: 'early', name: 'Early', start: 420, end: 930, grace: 5, brk: 30, half: 240, tone: 'ok', ic: 'clock' },
+    { id: 'eve', name: 'Evening', start: 780, end: 1290, grace: 10, brk: 30, half: 240, tone: 'ah', ic: 'clock' },
+    { id: 'flex', name: 'Flexible', start: 540, end: 1050, grace: 60, brk: 30, half: 240, tone: 'warn', ic: 'sliders', flex: 1 }];
+  const SH = id => SHIFTS.find(x => x.id === id) || SHIFTS[0];
+  const BASE = { 'Rasha Hadi': 'early', 'Sara Majid': 'eve', 'Hadi Jawad': 'flex' };
+  const ROST = {}, PEND = new Set();                          /* "who|date" → a shift id or 'off'; PEND: changed, not published yet */
+  const key = (w, s) => w + '|' + s;
+  const shiftOn = (w, s) => ROST[key(w, s)] || BASE[w] || 'gen';
+  const shLine = sh => `${hm(sh.start)} – ${hm(sh.end)}`;
+
+  /* ---------- check-in locations (Frappe: Shift Location), with how far you are from each ---------- */
+  const LOCS = [
+    { id: 'bgd', n: 'Baghdad office', a: 'Karrada, Baghdad', r: 150, dist: 40 },
+    { id: 'njf', n: 'Najaf site', a: 'Kufa Road, Najaf', r: 300, dist: 161000 },
+    { id: 'home', n: 'Home', a: 'Remote days, with your manager’s OK', remote: 1 }];
+  const LOC = id => LOCS.find(l => l.id === id) || LOCS[0];
+  const far = m => m < 1000 ? `${m} m` : `${(m / 1000).toFixed(m < 10000 ? 1 : 0)} km`;
+  const inZone = l => l.remote || l.dist <= l.r;
+
+  /* ---------- punches (Frappe: Employee Checkin): in, break start, break end, out, and 'auto' when the system closed a day ---------- */
+  const DAYS = {};
+  let seed = 11; const rnd = (a, b) => { seed = seed * 16807 % 2147483647; return a + (seed % 1000) / 1000 * (b - a); };
+  const onLeave = (w, s) => LREQ.find(r => r.who === w && r.status === 'Approved' && r.from <= s && r.to >= s);
+  const weekend = s => WEEKEND.includes(D(s).getDay());
+  const SRC = ['Mobile, in zone', 'Mobile, in zone', 'Gate reader', 'Web, in zone'];
+  PPL.forEach(p => each('2026-09-01', add(TODAY, -1)).forEach(s => {
+    if (weekend(s) || holOf(s) || onLeave(p.n, s)) return; const sh = SH(shiftOn(p.n, s));
+    const late = rnd(0, 1) < .12, inT = Math.round(sh.start + (late ? rnd(9, 24) : rnd(-9, 4))), b0 = Math.round(sh.start + 230 + rnd(-30, 40)), bl = Math.round(rnd(24, 38)), ot = rnd(0, 1) < .18;
+    const outT = Math.round(inT + TARGET + bl + (ot ? rnd(40, 100) : rnd(-4, 22)));
+    DAYS[key(p.n, s)] = { loc: 'bgd', p: [{ t: inT, k: 'in', s: SRC[Math.floor(rnd(0, 4))] }, { t: b0, k: 'bs', s: 'Break' }, { t: b0 + bl, k: 'be', s: 'Back from break' }, { t: outT, k: 'out', s: rnd(0, 1) < .5 ? 'Gate reader' : 'Mobile, in zone' }] }; }));
+  const set = (w, s, loc, p) => { DAYS[key(w, s)] = { loc, p: p.map(([t, k, src]) => ({ t: typeof t === 'string' ? toMin(t) : t, k, s: src })) }; };
+  /* the days the story needs */
+  set(ME, '2026-11-16', 'bgd', [['08:06', 'in', 'Mobile, in zone'], ['16:30', 'auto', 'No check-out by the end of your shift']]);
+  set(ME, '2026-11-17', 'bgd', [['08:04', 'in', 'Mobile, in zone'], ['12:10', 'bs', 'Break'], ['12:41', 'be', 'Back from break'], ['16:52', 'out', 'Gate reader']]);
+  set(ME, '2026-11-12', 'bgd', [['08:19', 'in', 'Mobile, in zone'], ['12:30', 'bs', 'Break'], ['13:00', 'be', 'Back from break'], ['16:41', 'out', 'Gate reader']]);
+  set(ME, '2026-11-11', 'bgd', [['07:58', 'in', 'Gate reader'], ['12:02', 'bs', 'Break'], ['12:32', 'be', 'Back from break'], ['18:01', 'out', 'Gate reader']]);
+  set('Zaid Qasim', '2026-11-12', 'bgd', [['08:01', 'in', 'Mobile, in zone'], ['16:30', 'auto', 'No check-out by the end of the shift']]);
+  set('Kamal Adnan', '2026-11-17', 'bgd', [['08:21', 'in', 'Gate reader'], ['16:58', 'out', 'Gate reader']]);
+  set('Hadi Jawad', '2026-11-17', 'bgd', [['09:12', 'in', 'Mobile, out of zone'], ['17:40', 'out', 'Mobile, out of zone']]);
+  delete DAYS[key('Omar Khalid', '2026-11-11')];
+  /* today, at 1:40 PM */
+  set(ME, TODAY, 'bgd', [['08:04', 'in', 'Mobile, in zone'], ['11:02', 'bs', 'Break'], ['11:31', 'be', 'Back from break']]);
+  set('Zaid Qasim', TODAY, 'bgd', [['07:58', 'in', 'Gate reader']]);
+  set('Kamal Adnan', TODAY, 'bgd', [['08:21', 'in', 'Mobile, in zone']]);
+  set('Nabil Hasan', TODAY, 'bgd', [['08:02', 'in', 'Gate reader'], ['13:20', 'bs', 'Break']]);
+  set('Hadi Jawad', TODAY, 'home', [['09:10', 'in', 'Home, remote day']]);
+  set('Sara Majid', TODAY, 'bgd', []);
+  delete DAYS[key('Omar Khalid', TODAY)]; delete DAYS[key('Rasha Hadi', TODAY)];
+
+  /* ---------- a day worked out: hours, breaks and its pieces for the timeline ---------- */
+  const sorted = p => p.slice().sort((a, b) => a.t - b.t);
+  const calc = (p, upto) => { let w = 0, b = 0, st = null, bs = null; const seg = [];
+    for (const x of sorted(p)) {
+      if (x.k === 'in' || x.k === 'be') { if (bs != null) { b += x.t - bs; seg.push({ a: bs, z: x.t, k: 'b' }); bs = null; } if (st == null) st = x.t; }
+      else if (x.k === 'bs') { if (st != null) { w += x.t - st; seg.push({ a: st, z: x.t, k: 'w' }); st = null; } bs = x.t; }
+      else { if (st != null) { w += x.t - st; seg.push({ a: st, z: x.t, k: x.k === 'auto' ? 'q' : 'w' }); st = null; } } }
+    if (upto != null) { if (st != null) { w += upto - st; seg.push({ a: st, z: upto, k: 'w' }); } if (bs != null) { b += upto - bs; seg.push({ a: bs, z: upto, k: 'b' }); } }
+    return { w, b, seg, open: st != null, brk: bs != null }; };
+  /* a person's day: st is ok · late · miss (no check-out) · abs (nothing recorded) · leave · off (weekend, holiday) · none (today, not in yet) · wait (today, leave asked) · future */
+  const info = (w, s) => { const h = holOf(s), lv = onLeave(w, s), rec = DAYS[key(w, s)], sh = SH(shiftOn(w, s)), has = rec && rec.p.length;
+    if (s > TODAY) return { st: h || weekend(s) ? 'off' : lv ? 'leave' : 'future', label: h ? h.n : lv ? LT(lv.type).name : '', sh };
+    if (h && !has) return { st: 'off', label: h.n, sh };
+    if (weekend(s) && !has) return { st: 'off', label: 'Weekend', sh };
+    if (shiftOn(w, s) === 'off' && !has) return { st: 'off', label: 'Day off', sh };
+    if (lv) return { st: 'leave', label: LT(lv.type).name, lv, sh };
+    if (!has) { const asked = LREQ.find(r => r.who === w && r.status === 'Pending' && r.from <= s && r.to >= s);
+      return s === TODAY ? { st: asked ? 'wait' : 'none', label: asked ? `Asked for ${LT(asked.type).name.toLowerCase()}` : 'Not checked in', sh, late: NOW() > sh.start + sh.grace } : { st: 'abs', label: 'Not recorded', sh }; }
+    const c = calc(rec.p, s === TODAY ? NOW() : null), first = sorted(rec.p).find(x => x.k === 'in'), last = sorted(rec.p).filter(x => x.k === 'out' || x.k === 'auto').pop();
+    const late = first && first.t > sh.start + sh.grace ? first.t - sh.start : 0, miss = rec.p.some(x => x.k === 'auto');
+    return { st: miss ? 'miss' : late ? 'late' : 'ok', rec, c, first, last, late, ot: Math.max(0, c.w - TARGET), sh, remote: rec.loc === 'home', label: '' }; };
+  const tagOf = i => i.st === 'ok' ? (i.remote ? UI.tag('Remote', 'info') : i.ot >= 15 ? UI.tag(`+${dur(i.ot)} overtime`, 'ok') : UI.tag('On time', 'ok'))
+    : i.st === 'late' ? UI.tag(`Late ${dur(i.late)}`, 'warn') : i.st === 'miss' ? UI.tag('Missing check-out', 'bad') : i.st === 'abs' ? UI.tag('Not recorded', 'bad')
+    : i.st === 'leave' ? UI.tag(i.label, 'info') : i.st === 'off' ? UI.tag(i.label) : i.st === 'wait' ? UI.tag(i.label, 'warn') : i.st === 'none' ? UI.tag(i.late ? 'Not in yet' : 'Not started', i.late ? 'bad' : '') : '';
+  /* right now: none · in · break · out */
+  const stateOf = w => { const r = DAYS[key(w, TODAY)]; if (!r || !r.p.length) return 'none'; const l = sorted(r.p).pop(); return l.k === 'bs' ? 'break' : l.k === 'out' ? 'out' : 'in'; };
+  const mine = () => DAYS[key(ME, TODAY)] || (DAYS[key(ME, TODAY)] = { loc: 'bgd', p: [] });
+
+  /* ---------- corrections and remote days (Frappe: Attendance Request), sent to the manager ---------- */
+  const KINDS = { out: 'Missing check-out', in: 'Wrong check-in time', miss: 'Missing check-in', remote: 'Remote day' };
+  let CID = 300;
+  const C = (who, d, kind, t, why, status = 'Pending', o = {}) => Object.assign({ id: 'AC-' + (++CID), who, d, kind, t, why, status, by: who === ME ? BOSS : ME, sent: TODAY }, o);
+  const CORR = [
+    C('Zaid Qasim', '2026-11-12', 'out', 975, 'My phone died at the gate; I left at 4:15.', 'Pending', { sent: '2026-11-13' }),
+    C('Kamal Adnan', '2026-11-17', 'in', 480, 'I was at the client’s office from 8, then came in.', 'Pending', { sent: '2026-11-17' }),
+    C('Hadi Jawad', '2026-11-17', 'remote', null, 'Worked from home while the plumber came; I told Mustafa in the morning.', 'Pending', { sent: '2026-11-17' }),
+    C(ME, '2026-10-21', 'out', 1000, 'Forgot to tap out after the workshop.', 'Approved', { sent: '2026-10-22', dec: '2026-10-22' }),
+    C('Omar Khalid', '2026-11-04', 'in', 482, 'The gate reader was down.', 'Approved', { sent: '2026-11-04', dec: '2026-11-05' })];
+  const applyCorr = c => { const r = DAYS[key(c.who, c.d)] || (DAYS[key(c.who, c.d)] = { loc: 'bgd', p: [] });
+    if (c.kind === 'out') { r.p = r.p.filter(x => x.k !== 'auto' && x.k !== 'out'); r.p.push({ t: c.t, k: 'out', s: 'Corrected, approved by ' + c.by }); }
+    if (c.kind === 'in' || c.kind === 'miss') { r.p = r.p.filter(x => !(x.k === 'in' && x === sorted(r.p).find(y => y.k === 'in'))); r.p.push({ t: c.t, k: 'in', s: 'Corrected, approved by ' + c.by }); }
+    if (c.kind === 'remote') r.loc = 'home'; };
+  const fixable = () => each(add(TODAY, -45), add(TODAY, -1)).filter(s => { const i = info(ME, s); return (i.st === 'miss' || i.st === 'abs') && !CORR.some(c => c.who === ME && c.d === s && c.status !== 'Declined'); }).reverse();
+  const corrOf = (w, s) => CORR.filter(c => c.who === w && c.d === s).pop();
+
+  /* ---------- a month in numbers ---------- */
+  const monthOf = (w, m) => { const days = each(`${m}-01`, add(`${m}-01`, 30)).filter(s => s.slice(0, 7) === m && s < TODAY), I = days.map(s => info(w, s));
+    const work = I.filter(i => ['ok', 'late', 'miss'].includes(i.st));
+    return { present: work.length, late: I.filter(i => i.st === 'late').length, miss: I.filter(i => i.st === 'miss').length, abs: I.filter(i => i.st === 'abs').length, leave: I.filter(i => i.st === 'leave').length,
+      ot: work.reduce((a, i) => a + i.ot, 0), hours: work.reduce((a, i) => a + i.c.w, 0), due: (work.length + I.filter(i => i.st === 'abs').length) * TARGET, remote: work.filter(i => i.remote).length }; };
+
+  /* ---------- pieces shared by the desktop and the phone ---------- */
+  const ringSVG = (w, mode) => { const C2 = 2 * Math.PI * 52, f = Math.min(w, TARGET) / TARGET, o = Math.min(1, Math.max(0, w - TARGET) / TARGET);
+    return `<svg viewBox="0 0 128 128" aria-hidden="true"><circle class="bg" r="52" cx="64" cy="64"/><circle class="fg${mode === 'break' ? ' brk' : ''}" r="52" cx="64" cy="64" stroke-dasharray="${(f * C2).toFixed(1)} ${C2.toFixed(1)}"/>${o > 0 ? `<circle class="ot" r="52" cx="64" cy="64" stroke-dasharray="${(o * C2).toFixed(1)} ${C2.toFixed(1)}"/>` : ''}</svg>`; };
+  const ringLine = (w, mode) => mode === 'break' ? '<em class="brk">On break</em>' : w > TARGET ? `<em class="ot">+${dur(w - TARGET)} overtime</em>` : mode === 'none' ? 'worked today' : mode === 'out' ? 'worked today' : `${dur(TARGET - w)} left`;
+  const timeline = (p, upto, cls = '') => { const a0 = 420, z0 = 1260, x = t => Math.max(0, Math.min(100, (t - a0) / (z0 - a0) * 100)), c = calc(p, upto);
+    return `<div class="at-tl ${cls}"><div class="bar">${c.seg.map(s => `<i class="${s.k}" style="left:${x(s.a).toFixed(2)}%;width:${Math.max(.6, x(s.z) - x(s.a)).toFixed(2)}%">${s.k === 'b' && s.z - s.a >= 20 ? xi('pause', 12, 1.6) : ''}</i>`).join('')}${upto != null ? `<span class="now" style="left:${x(upto).toFixed(2)}%"></span>` : ''}</div>
+      <div class="ax">${[480, 720, 960, 1200].map(t => `<span style="left:${x(t).toFixed(2)}%">${hm(t).replace(':00', '')}</span>`).join('')}</div></div>`; };
+  const PTXT = { in: 'Checked in', bs: 'Break started', be: 'Back from break', out: 'Checked out', auto: 'Auto-closed' };
+  const pTag = k => k === 'in' || k === 'be' ? ['In', 'in'] : k === 'bs' ? ['Break', 'brk'] : k === 'auto' ? ['Auto', 'auto'] : ['Out', 'out'];
+  const zoneLine = l => l.remote ? (CORR.some(c => c.who === ME && c.d === TODAY && c.kind === 'remote') ? `Remote today · ${CORR.find(c => c.who === ME && c.d === TODAY && c.kind === 'remote').status === 'Approved' ? 'approved' : 'waiting for ' + BOSS}` : `Remote: ${BOSS} is asked to OK it`)
+    : inZone(l) ? `In the ${l.n} zone · ${far(l.dist)} away` : `${far(l.dist)} from ${l.n} · check-in works within ${far(l.r)}`;
+  const ANS = [
+    () => { const f = fixable()[0]; return f ? `<b>${dayName(f)}</b> has a check-in with no check-out. I filled in a correction with <b>${hm(SH(shiftOn(ME, f)).end)}</b>, your shift’s end; change the time if you left earlier, then send it.` : 'Nothing is missing. Every day this month has a check-in and a check-out.'; },
+    () => { const m = monthOf(ME, TODAY.slice(0, 7)); return `You’ve worked <b>${dur(m.ot)}</b> of overtime in ${MONL[+TODAY.slice(5, 7) - 1]}, over ${m.present} days. It’s banked and paid with your salary on the 30th.`; },
+    () => { const m = monthOf(ME, TODAY.slice(0, 7)), d = m.hours - m.due; return `${d >= 0 ? 'Yes.' : 'Nearly.'} You’ve worked <b>${dur(m.hours)}</b> of the <b>${dur(m.due)}</b> due so far this month (${d >= 0 ? `${dur(d)} ahead` : `${dur(-d)} behind`}), with <b>${m.late}</b> late arrival${m.late === 1 ? '' : 's'} and <b>${m.miss}</b> missing punch${m.miss === 1 ? '' : 'es'} to fix.`; }];
+  const ASKQ = ['Fix my missing punch', 'How much overtime this month?', 'Am I on track?'];
+
+  /* ---------- actions on your own day (desktop and phone) ---------- */
+  const S = { loc: 'bgd', hm: TODAY.slice(0, 7), wk: '2026-11-22', rm: TODAY.slice(0, 7), q: '', ask: null, hl: null, f: 'all' };
+  const punch = (k, src) => { const r = mine(), t = NOW(); if (r.p.length && sorted(r.p).pop().t > t) return; r.loc = S.loc; r.p.push({ t, k, s: src });
+    if (k === 'in' && LOC(S.loc).remote && !CORR.some(c => c.who === ME && c.d === TODAY && c.kind === 'remote')) CORR.unshift(C(ME, TODAY, 'remote', null, 'Working from home today.'));
+    const c = calc(r.p, t);
+    return k === 'in' ? `Checked in at ${hm(t)}${LOC(S.loc).remote ? `. ${BOSS} is asked to OK the remote day.` : ''}` : k === 'bs' ? 'Break started. Enjoy it.' : k === 'be' ? `Welcome back. ${dur(c.b)} of break today.` : `Checked out at ${hm(t)} · ${dur(c.w)} today`; };
+  const sendCorr = (s, kind, t, why) => { const c = C(ME, s, kind, kind === 'remote' ? null : t, why); CORR.unshift(c); return c; };
+  const decide = (c, ok, why) => { c.status = ok ? 'Approved' : 'Declined'; c.dec = TODAY; if (why) c.no = why; if (ok) applyCorr(c); };
+
+  window.ATX = { TODAY, NOW, hm, dur, toMin, toHHMM, dayName, TARGET, SHIFTS, SH, shiftOn, shLine, LOCS, LOC, far, inZone, DAYS, key, calc, info, stateOf, mine, sorted,
+    KINDS, CORR, fixable, corrOf, monthOf, ringSVG, ringLine, timeline, PTXT, pTag, zoneLine, ANS, ASKQ, S, punch, sendCorr, decide, ME, BOSS, MINE, PPL, MON, MONL, DOW, each, add, D, iso, span };
+
+  /* ---------- desktop pages ---------- */
+  const redraw = top => APPX.redraw(top);
+  const ic = (n, s = 16) => xi(n, s, s >= 18 ? 1.4 : 1.5);
+  const go = (g, i = -1) => { X.an = [g, i]; redraw(true); };
+  const flash = id => { S.hl = id; setTimeout(() => { S.hl = null; }, 1300); };
+  const alertBar = () => { const f = fixable(); return f.length ? `<div class="at-alert">${ic('info', 18)}<span><b>${dayName(f[0])}</b> has a check-in with no check-out${f.length > 1 ? `, and ${f.length - 1} more day${f.length > 2 ? 's need' : ' needs'} a look` : ''}.</span>${UI.btn({ label: 'Fix it', size: 'sm', attrs: { 'data-at': 'day', 'data-d': f[0] } })}</div>` : ''; };
+  const punches = (p, open) => `<div class="at-pl">${sorted(p).map(x => { const [l, c] = pTag(x.k); return `<div><span class="tm">${hm(x.t)}</span><span class="t"><b>${x.k === 'in' && sorted(p).indexOf(x) > 0 ? 'Checked in again' : PTXT[x.k]}</b>${x.s && x.s !== PTXT[x.k] ? `<small>${esc(x.s)}</small>` : ''}</span><i class="at-pt ${c}">${l}</i></div>`; }).join('')}
+    ${open ? `<div class="soon"><span class="tm">Now</span><span class="t"><b>${open}</b></span></div>` : ''}</div>`;
+
+  function nowCard(){
+    const r = mine(), st = stateOf(ME), t = NOW(), c = calc(r.p, t), sh = SH(shiftOn(ME, TODAY)), first = sorted(r.p).find(x => x.k === 'in'), l = LOC(S.loc), ok = inZone(l);
+    const lastBs = sorted(r.p).filter(x => x.k === 'bs').pop();
+    const status = st === 'none' ? 'Not checked in' : st === 'in' ? `Checked in ${hm(first.t)}` : st === 'break' ? `<span class="brk">On break <span data-atl="brk">${dur(t - lastBs.t)}</span></span>` : `Checked out ${hm(sorted(r.p).pop().t)}`;
+    const acts = st === 'none' || st === 'out' ? UI.btn({ label: st === 'out' ? 'Check in again' : 'Check in', kind: 'primary', disabled: !ok, icon: ic('checkin', 16), attrs: { 'data-at': 'in' } })
+      : st === 'in' ? UI.btn({ label: 'Start break', icon: ic('pause', 16), attrs: { 'data-at': 'bs' } }) + UI.btn({ label: 'Check out', kind: 'primary', icon: ic('checkout', 16), attrs: { 'data-at': 'out' } })
+      : UI.btn({ label: 'End break', kind: 'primary', icon: ic('play', 16), attrs: { 'data-at': 'be' } });
+    return UI.card(UI.cardh({ label: `Today, ${dayName(TODAY)}`, html: `<span class="at-st">${status}</span>` })
+      + `<div class="at-shift">${ic('clock', 15)}<span>${esc(sh.name)} shift, ${shLine(sh)}. You’re late after ${hm(sh.start + sh.grace)}.</span></div>
+        <div class="at-now"><div class="at-ring" data-atl="ring">${ringSVG(c.w, st)}<span class="c"><b data-atl="w">${dur(c.w)}</b><small data-atl="sub">${ringLine(c.w, st)}</small></span></div>
+          <div class="at-side"><div class="ms-field"><span class="lbl">Where are you working today?</span><button type="button" class="ms-dd" data-at="loc" ${st === 'in' || st === 'break' ? 'aria-disabled="true"' : ''}><span class="at-ddv">${ic(l.remote ? 'home' : 'mappin', 16)}${esc(l.n)}</span>${ic('chevdn', 16)}</button></div>
+            <p class="at-zone ${ok ? 'ok' : 'bad'}">${ic(ok ? 'check' : 'info', 14)}${esc(zoneLine(l))}</p><div class="at-acts">${acts}</div></div></div>`); }
+  function today(){
+    const r = mine(), st = stateOf(ME), m = monthOf(ME, TODAY.slice(0, 7)), wait = CORR.filter(c => c.status === 'Pending' && c.by === ME);
+    const sum = UI.card(UI.cardh({ icon: ic('cal'), tone: 'info', label: MONL[+TODAY.slice(5, 7) - 1], html: UI.btn({ label: 'History', size: 'sm', kind: 'ghost', attrs: { 'data-at': 'nav', 'data-g': 1 } }) })
+      + `<div class="at-kv">${[['Days present', `${m.present}`], ['Hours worked', dur(m.hours)], ['Overtime banked', dur(m.ot)], ['Late arrivals', `${m.late}`], ['Missing punches', `${m.miss + m.abs}`]].map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}</div>`);
+    const appr = wait.length ? UI.card(UI.cardh({ icon: ic('approve'), tone: 'warn', label: 'Waiting on you' }) + `<p class="ms-sub" style="margin:0 0 var(--ms-s-6)">${wait.length} correction${wait.length === 1 ? '' : 's'} from your team.</p><div class="ms-stack">${wait.slice(0, 5).map(c => av(c.who)).join('')}</div><div style="margin-top:var(--ms-s-6)">${UI.btn({ label: 'Review', kind: 'primary', attrs: { 'data-at': 'nav', 'data-g': 3 } })}</div>`) : '';
+    const tm = MINE.map(n => ({ n, i: info(n, TODAY), s: stateOf(n) })), inN = tm.filter(x => x.s === 'in' || x.s === 'break').length;
+    const team = UI.card(UI.cardh({ icon: ic('users'), tone: 'info', label: `Your team · ${inN} of ${tm.length} in`, html: UI.btn({ label: 'Team', size: 'sm', kind: 'ghost', attrs: { 'data-at': 'nav', 'data-g': 2 } }) })
+      + `<div class="to-off">${tm.map(x => `<div>${av(x.n)}<span class="t"><b>${esc(x.n)}</b><small>${esc(teamLine(x))}</small></span>${teamTag(x)}</div>`).join('')}</div>`);
+    const ask = UI.card(UI.cardh({ icon: ic('spark'), tone: 'ah', label: 'Ask Auto' }) + `<div class="to-ask">${ASKQ.map((q, i) => `<button type="button" class="q" data-at="ask" data-q="${i}">${ic('spark', 15)}${q}${ic('right', 14)}</button>`).join('')}
+      <div class="to-ans" ${S.ask == null ? 'hidden' : ''}>${UI.av('', '', 'auto sm')}<span>${S.ask == null ? '' : ANS[S.ask]()}</span></div></div>`);
+    return UI.ptitle({ title: 'Attendance', sub: `Hi ${ME.split(' ')[0]}, here’s your day.` })
+      + `<div class="to-page">${alertBar()}<div class="to-grid"><div class="to-col">${nowCard()}
+        ${UI.card(UI.cardh({ label: 'Today’s punches', html: `<span class="ms-sub">${r.p.length} so far</span>` }) + timeline(r.p, st === 'out' ? null : NOW()) + punches(r.p, st === 'in' ? 'Working' : st === 'break' ? 'On break' : ''))}</div>
+        <div class="to-col">${appr}${sum}${team}${ask}</div></div></div>`; }
+  const teamLine = x => { const r = DAYS[key(x.n, TODAY)], f = r && sorted(r.p).find(p => p.k === 'in');
+    return x.s === 'none' ? (x.i.st === 'leave' || x.i.st === 'wait' ? x.i.label : `${x.i.sh.name} shift from ${hm(x.i.sh.start)}`) : x.s === 'break' ? `In ${hm(f.t)} · on break since ${hm(sorted(r.p).pop().t)}` : x.s === 'out' ? `${hm(f.t)} – ${hm(sorted(r.p).pop().t)}` : `In ${hm(f.t)}${r.loc === 'home' ? ' · from home' : ''}`; };
+  const teamTag = x => x.s === 'break' ? UI.tag('On break', 'warn') : x.s === 'in' ? (x.i.remote ? UI.tag('Remote', 'info') : x.i.st === 'late' ? UI.tag(`In · late ${dur(x.i.late)}`, 'warn') : UI.tag('In', 'ok')) : x.s === 'out' ? UI.tag('Checked out') : tagOf(x.i);
+
+  function history(){
+    const [y, m] = S.hm.split('-').map(Number), first = new Date(y, m - 1, 1), start = add(iso(first), -first.getDay()), days = each(start, add(start, 41)).filter((s, i) => i < 35 || D(s).getMonth() === m - 1);
+    const cell = s => { const d = D(s); if (d.getMonth() !== m - 1) return '<span class="x"></span>'; const i = info(ME, s), v = i.c ? dur(i.c.w) : i.label || '';
+      const cls = s === TODAY ? 'today' : i.st; return `<button type="button" class="${cls}" data-at="day" data-d="${s}" ${i.st === 'future' ? 'disabled' : ''}><span class="n">${d.getDate()}</span><small>${s === TODAY ? 'Today' : i.st === 'future' ? '' : esc(v)}</small></button>`; };
+    const sm = monthOf(ME, S.hm), list = each(`${S.hm}-01`, add(`${S.hm}-01`, 30)).filter(s => s.slice(0, 7) === S.hm && s <= TODAY).reverse().map(s => ({ s, i: info(ME, s) })).filter(x => x.i.st !== 'off');
+    const cols = [{ label: 'Day', w: 'minmax(150px,1.2fr)' }, { label: 'In', w: 'minmax(90px,.8fr)' }, { label: 'Out', w: 'minmax(90px,.8fr)' }, { label: 'Hours', num: true, w: 'minmax(80px,.7fr)' }, { label: 'Status', w: 'minmax(150px,1.2fr)' }];
+    const tools = `<span class="to-mnav">${UI.ib({ icon: ic('left', 15), label: 'Previous month', attrs: { 'data-at': 'hm', 'data-d': -1 } })}<b>${MONL[m - 1]} ${y}</b>${UI.ib({ icon: ic('right', 15), label: 'Next month', disabled: S.hm >= TODAY.slice(0, 7), attrs: { 'data-at': 'hm', 'data-d': 1 } })}</span>`;
+    return UI.ptitle({ title: 'History', sub: 'Your days, their punches and corrections', tools })
+      + `<div class="to-page">${alertBar()}<div class="to-grid"><div class="to-col"><div class="at-cal">${DOW.map(w => `<span class="wd">${w}</span>`).join('')}${days.map(cell).join('')}</div>
+        <div class="to-legend at-legend"><span><i class="ok"></i>Present</span><span><i class="late"></i>Late</span><span><i class="miss"></i>Missing or not recorded</span><span><i class="leave"></i>Leave</span><span><i class="off"></i>Weekend, holiday</span></div>
+        <div class="ms-xscroll ms-xfade">${UI.table({ flat: true, cols, empty: 'No working days yet.', rows: list.map(({ s, i }) => ({ id: s, cls: S.hl === s ? 'to-flash' : '', attrs: { 'data-at': 'day', 'data-d': s, tabindex: 0, role: 'button' },
+          cells: [`<b>${esc(dayName(s))}</b>`, i.first ? hm(i.first.t) : '—', i.last ? (i.last.k === 'auto' ? '—' : hm(i.last.t)) : s === TODAY && i.c ? 'Now' : '—', i.c ? dur(i.c.w) : '—', tagOf(i) + (corrOf(ME, s) && corrOf(ME, s).status === 'Pending' ? ' ' + UI.tag('Correction sent', 'warn') : '')] })) })}</div></div>
+        <div class="to-col">${UI.card(UI.cardh({ icon: ic('perf'), tone: 'info', label: 'Summary' }) + `<div class="at-kv">${[['Days present', `${sm.present}`], ['Remote days', `${sm.remote}`], ['Leave', `${sm.leave} day${sm.leave === 1 ? '' : 's'}`], ['Hours worked', dur(sm.hours)], ['Overtime banked', dur(sm.ot)], ['Late arrivals', `${sm.late}`], ['Missing punches', `${sm.miss + sm.abs}`]].map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}</div>`)}
+          ${UI.card(UI.cardh({ icon: ic('approve'), tone: 'warn', label: 'Your corrections' }) + UI.rows(CORR.filter(c => c.who === ME).slice(0, 5).map(c => UI.item({ title: KINDS[c.kind], sub: `${dayName(c.d)}${c.t != null ? ' · ' + hm(c.t) : ''}`, tag: c.status === 'Pending' ? UI.tag('Waiting', 'warn') : c.status === 'Approved' ? UI.tag('Approved', 'ok') : UI.tag('Declined', 'bad'), attrs: { 'data-at': 'day', 'data-d': c.d, role: 'button' } })), 'No corrections yet.'))}</div></div></div>`; }
+
+  function team(){
+    const tm = MINE.map(n => ({ n, i: info(n, TODAY), s: stateOf(n), r: DAYS[key(n, TODAY)] }));
+    const n = f => tm.filter(f).length;
+    const stats = [['In', n(x => x.s === 'in' && !x.i.remote), 'ok'], ['On break', n(x => x.s === 'break'), 'warn'], ['Remote', n(x => x.s === 'in' && x.i.remote), 'info'], ['Not in yet', n(x => x.s === 'none' && x.i.st === 'none' && x.i.late), 'bad'], ['Off', n(x => x.i.st === 'leave' || x.i.st === 'wait'), '']];
+    const cols = [{ label: 'Person', w: 'minmax(170px,1.5fr)' }, { label: 'Now', w: 'minmax(130px,1.1fr)' }, { label: 'Shift', w: 'minmax(130px,1fr)' }, { label: 'In', w: 'minmax(76px,.6fr)' }, { label: 'Hours today', num: true, w: 'minmax(92px,.7fr)' }, { label: 'This month', w: 'minmax(130px,1fr)' }, { label: '', w: 'minmax(76px,.5fr)' }];
+    return UI.ptitle({ title: 'Team', sub: `Your team right now · ${dayName(TODAY)}, ${hm(NOW())}` })
+      + `<div class="to-page"><div class="at-stats">${stats.map(([l, v, k]) => `<div class="at-stat"><small>${UI.tag(l, k)}</small><b>${v}</b></div>`).join('')}</div>
+        <div class="ms-xscroll ms-xfade">${UI.table({ flat: true, cols, rows: tm.map(x => { const f = x.r && sorted(x.r.p).find(p => p.k === 'in'), mm = monthOf(x.n, TODAY.slice(0, 7));
+          return { id: x.n, cells: [`<span class="ms-tmain">${av(x.n, 'xs')}<b>${esc(x.n)}</b></span>`, teamTag(x), `${esc(x.i.sh.name)} · ${hm(x.i.sh.start)}`, f ? hm(f.t) : '—', x.i.c ? dur(x.i.c.w) : '—', `<span class="ms-sub">${mm.late} late · ${mm.miss + mm.abs} missing</span>`,
+            x.s === 'none' && x.i.st === 'none' && x.i.late ? UI.btn({ label: 'Nudge', size: 'sm', attrs: { 'data-at': 'nudge', 'data-p': x.n } }) : ''] }; }) })}</div></div>`; }
+
+  function approvals(){
+    const wait = CORR.filter(c => c.status === 'Pending' && c.by === ME), done = CORR.filter(c => c.by === ME && c.status !== 'Pending');
+    const card = c => { const i = info(c.who, c.d), rec = i.rec;
+      const was = rec ? `${i.first ? 'In ' + hm(i.first.t) : 'No check-in'} · ${i.last ? (i.last.k === 'auto' ? 'closed by the system at ' + hm(i.last.t) : 'out ' + hm(i.last.t)) : 'no check-out'}${rec.loc === 'home' ? ' · from home' : ''}` : 'Nothing recorded';
+      const asks = c.kind === 'remote' ? 'Count the day as a remote day' : `${c.kind === 'out' ? 'Check-out' : 'Check-in'} at ${hm(c.t)}`;
+      return `<div class="to-ar" data-ar="${c.id}">${av(c.who, 'md')}<div class="t"><b>${esc(c.who)}</b><div class="meta"><span>${UI.tile(ic(c.kind === 'remote' ? 'home' : 'clock', 16), c.kind === 'remote' ? 'info' : 'warn')}${KINDS[c.kind]}</span><span>${ic('cal', 14)}${esc(dayName(c.d))}</span><span>Sent ${esc(dayName(c.sent))}</span></div>
+        <div class="to-note">${esc(c.why)}</div><div class="at-was"><div><span>Recorded</span><b>${esc(was)}</b></div><div><span>Asks for</span><b>${esc(asks)}</b></div></div></div>
+        <div class="acts">${UI.btn({ label: 'Decline', attrs: { 'data-at': 'dec', 'data-id': c.id } })}${UI.btn({ label: 'Approve', kind: 'primary', icon: ic('check', 15), attrs: { 'data-at': 'ok', 'data-id': c.id } })}</div>
+        <div class="why" hidden>${UI.field({ label: 'Why are you declining?', type: 'textarea', placeholder: `${c.who.split(' ')[0]} will see this.`, attrs: { 'data-why': c.id } })}<div class="row">${UI.btn({ label: 'Back', kind: 'ghost', attrs: { 'data-at': 'nowhy', 'data-id': c.id } })}${UI.btn({ label: 'Decline', kind: 'danger', attrs: { 'data-at': 'dec-go', 'data-id': c.id } })}</div></div></div>`; };
+    const cols = [{ label: 'Person', w: 'minmax(200px,1.5fr)' }, { label: 'What', w: 'minmax(170px,1.3fr)' }, { label: 'Day', w: 'minmax(130px,1fr)' }, { label: 'Decision', w: 'minmax(110px,.9fr)' }];
+    return UI.ptitle({ title: 'Approvals', sub: wait.length ? `${wait.length} correction${wait.length === 1 ? '' : 's'} waiting on you` : 'You’re all caught up' })
+      + `<div class="to-page"><div class="to-appr">${wait.length ? wait.map(card).join('') : UI.empty('Nothing is waiting. Corrections and remote days from your team show up here.')}</div>
+        ${UI.sh({ title: 'Decided', count: done.length })}<div class="ms-xscroll ms-xfade">${UI.table({ flat: true, cols, empty: 'Nothing decided yet.', rows: done.map(c => ({ id: c.id, cls: S.hl === c.id ? 'to-flash' : '', cells: [`<span class="ms-tmain">${av(c.who, 'xs')}<b>${esc(c.who)}</b></span>`, esc(KINDS[c.kind]) + (c.t != null ? ` · ${hm(c.t)}` : ''), esc(dayName(c.d)), c.status === 'Approved' ? UI.tag('Approved', 'ok') : UI.tag('Declined', 'bad')] })) })}</div></div>`; }
+
+  /* ---------- HR ---------- */
+  const people = id => PPL.filter(p => (BASE[p.n] || 'gen') === id).length;
+  function shifts(){
+    const rule = (l, v) => `<li><span>${l}</span><b>${v}</b></li>`;
+    return UI.ptitle({ title: 'Shifts', sub: 'When people work and the rules that mark their days', tools: UI.btn({ label: 'New shift', kind: 'primary', icon: ic('plus', 15), attrs: { 'data-at': 'shift', 'data-id': '' } }) })
+      + `<div class="to-page"><div class="to-tgrid">${SHIFTS.map(s => `<div class="to-tc at-sc${S.hl === s.id ? ' to-flash' : ''}"><div class="hd">${UI.tile(ic(s.ic, 16), s.tone)}<span class="t"><b>${esc(s.name)}</b><small>${shLine(s)} · ${people(s.id)} ${people(s.id) === 1 ? 'person' : 'people'}</small></span>${UI.btn({ label: 'Edit', size: 'sm', attrs: { 'data-at': 'shift', 'data-id': s.id } })}</div>
+        <div class="at-wk" aria-label="Works Sunday to Thursday">${DOW.map((d, n) => `<i class="${WEEKEND.includes(n) ? '' : 'on'}">${d}</i>`).join('')}</div><ul>
+        ${rule('Late after', s.flex ? `${hm(s.start + s.grace)} (core hours)` : `${hm(s.start + s.grace)} (${s.grace} min grace)`)}${rule('Break', `${s.brk} min, not paid`)}
+        ${rule('Overtime', 'After 8h worked')}${rule('Half day', `Under ${s.half / 60}h worked`)}${rule('No check-out', 'Closed at the shift’s end')}</ul></div>`).join('')}</div></div>`; }
+  function roster(){
+    const days = each(S.wk, add(S.wk, 6)), cell = (p, s) => { const i = info(p.n, s), sid = shiftOn(p.n, s), ch = PEND.has(key(p.n, s));
+      if (holOf(s)) return `<span class="at-rc off">${esc(holOf(s).n)}</span>`;
+      if (weekend(s)) return `<span class="at-rc off">Weekend</span>`;
+      if (i.st === 'leave') return `<span class="at-rc leave">${esc(i.label)}</span>`;
+      return `<button type="button" class="at-rc ${sid === 'off' ? 'off' : 'sh'}${ch ? ' ch' : ''}" data-at="rc" data-p="${esc(p.n)}" data-d="${s}">${sid === 'off' ? 'Day off' : `<b>${esc(SH(sid).name)}</b><small>${hm(SH(sid).start)} – ${hm(SH(sid).end)}</small>`}</button>`; };
+    const ch = PEND.size;
+    const tools = `<span class="to-mnav">${UI.ib({ icon: ic('left', 15), label: 'Previous week', attrs: { 'data-at': 'wk', 'data-d': -7 } })}<b>${span(days[0], days[6])}</b>${UI.ib({ icon: ic('right', 15), label: 'Next week', attrs: { 'data-at': 'wk', 'data-d': 7 } })}</span>`
+      + UI.btn({ label: ch ? `Publish ${ch} change${ch === 1 ? '' : 's'}` : 'Publish', kind: 'primary', disabled: !ch, attrs: { 'data-at': 'pub' } });
+    return UI.ptitle({ title: 'Roster', sub: 'Who works which shift. Click a day to change it; people are told when you publish.', tools })
+      + `<div class="to-page"><div class="ms-xscroll ms-xfade"><div class="at-roster"><span class="h">Person</span>${days.map(s => `<span class="h${s === TODAY ? ' today' : ''}">${DOW[D(s).getDay()]} ${D(s).getDate()}</span>`).join('')}
+        ${PPL.map(p => `<span class="p">${av(p.n, 'xs')}<b>${esc(p.n)}</b></span>${days.map(s => cell(p, s)).join('')}`).join('')}</div></div>
+        <div class="to-legend"><span><i class="at-lg sh"></i>Shift</span><span><i class="at-lg ch"></i>Changed, not published</span><span><i class="at-lg leave"></i>Leave</span><span><i class="at-lg off"></i>Off</span></div></div>`; }
+  const mapSVG = l => `<svg viewBox="0 0 240 120" aria-hidden="true"><defs><pattern id="atg-${l.id}" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" class="gr"/></pattern></defs><rect width="240" height="120" fill="url(#atg-${l.id})"/>
+    <path class="rd" d="M0 78 C60 70 90 96 150 84 S220 60 240 64"/><path class="rd" d="M96 0 C100 40 110 80 104 120"/><circle class="zn" cx="120" cy="58" r="${Math.min(46, 14 + l.r / 10)}"/><circle class="pt" cx="120" cy="58" r="5"/></svg>`;
+  function locations(){
+    const rule = (l, v) => `<li><span>${l}</span><b>${v}</b></li>`;
+    return UI.ptitle({ title: 'Locations', sub: 'Where people can check in from their phones', tools: UI.btn({ label: 'Add location', kind: 'primary', icon: ic('plus', 15), attrs: { 'data-at': 'loc-ed', 'data-id': '' } }) })
+      + `<div class="to-page"><div class="to-tgrid">${LOCS.map(l => `<div class="to-tc${S.hl === l.id ? ' to-flash' : ''}">${l.remote ? `<div class="at-map home">${ic('home', 28)}</div>` : `<div class="at-map">${mapSVG(l)}</div>`}<div class="hd">${UI.tile(ic(l.remote ? 'home' : 'mappin', 16), l.remote ? 'info' : 'ok')}<b>${esc(l.n)}</b>${UI.btn({ label: 'Edit', size: 'sm', attrs: { 'data-at': 'loc-ed', 'data-id': l.id } })}</div><ul>
+        ${rule('Address', esc(l.a))}${l.remote ? rule('Needs', 'The manager’s OK each day') : rule('Check-in radius', far(l.r))}${rule('Checked in today', `${PPL.filter(p => { const r = DAYS[key(p.n, TODAY)]; return r && r.p.length && r.loc === l.id; }).length}`)}</ul></div>`).join('')}</div></div>`; }
+  function report(){
+    const q = S.q.toLowerCase(), [y, m] = S.rm.split('-').map(Number);
+    const cols = [{ label: 'Person', w: 'minmax(200px,1.6fr)' }, { label: 'Department', w: 'minmax(120px,1fr)' }, ...['Present', 'Late', 'Missing', 'Leave', 'Remote', 'Hours', 'Overtime'].map(l => ({ label: l, num: true, w: 'minmax(80px,.7fr)' }))];
+    const tools = `<span class="to-mnav">${UI.ib({ icon: ic('left', 15), label: 'Previous month', attrs: { 'data-at': 'rm', 'data-d': -1 } })}<b>${MONL[m - 1]} ${y}</b>${UI.ib({ icon: ic('right', 15), label: 'Next month', disabled: S.rm >= TODAY.slice(0, 7), attrs: { 'data-at': 'rm', 'data-d': 1 } })}</span>`
+      + UI.search({ placeholder: 'Search people', value: S.q, attrs: { 'data-atq': 'q' } }) + UI.btn({ label: 'Export', icon: ic('upfile', 15), attrs: { 'data-at': 'stub', 'data-s': `${MONL[m - 1]} attendance exported to Excel` } });
+    return UI.ptitle({ title: 'Report', sub: `${MONL[m - 1]} ${y} · days up to today · ${PPL.length} people`, tools })
+      + '<div class="ms-xscroll ms-xfade">' + UI.table({ flat: true, cols, empty: 'Nobody matches this search.', rows: PPL.map(p => { const r = monthOf(p.n, S.rm), bad = r.miss + r.abs;
+        return { id: p.n, q: (p.n + ' ' + p.dep).toLowerCase(), hidden: !!q && !(p.n + ' ' + p.dep).toLowerCase().includes(q),
+          cells: [`<span class="ms-tmain">${av(p.n, 'xs')}<b>${esc(p.n)}</b></span>`, esc(p.dep), String(r.present), r.late ? UI.tag(String(r.late), 'warn') : '0', bad ? UI.tag(String(bad), 'bad') : '0', String(r.leave), String(r.remote), dur(r.hours), dur(r.ot)] }; }) }) + '</div>'; }
+
+  const prevHTML = appHTML;
+  appHTML = function (s, a) {
+    if (a.id !== 'att') return prevHTML(s, a);
+    const page = APPX.pageOf(a) || 'Today';
+    const body = { Today: today, History: history, Team: team, Approvals: approvals, Shifts: shifts, Roster: roster, Locations: locations, Report: report }[page] || today;
+    return `<div class="ms-apage" data-apapp="att" data-at-page="${esc(page)}">${APPX.bar(a)}${body()}</div>`;
+  };
+
+  /* ---------- dialogs ---------- */
+  function dayFlow(s){
+    const i = info(ME, s), api = dialog(dayName(s)), c = corrOf(ME, s);
+    const note = i.st === 'miss' ? warnHTML(`Checked in at ${hm(i.first.t)} with no check-out. The system closed the day at ${hm(i.last.t)}, the end of your shift.`, 1)
+      : i.st === 'abs' ? warnHTML('Nothing was recorded on this working day. If you worked, ask for a correction.', 1)
+      : i.st === 'late' ? warnHTML(`You were ${dur(i.late)} late. Your shift starts at ${hm(i.sh.start)}.`) : i.ot >= 15 ? `<div class="to-warn ok">${ic('check', 14)}<span>You worked ${dur(i.ot)} of overtime.</span></div>` : '';
+    const can = s < TODAY && ['ok', 'late', 'miss', 'abs'].includes(i.st) && !(c && c.status === 'Pending');
+    api.set(head(dayName(s), i.st === 'miss' ? 'Missing check-out' : i.c ? `${dur(i.c.w)} worked${i.c.b ? ` · ${dur(i.c.b)} break` : ''}` : i.label)
+      + `<div class="to-body">${note ? `<div class="to-sum">${note}</div>` : ''}${i.rec ? timeline(i.rec.p, s === TODAY && stateOf(ME) !== 'out' ? NOW() : null) + punches(i.rec.p) : ''}
+        ${c ? `<div class="to-sum"><div class="r"><span>Correction</span><b>${esc(KINDS[c.kind])}${c.t != null ? ' · ' + hm(c.t) : ''}</b></div><div class="r"><span>Status</span><b>${c.status === 'Pending' ? UI.tag(`Waiting for ${c.by}`, 'warn') : c.status === 'Approved' ? UI.tag(`Approved by ${c.by}`, 'ok') : UI.tag('Declined', 'bad')}</b></div>${c.no ? `<div class="r"><span>Why</span><b>${esc(c.no)}</b></div>` : ''}</div>` : ''}</div>`
+      + foot('', can && (i.st === 'miss' || i.st === 'abs') ? xb('Done', 'close') + xb('Request correction', 'fix', 'primary') : (can ? xb('Request correction', 'fix') : '') + xb('Done', 'close', 'primary')));
+    api.on = { fix(){ api.close(); setTimeout(() => corrFlow(s), 280); } };
+  }
+  function corrFlow(s){
+    const i = info(ME, s), api = dialog('Request correction'), st = { kind: i.st === 'miss' ? 'out' : i.st === 'abs' ? 'miss' : i.st === 'late' ? 'in' : 'out', t: i.st === 'miss' ? i.sh.end : i.st === 'abs' ? i.sh.start : i.sh.start, why: '' };
+    const draw = () => api.set(head(`Correction for ${dayName(s)}`, i.st === 'miss' ? `Check-in at ${hm(i.first.t)} has no check-out.` : i.st === 'abs' ? 'Nothing was recorded on this day.' : 'Tell your manager what should change.')
+      + `<div class="to-body">${UI.optcards('at-kind', [['out', 'Missing check-out', 'checkout'], ['in', 'Wrong check-in time', 'checkin'], ['miss', 'Missing check-in', 'checkin'], ['remote', 'I worked remotely', 'home']].map(([v, t, icn]) => ({ icon: ic(icn, 18), title: t, v, on: v === st.kind })), 'What needs fixing')}
+        ${st.kind === 'remote' ? '' : UI.field({ label: st.kind === 'out' ? 'When you checked out' : 'When you checked in', type: 'time', value: toHHMM(st.t), attrs: { 'data-f': 't' } })}
+        ${UI.field({ label: 'Reason', type: 'textarea', placeholder: 'e.g. My phone died at the gate', value: st.why, attrs: { 'data-f': 'why' } })}
+        <div class="to-sum"><div class="r"><span>Goes to</span><b>${esc(BOSS)} · usually within a day</b></div></div></div>`
+      + foot('', xb('Cancel', 'close') + xb('Send to your manager', 'send', 'primary', !st.why.trim(), ic('send', 15))));
+    api.on = { change(t){ if (t.name === 'at-kind') { st.kind = t.value; draw(); } },
+      input(t){ if (t.dataset.f === 't') st.t = toMin(t.value || '00:00'); if (t.dataset.f === 'why') { st.why = t.value; const b = api.d.querySelector('[data-x=send]'); st.why.trim() ? b.removeAttribute('aria-disabled') : b.setAttribute('aria-disabled', 'true'); } },
+      send(){ if (!st.why.trim()) return; sendCorr(s, st.kind, st.t, st.why.trim()); api.close(); flash(s); redraw(); toast(`Sent to ${BOSS}. The day updates once it’s approved.`); } };
+    draw();
+  }
+  function shiftFlow(id){
+    const s0 = id ? SH(id) : { id: 'new' + Date.now(), name: '', start: 480, end: 990, grace: 5, brk: 30, half: 240, tone: 'info', ic: 'clock' }, api = dialog(s0.name || 'New shift'), st = Object.assign({}, s0);
+    const draw = () => api.set(head(id ? `Edit ${s0.name}` : 'New shift', 'Changes apply from tomorrow.')
+      + `<div class="to-body">${UI.field({ label: 'Name', value: st.name, placeholder: 'e.g. Night', attrs: { 'data-f': 'name' } })}
+        <div class="to-row2">${UI.field({ label: 'Starts', type: 'time', value: toHHMM(st.start), attrs: { 'data-f': 'start' } })}${UI.field({ label: 'Ends', type: 'time', value: toHHMM(st.end), attrs: { 'data-f': 'end' } })}</div>
+        <div class="to-row2">${UI.field({ label: 'Grace (minutes)', type: 'number', value: st.grace, help: 'Late after this', attrs: { 'data-f': 'grace', min: 0 } })}${UI.field({ label: 'Break (minutes)', type: 'number', value: st.brk, attrs: { 'data-f': 'brk', min: 0 } })}</div></div>`
+      + foot('', xb('Cancel', 'close') + xb(id ? 'Save' : 'Add shift', 'save', 'primary', !st.name.trim())));
+    api.on = { input(x){ const f = x.dataset.f; if (!f) return; st[f] = x.type === 'time' ? toMin(x.value || '00:00') : x.type === 'number' ? +x.value || 0 : x.value;
+        if (f === 'name') { const b = api.d.querySelector('[data-x=save]'); st.name.trim() ? b.removeAttribute('aria-disabled') : b.setAttribute('aria-disabled', 'true'); } },
+      save(){ if (id) Object.assign(s0, st); else SHIFTS.push(st); api.close(); flash(st.id); redraw(); toast(id ? `${st.name} saved` : `${st.name} added`); } };
+    draw();
+  }
+  function locFlow(id){
+    const l0 = id ? LOC(id) : { id: 'l' + Date.now(), n: '', a: '', r: 200, dist: 5000 }, api = dialog(l0.n || 'Add location'), st = Object.assign({}, l0);
+    const draw = () => api.set(head(id ? `Edit ${l0.n}` : 'Add location', l0.remote ? 'Remote days need the manager’s OK.' : 'People can check in inside the circle.')
+      + `<div class="to-body">${UI.field({ label: 'Name', value: st.n, placeholder: 'e.g. Basra warehouse', attrs: { 'data-f': 'n' } })}${UI.field({ label: 'Address', value: st.a, placeholder: 'Street and city', attrs: { 'data-f': 'a' } })}
+        ${l0.remote ? '' : UI.field({ label: 'Check-in radius (metres)', type: 'number', value: st.r, help: 'Big enough for the whole building and its car park', attrs: { 'data-f': 'r', min: 50, step: 50 } })}</div>`
+      + foot('', xb('Cancel', 'close') + xb(id ? 'Save' : 'Add location', 'save', 'primary', !st.n.trim())));
+    api.on = { input(x){ const f = x.dataset.f; if (!f) return; st[f] = f === 'r' ? +x.value || 0 : x.value; if (f === 'n') { const b = api.d.querySelector('[data-x=save]'); st.n.trim() ? b.removeAttribute('aria-disabled') : b.setAttribute('aria-disabled', 'true'); } },
+      save(){ if (id) Object.assign(l0, st); else LOCS.splice(LOCS.length - 1, 0, st); api.close(); flash(st.id); redraw(); toast(id ? `${st.n} saved` : `${st.n} added`); } };
+    draw();
+  }
+
+  /* ---------- the clock: the hours, the ring and the break timer move without redrawing ---------- */
+  setInterval(() => { const at = document.querySelector('#ws .ms-apage[data-apapp=att] [data-atl=ring]'); if (!at) return; const st = stateOf(ME), c = calc(mine().p, NOW());
+    at.querySelector('svg').outerHTML = ringSVG(c.w, st); const w = at.querySelector('[data-atl=w]'), sub = at.querySelector('[data-atl=sub]'); if (w) w.textContent = dur(c.w); if (sub) sub.innerHTML = ringLine(c.w, st);
+    const b = document.querySelector('#ws .ms-apage[data-apapp=att] [data-atl=brk]'), bs = sorted(mine().p).filter(x => x.k === 'bs').pop(); if (b && bs) b.textContent = dur(NOW() - bs.t); }, 20000);
+
+  /* ---------- clicks ---------- */
+  const IN = '#ws .ms-apage[data-apapp=att]';
+  document.addEventListener('click', ev => {
+    const b = ev.target.closest(`${IN} [data-at]`); if (!b || b.getAttribute('aria-disabled') === 'true' || b.disabled) return; const k = b.dataset.at;
+    if (k === 'nav') return go(+b.dataset.g);
+    if (k === 'in' || k === 'bs' || k === 'be' || k === 'out') { const m = punch(k, k === 'in' ? (LOC(S.loc).remote ? 'Home, remote day' : 'Web, in zone') : k === 'out' ? 'Web, in zone' : k === 'bs' ? 'Break' : 'Back from break'); redraw(); return m && toast(m); }
+    if (k === 'loc') { UI.openMenu(b, LOCS.map(l => ({ label: l.n, v: l.id, on: l.id === S.loc, icon: ic(l.remote ? 'home' : 'mappin', 16) })), { pick: v => { S.loc = v; redraw(); } }); const p = UI.popOpen(); if (p) p.el.style.minWidth = b.offsetWidth + 'px'; return; }
+    if (k === 'day') return dayFlow(b.dataset.d);
+    if (k === 'ask') { S.ask = +b.dataset.q; if (S.ask === 0 && fixable()[0]) return corrFlow(fixable()[0]); const a = document.querySelector(`${IN} .to-ans`); if (a) { a.querySelector('span').innerHTML = ANS[S.ask](); if (a.hidden) { a.hidden = false; if (!(reduce || SET.calm)) a.animate([{ opacity: 0, transform: 'translateY(-4px)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: UI.E }); } } return; }
+    if (k === 'hm' || k === 'rm') { const f = k === 'hm' ? 'hm' : 'rm', [y, m] = S[f].split('-').map(Number); S[f] = iso(new Date(y, m - 1 + +b.dataset.d, 1)).slice(0, 7); return redraw(); }
+    if (k === 'wk') { S.wk = add(S.wk, +b.dataset.d); return redraw(); }
+    if (k === 'nudge') return toast(`${b.dataset.p.split(' ')[0]} got a reminder to check in`);
+    if (k === 'ok' || k === 'dec-go') { const c = CORR.find(x => x.id === b.dataset.id), card = b.closest('.to-ar'); let why = '';
+      if (k === 'dec-go') { const w = card.querySelector('[data-why]'); if (!w.value.trim()) { w.focus(); return toast('Add a short reason, so they know what to change'); } why = w.value.trim(); }
+      decide(c, k === 'ok', why);
+      const fin = () => { flash(c.id); redraw(); toast(k === 'ok' ? `Approved. ${c.who.split(' ')[0]}’s ${dayName(c.d)} is fixed.` : `Declined. ${c.who.split(' ')[0]} sees your reason.`); };
+      if (reduce || SET.calm) return fin(); card.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateX(12px)' }], { duration: 220, easing: 'ease-in', fill: 'forwards' }).onfinish = fin; return; }
+    if (k === 'dec') { const c = b.closest('.to-ar'), w = c.querySelector('.why'); w.hidden = false; c.querySelector('.acts').hidden = true; if (!(reduce || SET.calm)) w.animate([{ opacity: 0, transform: 'translateY(-4px)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: UI.E }); w.querySelector('textarea').focus(); return; }
+    if (k === 'nowhy') { const c = b.closest('.to-ar'); c.querySelector('.why').hidden = true; c.querySelector('.acts').hidden = false; return; }
+    if (k === 'shift') return shiftFlow(b.dataset.id);
+    if (k === 'loc-ed') return locFlow(b.dataset.id);
+    if (k === 'rc') { const p = b.dataset.p, s = b.dataset.d; UI.openMenu(b, [...SHIFTS.map(x => ({ label: `${x.name} · ${shLine(x)}`, v: x.id, on: shiftOn(p, s) === x.id })), { label: 'Day off', v: 'off', on: shiftOn(p, s) === 'off' }],
+      { pick: v => { if (v === (BASE[p] || 'gen')) delete ROST[key(p, s)]; else ROST[key(p, s)] = v; PEND.add(key(p, s)); redraw(); } }); return; }
+    if (k === 'pub') { const n = PEND.size, who = new Set([...PEND].map(x => x.split('|')[0])).size; PEND.clear(); redraw(); toast(`Roster published. ${who} ${who === 1 ? 'person was' : 'people were'} told about ${n} change${n === 1 ? '' : 's'}.`); return; }
+    if (k === 'stub') return toast(b.dataset.s);
+  });
+  document.addEventListener('keydown', ev => { if (ev.key !== 'Enter' && ev.key !== ' ') return; const r = ev.target.closest && ev.target.closest(`${IN} .ms-tr[data-at=day]`); if (r) { ev.preventDefault(); r.click(); } });
+  document.addEventListener('input', ev => { const f = ev.target.closest && ev.target.closest(`${IN} [data-atq]`); if (!f) return; S[f.dataset.atq] = f.value; const q = f.value.toLowerCase();
+    document.querySelectorAll(`${IN} .ms-tr[data-q]`).forEach(r => { r.hidden = !!q && !r.dataset.q.includes(q); }); const n = document.querySelector(`${IN} .ms-tnone`); if (n) n.hidden = !!document.querySelector(`${IN} .ms-tr[data-q]:not([hidden])`); });
+  document.addEventListener('click', ev => { if (ev.target.closest(`${IN} .ms-mnav [data-ap]`)) S.ask = null; }, true);
+})();
+/* ---------- Attendance on phones: a mini app with its own bottom bar (Today · Month · History · Team) ----------
+   The same punches, shifts and corrections as the desktop app (window.ATX from 45-attendance.js), so a check-in on the phone is on the desktop too.
+   Today: your shift, the hours ring, where you're working (a sheet of locations with the distance), one big button (Check in, Check out, End break)
+   and Start break; then the day's timeline, every punch, and the Timesheet assistant. Month: the days coloured by what happened and the month in numbers.
+   History: the missing punch first, then recent days; a day opens as a sheet with its punches and Request correction. Team: corrections to approve
+   and who is in right now. */
+(() => {
+  const A = window.ATX; if (!A || typeof MA_APPS === 'undefined') return;
+  const { TODAY, NOW, hm, dur, toMin, toHHMM, dayName, SH, shiftOn, shLine, LOCS, LOC, far, inZone, DAYS, key, calc, info, stateOf, mine, sorted, KINDS, CORR, fixable, corrOf, monthOf,
+    ringSVG, ringLine, timeline, PTXT, pTag, zoneLine, ANS, ASKQ, S, punch, sendCorr, decide, ME, BOSS, MINE, MONL, DOW, each, add, D, iso } = A;
+  const ic = (n, s = 20) => xi(n, s, 1.4);
+  const tagOf = i => i.st === 'ok' ? mtag(i.c ? dur(i.c.w) : 'On time', 'ok') : i.st === 'late' ? mtag(dur(i.c.w), 'warn') : i.st === 'miss' ? mtag('Missing punch', 'bad') : i.st === 'abs' ? mtag('Not recorded', 'bad') : i.st === 'leave' ? mtag(i.label, 'info') : mtag(i.label || '', '');
+  const plist = (p, open) => `<div class="ms-card flush atm-pl">${sorted(p).map((x, n) => { const [l, c] = pTag(x.k); return `<div><span class="tm">${hm(x.t)}</span><span class="t"><b>${x.k === 'in' && n > 0 ? 'Checked in again' : PTXT[x.k]}</b>${x.s && x.s !== PTXT[x.k] ? `<small>${esc(x.s)}</small>` : ''}</span><i class="at-pt ${c}">${l}</i></div>`; }).join('')}
+    ${open ? `<div class="soon"><span class="tm">Now</span><span class="t"><b>${open}</b></span></div>` : ''}${!p.length ? '<p class="ms-empty">No punches yet today.</p>' : ''}</div>`;
+  const assistant = st => `<h2>Timesheet assistant</h2><div class="ms-card flush tom-ask">${ASKQ.map((q, i) => `<button data-ma="at-ask" data-q="${i}">${ic('spark', 18)}<span>${q}</span>${ic('right', 16)}</button>`).join('')}
+    ${st.ask != null ? `<div class="tom-ans">${UI.av('', '', 'auto sm')}<span>${ANS[st.ask]()}</span></div>` : ''}</div>`;
+  const alert = () => { const f = fixable()[0]; return f ? `<button class="atm-alert" data-ma="at-day" data-d="${f}">${ic('info', 20)}<span><b>${esc(dayName(f))}</b> has a check-in with no check-out. Tap to fix it.</span>${ic('right', 16)}</button>` : ''; };
+  const waiting = () => CORR.filter(c => c.status === 'Pending' && c.by === ME);
+
+  /* Today: the card in the reference's order: shift, ring, where, the button */
+  const nowCard = () => { const r = mine(), st = stateOf(ME), t = NOW(), c = calc(r.p, t), sh = SH(shiftOn(ME, TODAY)), l = LOC(S.loc), ok = inZone(l), bs = sorted(r.p).filter(x => x.k === 'bs').pop();
+    const big = st === 'none' || st === 'out' ? `<button class="ms-btn primary atm-big" data-ma="at-p" data-k="in" ${ok ? '' : 'disabled'}>${ic('checkin', 20)}${st === 'out' ? 'Check in again' : 'Check in'}</button>`
+      : st === 'in' ? `<button class="ms-btn primary atm-big" data-ma="at-p" data-k="out">${ic('checkout', 20)}Check out</button><button class="ms-btn atm-big" data-ma="at-p" data-k="bs">${ic('pause', 20)}Start break</button>`
+      : `<button class="ms-btn primary atm-big" data-ma="at-p" data-k="be">${ic('play', 20)}End break</button>`;
+    return `<div class="atm-dh"><b>Today, ${esc(dayName(TODAY))}</b><span class="${st === 'break' ? 'brk' : ''}">${st === 'none' ? 'Not checked in' : st === 'in' ? `Checked in ${hm(sorted(r.p).find(x => x.k === 'in').t)}` : st === 'break' ? `On break <span data-atl="brk">${dur(t - bs.t)}</span>` : `Checked out ${hm(sorted(r.p).pop().t)}`}</span></div>
+      <div class="ms-card atm-now">${st === 'none' ? `<div class="atm-shift">${ic('info', 18)}<span>${esc(sh.name)} shift starts at ${hm(sh.start)}. Late after ${hm(sh.start + sh.grace)}.</span></div>` : ''}
+        <div class="at-ring atm-ring" data-atl="ring">${ringSVG(c.w, st)}<span class="c"><b data-atl="w">${dur(c.w)}</b><small data-atl="sub">${ringLine(c.w, st)}</small></span></div>
+        ${st === 'none' || st === 'out' ? `<label class="atm-lbl">Where are you working today?</label><button class="atm-loc" data-ma="at-locs">${ic(l.remote ? 'home' : 'mappin', 20)}<b>${esc(l.n)}</b>${ic('chevdn', 18)}</button>` : ''}
+        <p class="atm-zone ${ok ? 'ok' : 'bad'}">${ic(ok ? 'mappin' : 'info', 16)}${esc(zoneLine(l))}</p><div class="atm-acts">${big}</div></div>`; };
+  /* the month of coloured days */
+  const month = m => { const [y, mo] = m.split('-').map(Number), first = new Date(y, mo - 1, 1), start = add(iso(first), -first.getDay()), days = each(start, add(start, 41)).filter((s, i) => i < 35 || D(s).getMonth() === mo - 1);
+    return `<div class="atm-month"><div class="hd"><button class="ms-ib" data-ma="at-m" data-d="-1" aria-label="Previous month">${ic('left', 18)}</button><b>${MONL[mo - 1]} ${y}</b><button class="ms-ib" data-ma="at-m" data-d="1" aria-label="Next month" ${m >= TODAY.slice(0, 7) ? 'disabled' : ''}>${ic('right', 18)}</button></div>
+      <div class="g">${DOW.map(d => `<span>${d[0]}</span>`).join('')}${days.map(s => { if (D(s).getMonth() !== mo - 1) return '<span></span>'; const i = info(ME, s);
+        return `<button class="${s === TODAY ? 'today' : i.st}" ${i.st === 'future' ? 'disabled' : `data-ma="at-day" data-d="${s}"`} aria-label="${esc(dayName(s))}${i.label ? ', ' + esc(i.label) : ''}">${D(s).getDate()}</button>`; }).join('')}</div>
+      <div class="tom-legend"><span><i class="ok"></i>Present</span><span><i class="late"></i>Late</span><span><i class="miss"></i>Not recorded</span><span><i class="leave"></i>Leave</span><span><i class="off"></i>Holiday</span></div></div>`; };
+  /* a day: the note, its punches, and Request correction */
+  const daySheet = s => { const i = info(ME, s), c = corrOf(ME, s), can = s < TODAY && ['ok', 'late', 'miss', 'abs'].includes(i.st) && !(c && c.status === 'Pending');
+    const note = i.st === 'miss' ? `<p class="atm-note bad">Check-in at ${hm(i.first.t)} has no check-out. The system closed the day at ${hm(i.last.t)}.</p>` : i.st === 'abs' ? '<p class="atm-note bad">Nothing was recorded on this working day.</p>'
+      : i.st === 'late' ? `<p class="atm-note warn">You were ${dur(i.late)} late.</p>` : i.ot >= 15 ? `<p class="atm-note ok">You worked +${dur(i.ot)} overtime.</p>` : '';
+    return `<div class="atm-sh"><p class="m-lbl">${esc(dayName(s))}</p><span>${i.c && i.st !== 'miss' ? dur(i.c.w) : ''}</span></div>${note}
+      ${i.rec ? `<div class="ms-card atm-tlc">${timeline(i.rec.p, s === TODAY && stateOf(ME) !== 'out' ? NOW() : null)}</div>${plist(i.rec.p)}` : `<p class="tom-hint">${esc(i.label)}</p>`}
+      ${c ? `<div class="tom-sum"><div><span>Correction</span><b>${esc(KINDS[c.kind])}${c.t != null ? ' · ' + hm(c.t) : ''}</b></div><div><span>Status</span><b>${c.status === 'Pending' ? `Waiting for ${esc(c.by)}` : c.status}</b></div></div>` : ''}
+      ${can ? `<button class="ms-btn primary tom-wide m-mt" data-ma="at-fix" data-d="${s}">Request correction</button>` : ''}`; };
+  const corrSheet = st => { const q = st.c, i = info(ME, q.d);
+    return `<p class="m-lbl">Correction for ${esc(dayName(q.d))}</p><p class="tom-hint">${i.st === 'miss' ? `Check-in at ${hm(i.first.t)} has no matching check-out.` : i.st === 'abs' ? 'Nothing was recorded on this day.' : 'Tell your manager what should change.'}</p>
+      <p class="m-lbl m-mt">What needs fixing</p><div class="atm-kinds">${[['out', 'Missing check-out', 'checkout'], ['in', 'Wrong check-in', 'checkin'], ['miss', 'Missing check-in', 'checkin'], ['remote', 'Worked remotely', 'home']].map(([v, t, n]) => `<button class="tom-tc" data-ma="at-kind" data-k="${v}" aria-pressed="${q.kind === v}"><span class="tom-ic">${ic(n, 20)}</span><b>${t}</b></button>`).join('')}</div>
+      ${q.kind === 'remote' ? '' : `<label class="ms-field m-mt"><span>${q.kind === 'out' ? 'When you checked out' : 'When you checked in'}</span><input class="ms-input" type="time" data-at-t value="${toHHMM(q.t)}"></label>`}
+      <label class="ms-field m-mt"><span>Reason</span><textarea class="ms-input" data-at-why rows="2" placeholder="e.g. Left from the site, forgot to tap out">${esc(q.why || '')}</textarea></label>
+      <div class="m-row2 m-mt"><button class="ms-btn" data-ma="shut">Cancel</button><button class="ms-btn primary" data-ma="at-send">Send to ${esc(BOSS.split(' ')[0])}</button></div>`; };
+  const locSheet = () => `<p class="m-lbl">Where are you working today?</p><div class="ms-card flush">${LOCS.map(l => `<button class="tom-row" data-ma="at-loc" data-lid="${l.id}" aria-pressed="${S.loc === l.id}"><span class="tom-ic">${ic(l.remote ? 'home' : 'mappin', 20)}</span><span class="t"><b>${esc(l.n)}</b><small>${l.remote ? `Needs ${esc(BOSS.split(' ')[0])}’s OK` : inZone(l) ? `You’re here · ${far(l.dist)} away` : `${far(l.dist)} away`}</small></span>${S.loc === l.id ? `<span class="atm-on">${ic('check', 18)}</span>` : ''}</button>`).join('')}</div>`;
+
+  MA_APPS.att = {
+    tabs: [['today', 'Today', 'clock'], ['month', 'Month', 'cal'], ['hist', 'History', 'list'], ['team', 'Team', 'users', 1]],
+    init: () => ({ m: TODAY.slice(0, 7), ask: null }),
+    badge: (st, t) => t === 'team' ? waiting().length : t === 'hist' ? fixable().length : 0,
+    view: {
+      today: st => { const r = mine(), s = stateOf(ME);
+        return `${mhead('Attendance', 'Check in, take a break, check out')}${alert()}${nowCard()}
+          <h2>Today’s punches</h2><div class="ms-card atm-tlc">${timeline(r.p, s === 'out' ? null : NOW())}</div>${plist(r.p, s === 'in' ? 'Working' : s === 'break' ? 'On break' : '')}${assistant(st)}`; },
+      month: st => { const m = monthOf(ME, st.m);
+        return `${mhead('Month', 'Your days at a glance')}<div class="ms-card">${month(st.m)}</div>
+          <h2>Summary</h2><div class="ms-card flush">${[['brief', 'Present', `${m.present} day${m.present === 1 ? '' : 's'}`], ['globe', 'Leave', `${m.leave} day${m.leave === 1 ? '' : 's'}`], ['plus', 'Overtime banked', dur(m.ot)], ['clock', 'Late arrivals', `${m.late}`], ['info', 'Missing punches', `${m.miss + m.abs}`]].map(([n, a, b]) => `<div class="tom-row"><span class="tom-ic">${ic(n, 20)}</span><span class="t"><b>${a}</b></span><span class="v">${b}</span></div>`).join('')}</div>${assistant(st)}`; },
+      hist: st => { const L = each(add(TODAY, -21), add(TODAY, -1)).reverse().map(s => ({ s, i: info(ME, s) })).filter(x => x.i.st !== 'off');
+        return `${mhead('History', 'Recent days')}${alert()}<div class="ms-card flush m-mt">${L.map(({ s, i }) => `<button class="tom-row" data-ma="at-day" data-d="${s}"><span class="t"><b>${esc(dayName(s))}</b><small>${i.first ? `${hm(i.first.t)} → ${i.st === 'miss' ? 'closed by the system' : i.last ? hm(i.last.t) : ''}` : esc(i.label)}</small></span>${tagOf(i)}</button>`).join('')}</div>`; },
+      team: st => { const W = waiting(), tm = MINE.map(n => ({ n, i: info(n, TODAY), s: stateOf(n), r: DAYS[key(n, TODAY)] }));
+        const line = x => { const f = x.r && sorted(x.r.p).find(p => p.k === 'in'); return x.s === 'none' ? (x.i.label === 'Not checked in' ? `${x.i.sh.name} shift from ${hm(x.i.sh.start)}` : x.i.label) : x.s === 'break' ? `In ${hm(f.t)} · on break` : `In ${hm(f.t)}${x.i.remote ? ' · from home' : ''}`; };
+        const tg = x => x.s === 'break' ? mtag('On break', 'warn') : x.s === 'in' ? (x.i.remote ? mtag('Remote', 'info') : x.i.st === 'late' ? mtag('Late', 'warn') : mtag('In', 'ok')) : x.s === 'out' ? mtag('Out', '') : x.i.st === 'none' && x.i.late ? mtag('Not in yet', 'bad') : x.i.st === 'wait' ? mtag('Off', 'warn') : mtag('Off', '');
+        return `${mhead('Team', `${tm.filter(x => x.s === 'in' || x.s === 'break').length} of ${tm.length} in · ${W.length ? `${W.length} waiting on you` : 'nothing waiting'}`)}
+          ${W.length ? `<div class="m-appr">${W.map(c => { const i = info(c.who, c.d); return `<div class="m-ap"><div class="top">${mav(c.who, 40)}<span><b>${esc(c.who)}</b><small>${esc(KINDS[c.kind])} · ${esc(dayName(c.d))}</small></span></div>
+            <p><b class="when">${c.kind === 'remote' ? 'Count it as a remote day' : `${c.kind === 'out' ? 'Check-out' : 'Check-in'} at ${hm(c.t)}`}</b>${esc(c.why)}</p><div class="tom-meta">${mtag(i.first ? `Checked in ${hm(i.first.t)}` : 'Nothing recorded', '')}${i.st === 'miss' ? mtag('Closed by the system', 'bad') : i.last ? mtag(`Out ${hm(i.last.t)}`, '') : ''}</div>
+            <div class="m-row2"><button class="ms-btn" data-ma="at-dec" data-cid="${c.id}">Decline</button><button class="ms-btn primary" data-ma="at-ok" data-cid="${c.id}">Approve</button></div></div>`; }).join('')}</div>` : ''}
+          <h2>Right now</h2><div class="ms-card flush">${tm.map(x => `<button class="tom-row" data-ma="${x.s === 'none' && x.i.st === 'none' && x.i.late ? 'at-nudge' : 'toast'}" data-p="${esc(x.n)}" data-t="${esc(x.n.split(' ')[0])}: ${esc(line(x))}">${mav(x.n, 40)}<span class="t"><b>${esc(x.n)}</b><small>${esc(line(x))}</small></span>${tg(x)}</button>`).join('')}</div>`; } },
+    act: (st, k, b) => { const redoC = () => { mobSheet(corrSheet(st)); return false; };
+      if (k === 'at-p') { const m = punch(b.dataset.k, b.dataset.k === 'in' ? (LOC(S.loc).remote ? 'Home, remote day' : 'Mobile, in zone') : b.dataset.k === 'out' ? 'Mobile, in zone' : b.dataset.k === 'bs' ? 'Break' : 'Back from break'); if (m) toast(m); return; }
+      if (k === 'at-locs') { mobSheet(locSheet()); return false; }
+      if (k === 'at-loc') { S.loc = b.dataset.lid; mobSheet(null); return; }
+      if (k === 'at-day') { mobSheet(daySheet(b.dataset.d)); return false; }
+      if (k === 'at-fix') { const d = b.dataset.d, i = info(ME, d); st.c = { d, kind: i.st === 'miss' ? 'out' : i.st === 'abs' ? 'miss' : 'in', t: i.st === 'miss' ? i.sh.end : i.sh.start, why: '' }; return redoC(); }
+      if (k === 'at-kind') { st.c.kind = b.dataset.k; return redoC(); }
+      if (k === 'at-send') { const q = st.c; if (!q || !(q.why || '').trim()) { toast('Add a short reason'); const w = $('#mSheet [data-at-why]'); if (w) w.focus(); return false; } sendCorr(q.d, q.kind, q.t, q.why.trim()); st.c = null; mobSheet(null); toast(`Sent to ${BOSS}`); return; }
+      if (k === 'at-ask') { st.ask = +b.dataset.q; if (st.ask === 0 && fixable()[0]) { const d = fixable()[0], i = info(ME, d); st.c = { d, kind: 'out', t: i.sh.end, why: '' }; return redoC(); } return; }
+      if (k === 'at-m') { const [y, m] = st.m.split('-').map(Number); st.m = iso(new Date(y, m - 1 + +b.dataset.d, 1)).slice(0, 7); return; }
+      if (k === 'at-nudge') { toast(`${b.dataset.p.split(' ')[0]} got a reminder to check in`); return false; }
+      const c = b.dataset.cid && CORR.find(x => x.id === b.dataset.cid);
+      if (k === 'at-ok' && c) { decide(c, true); toast(`Approved: ${c.who.split(' ')[0]}’s ${dayName(c.d)} is fixed`); return; }
+      if (k === 'at-dec' && c) { mobSheet(`<p class="m-lbl">Decline ${esc(c.who.split(' ')[0])}’s correction</p><p class="tom-hint">${esc(KINDS[c.kind])} · ${esc(dayName(c.d))}</p><label class="ms-field m-mt"><span>Why?</span><textarea class="ms-input" data-at-no rows="3" placeholder="${esc(c.who.split(' ')[0])} will see this"></textarea></label><div class="m-row2 m-mt"><button class="ms-btn" data-ma="shut">Back</button><button class="ms-btn danger" data-ma="at-dec-go" data-cid="${c.id}">Decline</button></div>`); return false; }
+      if (k === 'at-dec-go' && c) { const w = $('#mSheet [data-at-no]'); if (!w || !w.value.trim()) { toast('Add a short reason'); if (w) w.focus(); return false; } decide(c, false, w.value.trim()); mobSheet(null); toast(`Declined: ${c.who.split(' ')[0]} sees your reason`); return; }
+      return false; } };
+  /* the correction's time and reason */
+  document.addEventListener('input', e => { const st = MA.st.att; if (!st || !st.c || !e.target.matches) return; if (e.target.matches('#mSheet [data-at-t]')) st.c.t = toMin(e.target.value || '00:00'); if (e.target.matches('#mSheet [data-at-why]')) st.c.why = e.target.value; });
+  /* the clock: the ring, the hours and the break timer move without redrawing */
+  setInterval(() => { const at = document.querySelector('#ws.mob .m-ma [data-atl=ring]'); if (!at) return; const s = stateOf(ME), c = calc(mine().p, NOW());
+    at.querySelector('svg').outerHTML = ringSVG(c.w, s); at.querySelector('[data-atl=w]').textContent = dur(c.w); at.querySelector('[data-atl=sub]').innerHTML = ringLine(c.w, s);
+    const b = document.querySelector('#ws.mob .m-ma [data-atl=brk]'), bs = sorted(mine().p).filter(x => x.k === 'bs').pop(); if (b && bs) b.textContent = dur(NOW() - bs.t); }, 20000);
 })();
 </script>
 </body>
