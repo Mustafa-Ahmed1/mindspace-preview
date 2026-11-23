@@ -7293,6 +7293,7 @@ body.m-boot>:not(#ws){visibility:hidden}
 /* the Chat tab shows how many chats have unread messages: a red bubble at its icon's top right */
 #ws.mob .m-wcds button>i{position:relative}
 #ws.mob .m-wbadge{position:absolute;top:-6px;left:calc(100% - 8px);min-width:18px;height:18px;padding:0 5px;border-radius:var(--ms-r-pill);display:grid;place-items:center;background:var(--ms-red);color:var(--ms-tip-text);font-style:normal;font-size:var(--ms-fs-tag);font-weight:var(--ms-fw-semibold);line-height:1;box-shadow:0 0 0 2px var(--x-bg)}
+#ws.mob .m-wcds button .m-wbadge{box-shadow:0 0 0 2px color-mix(in srgb,var(--x-line) 40%,var(--x-bg))}   /* the ring matches the tab's card (.m-wcslot) */
 #ws.mob .m-wcds button.on .m-wbadge{box-shadow:0 0 0 2px var(--x-panel)}
 #ws.mob .m-wtray button .m-wbadge{position:static;margin-inline-start:var(--ms-s-1)}
 /* AI: the menu button carries the count of new replies; the chat has a dot in the side menu */
@@ -7489,7 +7490,9 @@ body.theme-light #ws.mob .m-screen,body.theme-light #ws.mob .m-screen>.x-canvas,
 body.theme-light #ws.mob .m-wcind::before{background:radial-gradient(circle at 0 0,transparent 15.5px,var(--m-page) 16px)} /* lint-allow: the tab's curved foot */
 body.theme-light #ws.mob .m-wcind::after{background:radial-gradient(circle at 100% 0,transparent 15.5px,var(--m-page) 16px)} /* lint-allow: the tab's curved foot */
 body.theme-light #ws.mob .m-wcds button.on[data-k=home] svg>path+path,body.theme-light #ws.mob .m-wcds button.on[data-k=chat] svg>path+path{stroke:var(--m-page)}
+body.theme-light #ws.mob .m-wcds button .m-wbadge{box-shadow:0 0 0 2px color-mix(in srgb,var(--x-line) 55%,var(--ms-raise))}   /* the ring matches the tab's card */
 body.theme-light #ws.mob .m-wcds button.on .m-wbadge{box-shadow:0 0 0 2px var(--m-page)}
+body.theme-light #ws.mob .m-apps .m-anote,body.theme-light #ws.mob .m-fapps .m-anote,body.theme-light #ws.mob .m-aclone .m-anote{box-shadow:0 0 0 2px var(--m-page)}   /* the ring matches the grey page around the app */
 /* the page's own bars take the page grey too: the Chats and Channels header with its search and filters, the AI bar, the Apps header and its search block,
    a conversation's header and composer area; their fades under them fade from the page grey */
 body.theme-light #ws.mob .x-side>.x-sh2,body.theme-light #ws.mob .m-chathead,body.theme-light #ws.mob .m-aibar,body.theme-light #ws.mob .m-apphd,body.theme-light #ws.mob .m-appfold,body.theme-light #ws.mob .x-main{background:var(--m-page)}
