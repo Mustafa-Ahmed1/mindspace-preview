@@ -9786,7 +9786,7 @@ body.theme-light .fz-hero{background:var(--ws-panel)}
 <div class="grain" aria-hidden="true"></div>
 
 <script>
-const MS_BUILT = '26.11.23';
+const MS_BUILT = '26.11.25';
 /* The Mindspace app library in code: builders that return the HTML of each component, and the behaviours that make them move.
    Every screen is built from the same pieces: change a component here (or its CSS) and every app that uses it changes with it.
    Text you pass is escaped. Anything named `html` (and table cells, card bodies) is inserted as it is, so build it from other UI calls.
@@ -18365,7 +18365,8 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-ma]'); if (!b && !card) return;
   e.stopPropagation(); e.preventDefault();
   if (Date.now() - MA.at < 300) return;                                                /* the end of a drag isn't a tap */
-  const k = b ? b.dataset.ma : 'head', win = (b || card).closest('.m-ma'), id = win ? win.dataset.id : (b && b.dataset.id) || MA.open;      /* a sheet's buttons name their app */
+  const k = b ? b.dataset.ma : 'head', win = (b || card).closest('.m-ma'), id = win ? win.dataset.id : (b && b.dataset.id) || MA.last || MA.open;      /* a sheet's buttons name their app, or belong to the app that opened the sheet (a window or a pinned tab) */
+  if (win) MA.last = id;
   if (card && k !== 'close') { MA.open = card.dataset.id; MA.fan = false; return maSync(); }
   if (k === 'scrim') { if (MA.fan) MA.fan = false; else MA.open = null; return maSync(); }
   if (k === 'close') return maClose(id);
@@ -18378,7 +18379,8 @@ document.addEventListener('click', e => {
   if (k === 'mbar-rm') { maBarSet(id, maBarKeys(id).filter(x => x !== b.dataset.k)); return maBarSheet(id, true); }
   if (k === 'mbar-add') { const L = maBarKeys(id); if (L.length >= 3) { toast('The bar has room for 3. Remove one first.'); return; } maBarSet(id, [...L, b.dataset.k]); return maBarSheet(id, true); }
   if (k === 'mp-back') { st.mp = null; return maBody(id, false, -1); }
-  if (k === 'mrow') return mobSheet(maGeneric(a).detail({ rows: st.mrows }, +b.dataset.i));
+  if (k === 'mrow') return mobSheet(maGeneric(a).detail({ rows: st.mrows }, +b.dataset.i).replace('data-ma="x" data-x="ready"', 'data-ma="mrow-ready"'));   /* a More page's rows: Mark ready changes those rows, not the app's own */
+  if (k === 'mrow-ready') { const r = (st.mrows || [])[+b.dataset.i]; if (r) { r[2] = 'Ready'; toast(`${r[0]} is ready`); } mobSheet(null); return maBody(id, true); }
   if (k === 'tab' && b.dataset.t === 'more' && st.tab === 'more' && st.mp) { st.mp = null; return maBody(id, false, -1); }      /* tapping More again goes back to its list */
   if (k === 'tab' || k === 'go') { if (b.dataset.f) st[b.dataset.f] = b.dataset.v; st.tab = b.dataset.t; mobSheet(null); return maBody(id); }
   if (k === 'chip') { st[b.dataset.f] = b.dataset.k; return maBody(id, true); }
@@ -18647,7 +18649,7 @@ MA_APPS.exp = {
 const EXP_IC = { Travel: 'globe', Meals: 'smile', Office: 'brief', Phone: 'phone', Software: 'device' };
 
 /* ---------- every other app: an overview, then one tab for each part of the app ---------- */
-const MA_TAB_IC = [[/report|result|summary|forecast|win|turnover|headcount/i, 'perf', 'stroke'], [/people|candidate|customer|compan|contact|audience|supplier|team|vendor/i, 'users', 1], [/time|schedul|interview|history/i, 'clock'], [/doc|article|librar|note|contract|polic|template|collection/i, 'file'], [/stock|item|asset|device|licen/i, 'db'], [/channel|ticket/i, 'chat']];
+const MA_TAB_IC = [[/report|result|summary|forecast|win|turnover|headcount/i, 'perf', 'stroke'], [/people|candidate|customer|compan|contact|audience|supplier|team|vendor/i, 'users', 1], [/time|schedul|interview|history/i, 'clock'], [/doc|article|librar|note|contract|polic|template|collection/i, 'file'], [/stock|item|asset|device|licen/i, 'db', 'stroke'],   /* the database icon has no solid form: it stays an outline when its tab is open */ [/channel|ticket/i, 'chat']];
 const maGenCache = {};
 function maGeneric(a){
   if (maGenCache[a.id]) return maGenCache[a.id];
@@ -22041,10 +22043,21 @@ lwRender();
       + UI.treetable({ title: 'Account', cols: ['Balance (IQD)'], rows, attrs: { 'data-erp-fin': '' } });
   }
 
+  /* Home: the dashboard's figures and list come from these invoices (in IQD), not the old placeholder.
+     The stat rows are changed in place: the dashboard's widgets keep a hold of these same arrays. */
+  A.title = 'Accounting'; A.sub = 'Invoices, the ledger and the reports, in IQD.';
+  A.cols = ['Invoice', 'Customer', 'Status', 'Total (IQD)']; A.tt = 'Latest invoices';
+  A.stats = [['Unpaid', '', ''], ['Overdue', '', ''], ['Paid', '', '']];
+  const homeSync = () => { const sum = L => money(L.reduce((t, x) => t + total(x), 0)).replace(/\.00$/, ''), by = st => INV.filter(x => x.status === st), n = L => `${L.length} invoice${L.length === 1 ? '' : 's'}`;
+    [['Unpaid', 'Unpaid'], ['Overdue', 'Overdue'], ['Paid', 'Paid']].forEach(([st], i) => { const L = by(st); A.stats[i][1] = `IQD ${sum(L)}`; A.stats[i][2] = L.length ? n(L) : 'None'; });
+    A.rows = [...INV].sort((a, b) => a.date < b.date ? 1 : -1).map(x => [x.id, x.customer, x.status, money(total(x)).replace(/\.00$/, '')]);
+    (X.aRows = X.aRows || {}).acc = A.rows.map(r => r.slice()); };
+  homeSync();
+
   const prevHTML = appHTML;
   appHTML = function (s, a) {
     if (a.id !== 'acc') return prevHTML(s, a);
-    const page = APPX.pageOf(a); if (!page) return prevHTML(s, a);
+    const page = APPX.pageOf(a); if (!page) { homeSync(); return prevHTML(s, a); }
     const key = (X.an || []).join(); if (key !== E.key) { E.key = key; E.cur = null; }
     const body = page === 'General ledger' ? glPage() : page === 'Trial balance' ? tbPage() : page === 'Chart of accounts' ? coaPage() : E.cur ? formPage() : listPage();
     return `<div class="ms-apage" data-apapp="acc" data-erp-page="${esc(page)}">${APPX.bar(a)}${body}</div>`;
@@ -22232,7 +22245,7 @@ const LX_KIND = { me: 'Personal', swibit: 'Product company', najaf: 'Constructio
       ['API gateway', ['API identities']],
       ['Configuration', ['RMS settings', 'Payment plans', 'Payment plan assignments', 'Bank loans', 'Tranche names', 'Discount templates', 'Statuses', 'Features', 'Unit types', 'Finishes', 'Delivery periods', 'Lead sources', 'Notifications']]],
     stats: [['Waiting on operations', '9', 'Reservations to approve'], ['Reservations', '1,055', '24 new this week'], ['Available units', '1,412', 'Of 2,826 units']],
-    tt: 'Reservations', cols: ['Reservation', 'Project', 'Status', 'Amount'], rows: [['RES/2026/132-2709', 'Budoor Elite', 'In progress', '723,853,858'], ['RES/2026/183-2708', 'Budoor Elite', 'In progress', '810,075,000'], ['RSV-2026-00014', 'Budoor Al-Najaf', 'Ready', '382,252,500']] };
+    tt: 'Reservations', cols: ['Reservation', 'Project', 'Status', 'Amount'], rows: [['RES/2026/132-2709', 'Budoor Elite', 'Operations pending', '723,853,858'], ['RES/2026/183-2708', 'Budoor Elite', 'Operations pending', '810,075,000'], ['RES/2026/097-2707', 'Budoor Al-Najaf', 'Confirmed', '382,252,500']] };   /* one id format and RMS's own status words (the phone's generic page shows these) */
   APPS.push(A);
 
   /* ---------- test data ---------- */
@@ -22525,6 +22538,10 @@ const LX_KIND = { me: 'Personal', swibit: 'Product company', najaf: 'Constructio
   const SETTINGS = { ws: false, user: false, emp: false, inv: true };
 
   /* ---------- derived numbers ---------- */
+  /* the phone's generic Projects page (29-mobile-miniapps.js: maGeneric) reads the app's stats and rows: give it these projects, not the old placeholder */
+  { const open = PROJ.filter(p => p.status === 'Open'), tasks = TASK.filter(t => !t.group && !['Completed', 'Cancelled', 'Template'].includes(t.status)), late = tasks.filter(t => t.to && dn(t.to) < dn(TODAY));
+    Object.assign(A, { stats: [['Open projects', String(open.length), `of ${PROJ.length} projects`], ['Tasks not completed', String(tasks.length), `${late.length} overdue`], ['Completed projects', String(PROJ.filter(p => p.status === 'Completed').length), 'this year']],
+      tt: 'Open projects', cols: ['Project', 'Department', 'Status', 'Ends'], rows: open.slice(0, 8).map(p => [p.name, p.dept, p.status, fd(p.end)]) }); }
   const P = id => PROJ.find(p => p.id === id), T = id => TASK.find(t => t.id === id);
   const live = t => t.status !== 'Cancelled' && t.status !== 'Template';
   const tStatus = t => !['Completed', 'Cancelled', 'Template'].includes(t.status) && t.to && dn(t.to) < dn(TODAY) ? 'Overdue' : t.status;
